@@ -1,6 +1,13 @@
-import { sqliteTable, text, integer, real, primaryKey } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, real, blob, primaryKey } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
-// --- Tables ---
+
+export const users = sqliteTable('users', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  email: text('email').unique().notNull(),
+  password: text('password').notNull(),
+  name: text('name'),
+  createdAt: text('created_at').$defaultFn(() => new Date().toISOString()),
+});
 
 export const games = sqliteTable('games', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -23,6 +30,15 @@ export const games = sqliteTable('games', {
   metaProgression: integer('meta_progression', { mode: 'boolean' }).notNull(),
   steamDeckVerified: integer('steam_deck_verified', { mode: 'boolean' }).notNull(),
   rating: real('rating').notNull(),
+  headerBlob: blob('header_blob', { mode: 'buffer' }),
+  heroBlob: blob('hero_blob', { mode: 'buffer' }),
+  logoBlob: blob('logo_blob', { mode: 'buffer' }),
+  releaseDate: text('release_date'),
+  developer: text('developer'),
+  publisher: text('publisher'),
+  achievementsCount: integer('achievements_count'),
+  websiteUrl: text('website_url'),
+  supportEmail: text('support_email'),
 });
 
 export const tags = sqliteTable('tags', {
@@ -30,7 +46,6 @@ export const tags = sqliteTable('tags', {
   name: text('name').unique().notNull(),
 });
 
-// Explicit Many-to-Many table for Games <-> Tags
 export const gamesToTags = sqliteTable('games_to_tags', {
   gameId: text('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
   tagId: integer('tag_id').notNull().references(() => tags.id, { onDelete: 'cascade' }),
@@ -41,6 +56,7 @@ export const gamesToTags = sqliteTable('games_to_tags', {
 export const reviews = sqliteTable('reviews', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   user: text('user').notNull(),
+  userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }),
   rating: integer('rating').notNull(),
   comment: text('comment').notNull(),
   date: text('date').notNull(),
@@ -72,7 +88,6 @@ export const gameImages = sqliteTable('game_images', {
   gameId: text('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
 });
 
-// Join table for "Similar Games" (Self-reference)
 export const similarGames = sqliteTable('similar_games', {
   gameId: text('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
   similarGameId: text('similar_game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
@@ -80,7 +95,19 @@ export const similarGames = sqliteTable('similar_games', {
   pk: primaryKey({ columns: [t.gameId, t.similarGameId] }),
 }));
 
-// --- Relations ---
+export const favorites = sqliteTable('favorites', {
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  gameId: text('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
+}, (t) => ({
+  pk: primaryKey({ columns: [t.userId, t.gameId] }),
+}));
+
+export const ownedGames = sqliteTable('owned_games', {
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  gameId: text('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
+}, (t) => ({
+  pk: primaryKey({ columns: [t.userId, t.gameId] }),
+}));
 
 export const gamesRelations = relations(games, ({ many }) => ({
   tags: many(gamesToTags),
@@ -89,6 +116,14 @@ export const gamesRelations = relations(games, ({ many }) => ({
   externalRatings: many(externalRatings),
   gallery: many(gameImages),
   similarGames: many(similarGames, { relationName: 'isSimilarTo' }),
+  favoritedBy: many(favorites),
+  ownedBy: many(ownedGames),
+}));
+
+export const usersRelations = relations(users, ({ many }) => ({
+  favorites: many(favorites),
+  ownedGames: many(ownedGames),
+  reviews: many(reviews),
 }));
 
 export const tagsRelations = relations(tags, ({ many }) => ({
@@ -102,6 +137,7 @@ export const gamesToTagsRelations = relations(gamesToTags, ({ one }) => ({
 
 export const reviewsRelations = relations(reviews, ({ one }) => ({
   game: one(games, { fields: [reviews.gameId], references: [games.id] }),
+  user: one(users, { fields: [reviews.userId], references: [users.id] }),
 }));
 
 export const pricePointsRelations = relations(pricePoints, ({ one }) => ({
@@ -119,4 +155,14 @@ export const gameImagesRelations = relations(gameImages, ({ one }) => ({
 export const similarGamesRelations = relations(similarGames, ({ one }) => ({
   sourceGame: one(games, { fields: [similarGames.gameId], references: [games.id], relationName: 'isSimilarTo' }),
   targetGame: one(games, { fields: [similarGames.similarGameId], references: [games.id] }),
+}));
+
+export const favoritesRelations = relations(favorites, ({ one }) => ({
+  user: one(users, { fields: [favorites.userId], references: [users.id] }),
+  game: one(games, { fields: [favorites.gameId], references: [games.id] }),
+}));
+
+export const ownedGamesRelations = relations(ownedGames, ({ one }) => ({
+  user: one(users, { fields: [ownedGames.userId], references: [users.id] }),
+  game: one(games, { fields: [ownedGames.gameId], references: [games.id] }),
 }));

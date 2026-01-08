@@ -250,16 +250,6 @@ const slugify = (text: string) => text.toLowerCase().replace(/[^\w ]+/g, '').rep
 
 async function main() {
   console.log("Seeding database...");
-  
-  // Clear existing data (order matters for foreign keys)
-  db.delete(similarGames).run();
-  db.delete(gameImages).run();
-  db.delete(externalRatings).run();
-  db.delete(pricePoints).run();
-  db.delete(reviews).run();
-  db.delete(gamesToTags).run();
-  db.delete(tags).run();
-  db.delete(games).run();
 
   for (const gameData of baseGames) {
     const slug = slugify(gameData.title);
