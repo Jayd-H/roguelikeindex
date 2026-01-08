@@ -2,11 +2,14 @@
 
 import Image from "next/image";
 import {
-  GameControllerIcon,
   CheckIcon,
   HeartIcon,
   ListPlusIcon,
   ShareNetworkIcon,
+  GameControllerIcon,
+  CodeIcon,
+  BuildingsIcon,
+  CalendarBlankIcon,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -53,7 +56,7 @@ export function GameHero({
       )}
       <div className="absolute bottom-0 left-0 w-full z-20 pb-8">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
-          <div className="max-w-100 w-full">
+          <div className="max-w-2xl w-full">
             {logoUrl ? (
               <div className="relative h-24 md:h-36 w-auto max-w-100 mb-6 origin-left">
                 <Image
@@ -70,13 +73,8 @@ export function GameHero({
                 {game.title}
               </h1>
             )}
-            <div className="flex flex-wrap gap-2 mb-2">
-              <Badge
-                variant="secondary"
-                className="bg-primary/20 text-primary hover:bg-primary/30 border-none backdrop-blur-md px-3 py-1 text-sm"
-              >
-                {game.subgenre}
-              </Badge>
+
+            <div className="flex flex-wrap gap-2 mb-3">
               {game.steamDeckVerified && (
                 <Badge
                   variant="outline"
@@ -94,7 +92,29 @@ export function GameHero({
                 </Badge>
               )}
             </div>
+
+            <div className="flex flex-wrap gap-x-6 gap-y-2 py-2 text-sm text-white/80 font-medium">
+              {game.developer && (
+                <div className="flex items-center gap-2">
+                  <CodeIcon size={18} className="text-primary" />
+                  {game.developer}
+                </div>
+              )}
+              {game.publisher && (
+                <div className="flex items-center gap-2">
+                  <BuildingsIcon size={18} className="text-primary" />
+                  {game.publisher}
+                </div>
+              )}
+              {game.releaseDate && (
+                <div className="flex items-center gap-2">
+                  <CalendarBlankIcon size={18} className="text-primary" />
+                  {game.releaseDate}
+                </div>
+              )}
+            </div>
           </div>
+
           <div className="flex gap-3 shrink-0">
             {statusLoaded ? (
               <>

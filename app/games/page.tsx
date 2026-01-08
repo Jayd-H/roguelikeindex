@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Header } from "@/components/ui/header";
 import { Footer } from "@/components/ui/footer";
 import { useAuth } from "@/components/auth-provider";
@@ -16,51 +16,136 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Game } from "@/lib/types";
+import { Game, Tag } from "@/lib/types";
 import { GameCard } from "@/components/games/game-card";
 import { GameFilters } from "@/components/games/game-filters";
 
 export default function GamesPage() {
   useAuth();
   const [games, setGames] = useState<Game[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [error, setError] = useState("");
+  const [totalGames, setTotalGames] = useState(0);
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
 
-  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState("");
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedCombat, setSelectedCombat] = useState<string[]>([]);
   const [selectedNarrative, setSelectedNarrative] = useState<string[]>([]);
   const [minRating, setMinRating] = useState([0]);
   const [complexity, setComplexity] = useState([0]);
   const [metaProgression, setMetaProgression] = useState(false);
   const [deckVerified, setDeckVerified] = useState(false);
+  const [sortBy, setSortBy] = useState("rating");
 
   useEffect(() => {
-    fetch("/api/games")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch games");
-        return res.json();
-      })
+    fetch("/api/tags")
+      .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data)) {
-          setGames(data);
-        } else {
-          setGames([]);
-          console.error("API returned invalid data:", data);
-        }
-        setLoading(false);
+        if (Array.isArray(data)) setAvailableTags(data);
       })
-      .catch((err) => {
-        console.error(err);
-        setError("Could not load games. Please try again later.");
-        setLoading(false);
-      });
+      .catch(console.error);
   }, []);
 
-  const handleGenreToggle = (genre: string) =>
-    setSelectedGenres((prev) =>
-      prev.includes(genre) ? prev.filter((g) => g !== genre) : [...prev, genre]
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastGameElementRef = useCallback(
+    (node: HTMLDivElement) => {
+      if (loading || loadingMore) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prevPage) => prevPage + 1);
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [loading, loadingMore, hasMore]
+  );
+
+  const fetchGames = useCallback(
+    async (pageNum: number, isReset: boolean) => {
+      try {
+        const params = new URLSearchParams();
+        params.append("page", pageNum.toString());
+        params.append("limit", "10");
+        params.append("sort", sortBy);
+
+        if (searchQuery) params.append("search", searchQuery);
+        if (selectedTags.length) params.append("tags", selectedTags.join(","));
+        if (selectedCombat.length)
+          params.append("combat", selectedCombat.join(","));
+        if (selectedNarrative.length)
+          params.append("narrative", selectedNarrative.join(","));
+        if (minRating[0] > 0) params.append("rating", minRating[0].toString());
+        if (complexity[0] > 0)
+          params.append("complexity", complexity[0].toString());
+        if (metaProgression) params.append("meta", "true");
+        if (deckVerified) params.append("deck", "true");
+
+        const res = await fetch(`/api/games?${params.toString()}`);
+        if (!res.ok) throw new Error("Failed to fetch games");
+
+        const data = await res.json();
+        const newGames = data.games || [];
+        const total = data.total || 0;
+
+        if (isReset) {
+          setTotalGames(total);
+        }
+
+        if (newGames.length < 10) setHasMore(false);
+
+        setGames((prev) => {
+          const combined = isReset ? newGames : [...prev, ...newGames];
+          return combined.filter(
+            (game: Game, index: number, self: Game[]) =>
+              index === self.findIndex((g: Game) => g.id === game.id)
+          );
+        });
+      } catch {
+        setError("Could not load games.");
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
+      }
+    },
+    [
+      sortBy,
+      searchQuery,
+      selectedTags,
+      selectedCombat,
+      selectedNarrative,
+      minRating,
+      complexity,
+      metaProgression,
+      deckVerified,
+    ]
+  );
+
+  useEffect(() => {
+    setLoading(true);
+    setGames([]);
+    setPage(1);
+    setHasMore(true);
+    fetchGames(1, true);
+  }, [fetchGames]);
+
+  useEffect(() => {
+    if (page > 1) {
+      setLoadingMore(true);
+      fetchGames(page, false);
+    }
+  }, [page, fetchGames]);
+
+  const handleTagToggle = (tag: string) =>
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
+
   const handleCombatToggle = (type: string) =>
     setSelectedCombat((prev) =>
       prev.includes(type) ? prev.filter((g) => g !== type) : [...prev, type]
@@ -71,7 +156,7 @@ export default function GamesPage() {
     );
 
   const clearFilters = () => {
-    setSelectedGenres([]);
+    setSelectedTags([]);
     setSelectedCombat([]);
     setSelectedNarrative([]);
     setMinRating([0]);
@@ -81,35 +166,8 @@ export default function GamesPage() {
     setSearchQuery("");
   };
 
-  const filteredGames = games.filter((game) => {
-    const searchTokens = searchQuery
-      .toLowerCase()
-      .split(" ")
-      .filter((t) => t.length > 0);
-    const title = game.title.toLowerCase();
-    const gameTags = game.tags.map((t) => t.name.toLowerCase());
-    const matchesSearch =
-      searchTokens.length === 0 ||
-      searchTokens.every(
-        (token) =>
-          title.includes(token) || gameTags.some((tag) => tag.includes(token))
-      );
-    return (
-      matchesSearch &&
-      (selectedGenres.length === 0 || selectedGenres.includes(game.subgenre)) &&
-      (selectedCombat.length === 0 ||
-        selectedCombat.includes(game.combatType)) &&
-      (selectedNarrative.length === 0 ||
-        selectedNarrative.includes(game.narrativePresence)) &&
-      game.rating >= minRating[0] &&
-      game.complexity >= complexity[0] &&
-      (!metaProgression || game.metaProgression) &&
-      (!deckVerified || game.steamDeckVerified)
-    );
-  });
-
   const hasActiveFilters =
-    selectedGenres.length > 0 ||
+    selectedTags.length > 0 ||
     selectedCombat.length > 0 ||
     selectedNarrative.length > 0 ||
     minRating[0] > 0 ||
@@ -136,7 +194,7 @@ export default function GamesPage() {
               className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors"
             />
             <Input
-              placeholder="Search by title, tag, or mechanic..."
+              placeholder="Search by title..."
               className="pl-11 h-12 bg-secondary/30 border-transparent rounded-full text-base focus-visible:ring-1 focus-visible:ring-primary shadow-sm transition-all hover:bg-secondary/50 focus-visible:bg-background"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -146,7 +204,8 @@ export default function GamesPage() {
         <div className="flex flex-col lg:flex-row gap-12">
           <aside className="w-full lg:w-72 shrink-0">
             <GameFilters
-              selectedGenres={selectedGenres}
+              availableTags={availableTags}
+              selectedTags={selectedTags}
               selectedCombat={selectedCombat}
               selectedNarrative={selectedNarrative}
               minRating={minRating}
@@ -154,7 +213,7 @@ export default function GamesPage() {
               metaProgression={metaProgression}
               deckVerified={deckVerified}
               hasActiveFilters={hasActiveFilters}
-              onGenreToggle={handleGenreToggle}
+              onTagToggle={handleTagToggle}
               onCombatToggle={handleCombatToggle}
               onNarrativeToggle={handleNarrativeToggle}
               onMinRatingChange={setMinRating}
@@ -167,17 +226,16 @@ export default function GamesPage() {
           <section className="flex-1 space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-background/50 backdrop-blur-sm sticky top-16 lg:static z-20 py-2">
               <div className="text-muted-foreground text-sm font-medium">
-                Showing{" "}
                 <span className="text-foreground font-bold">
-                  {filteredGames.length}
+                  {loading && totalGames === 0 ? "..." : totalGames}
                 </span>{" "}
-                Games
+                Games Found
               </div>
               <div className="flex items-center gap-2">
                 <Label className="text-xs text-muted-foreground mr-1">
                   Sort by:
                 </Label>
-                <Select defaultValue="rating">
+                <Select value={sortBy} onValueChange={setSortBy}>
                   <SelectTrigger className="w-45 h-9 text-sm cursor-pointer">
                     <SortAscendingIcon size={16} className="mr-2" />
                     <SelectValue placeholder="Sort by" />
@@ -200,19 +258,22 @@ export default function GamesPage() {
               </div>
             </div>
             <div className="flex flex-col gap-6">
-              {loading ? (
-                <div className="text-center py-20">Loading games...</div>
-              ) : error ? (
+              {error && (
                 <div className="text-center py-20 text-red-500">{error}</div>
-              ) : (
-                filteredGames.map((game) => (
-                  <div key={game.id}>
-                    <GameCard game={game} />
-                    <Separator className="opacity-50 last:hidden" />
-                  </div>
-                ))
               )}
-              {!loading && !error && filteredGames.length === 0 && (
+              {games.map((game, index) => (
+                <div
+                  key={game.id}
+                  ref={index === games.length - 1 ? lastGameElementRef : null}
+                >
+                  <GameCard game={game} />
+                  <Separator className="opacity-50 last:hidden" />
+                </div>
+              ))}
+              {(loading || loadingMore) && (
+                <div className="text-center py-10">Loading games...</div>
+              )}
+              {!loading && !error && games.length === 0 && (
                 <div className="text-center py-24 text-muted-foreground bg-secondary/5 rounded-xl border border-dashed border-border/60">
                   <div className="flex flex-col items-center gap-2">
                     <MagnifyingGlassIcon size={32} className="opacity-20" />

@@ -22,9 +22,14 @@ export function TagCycler({ tags }: TagCyclerProps) {
   if (!tags || tags.length === 0) return null;
 
   return (
-    <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground animate-in fade-in slide-in-from-bottom-1 duration-500">
-      <TagIcon size={14} weight="fill" />
-      <span className="truncate">{tags[index]}</span>
+    <div className="flex items-center justify-end gap-1.5 text-xs font-medium text-muted-foreground">
+      <TagIcon size={14} weight="fill" className="shrink-0" />
+      <span
+        key={index}
+        className="truncate max-w-25 animate-in fade-in slide-in-from-bottom-1 duration-500 text-right"
+      >
+        {tags[index]}
+      </span>
     </div>
   );
 }

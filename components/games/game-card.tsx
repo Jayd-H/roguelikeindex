@@ -43,11 +43,18 @@ export function GameCard({ game }: GameCardProps) {
             />
           </div>
         )}
-        <div className="absolute top-2 left-2">
-          <Badge className="backdrop-blur-md bg-black/70 text-white border-none hover:bg-black/80 font-semibold">
-            {game.subgenre}
-          </Badge>
-        </div>
+
+        {/* Deck Verified Badge in Top Left */}
+        {game.steamDeckVerified && (
+          <div className="absolute top-2 left-2 z-10">
+            <Badge
+              variant="outline"
+              className="bg-black/70 border-green-500/50 text-green-400 backdrop-blur-md gap-1 px-2 py-0.5 text-[10px] h-auto font-bold shadow-sm"
+            >
+              <GameControllerIcon size={12} weight="fill" /> Verified
+            </Badge>
+          </div>
+        )}
       </div>
       <div className="flex-1 flex flex-col justify-between py-1">
         <div>

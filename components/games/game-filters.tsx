@@ -7,9 +7,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import { Tag } from "@/lib/types";
 
 interface GameFiltersProps {
-  selectedGenres: string[];
+  availableTags: Tag[];
+  selectedTags: string[];
   selectedCombat: string[];
   selectedNarrative: string[];
   minRating: number[];
@@ -17,7 +19,7 @@ interface GameFiltersProps {
   metaProgression: boolean;
   deckVerified: boolean;
   hasActiveFilters: boolean;
-  onGenreToggle: (genre: string) => void;
+  onTagToggle: (tag: string) => void;
   onCombatToggle: (type: string) => void;
   onNarrativeToggle: (type: string) => void;
   onMinRatingChange: (val: number[]) => void;
@@ -28,7 +30,8 @@ interface GameFiltersProps {
 }
 
 export function GameFilters({
-  selectedGenres,
+  availableTags,
+  selectedTags,
   selectedCombat,
   selectedNarrative,
   minRating,
@@ -36,7 +39,7 @@ export function GameFilters({
   metaProgression,
   deckVerified,
   hasActiveFilters,
-  onGenreToggle,
+  onTagToggle,
   onCombatToggle,
   onNarrativeToggle,
   onMinRatingChange,
@@ -45,14 +48,7 @@ export function GameFilters({
   onDeckVerifiedChange,
   onClearFilters,
 }: GameFiltersProps) {
-  const genres = [
-    "Deckbuilder",
-    "Action",
-    "Turn-Based",
-    "Traditional",
-    "Tower Defense",
-  ];
-  const combatTypes = ["Turn-Based", "Real-Time", "Card-Based", "Auto-Battler"];
+  const combatTypes = ["Turn-Based", "Real-Time", "Auto-Battler"];
   const narrativeTypes = ["None", "Environmental", "Light", "Story-Rich"];
 
   return (
@@ -74,21 +70,23 @@ export function GameFilters({
       </div>
       <div className="space-y-6">
         <div className="space-y-3">
-          <h3 className="font-semibold text-sm">Subgenre</h3>
-          <div className="flex flex-wrap gap-2">
-            {genres.map((genre) => (
-              <button
-                key={genre}
-                onClick={() => onGenreToggle(genre)}
-                className={`text-xs px-3 py-1.5 rounded-md transition-all border cursor-pointer ${
-                  selectedGenres.includes(genre)
-                    ? "bg-primary text-primary-foreground border-primary font-medium shadow-sm"
-                    : "bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
-                }`}
-              >
-                {genre}
-              </button>
-            ))}
+          <h3 className="font-semibold text-sm">Tags</h3>
+          <div className="max-h-36 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+            <div className="flex flex-wrap gap-2">
+              {availableTags.map((tag) => (
+                <button
+                  key={tag.id}
+                  onClick={() => onTagToggle(tag.name)}
+                  className={`text-xs px-3 py-1.5 rounded-md transition-all border cursor-pointer ${
+                    selectedTags.includes(tag.name)
+                      ? "bg-primary text-primary-foreground border-primary font-medium shadow-sm"
+                      : "bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
+                  }`}
+                >
+                  {tag.name}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
         <Separator />

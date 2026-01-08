@@ -57,6 +57,10 @@ export interface Game {
   timeToFirstWin: string;
   timeTo100: string;
   
+  developer?: string | null;
+  publisher?: string | null;
+  releaseDate?: string | null;
+  
   reviews: Review[];
   pricing: PricePoint[];
   externalRatings: ExternalRating[];

@@ -105,7 +105,7 @@ export default function GameDetailsPage() {
         handleGenericAction={handleGenericAction}
       />
 
-      <main className="max-w-7xl mx-auto w-full px-6 py-12 flex-1">
+      <main className="max-w-7xl mx-auto w-full px-6 py-4 flex-1">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           <div className="lg:col-span-8 space-y-10">
             <GameStats game={game} />

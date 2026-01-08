@@ -177,3 +177,11 @@ export const ownedGamesRelations = relations(ownedGames, ({ one }) => ({
   user: one(users, { fields: [ownedGames.userId], references: [users.id] }),
   game: one(games, { fields: [ownedGames.gameId], references: [games.id] }),
 }));
+
+export const rateLimits = sqliteTable('rate_limits', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  key: text('key').notNull(),
+  action: text('action').notNull(),
+  count: integer('count').notNull().default(1),
+  expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
+});

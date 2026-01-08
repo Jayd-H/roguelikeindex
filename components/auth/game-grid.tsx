@@ -2,18 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { GameControllerIcon } from "@phosphor-icons/react";
 
 interface GridGame {
   id: string;
   slug: string;
+  image: string | null;
 }
 
-interface ColumnProps {
-  items: GridGame[];
-  duration: string;
-}
-
-function Column({ items, duration }: ColumnProps) {
+function Column({ items, duration }: { items: GridGame[]; duration: string }) {
   return (
     <div
       className="flex flex-col gap-4 animate-marquee"
@@ -24,13 +21,20 @@ function Column({ items, duration }: ColumnProps) {
           key={`${game.id}-${i}`}
           className="relative w-full aspect-video rounded-lg overflow-hidden bg-secondary/20 border border-white/5 shadow-lg shrink-0"
         >
-          <Image
-            src={`/api/games/${game.slug}/image/header`}
-            alt="Game"
-            fill
-            className="object-cover opacity-60 hover:opacity-100 transition-opacity duration-500"
-            sizes="(max-width: 768px) 33vw, 20vw"
-          />
+          {game.image ? (
+            <Image
+              src={game.image}
+              alt="Game"
+              fill
+              className="object-cover opacity-60 hover:opacity-100 transition-opacity duration-500"
+              sizes="(max-width: 768px) 33vw, 20vw"
+              unoptimized
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-zinc-900">
+              <GameControllerIcon size={32} className="text-zinc-700" />
+            </div>
+          )}
         </div>
       ))}
     </div>
@@ -62,11 +66,13 @@ export function GameGrid() {
   const col3 = games.slice(20, 30);
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-black/80">
+    <div className="relative h-full w-full overflow-hidden bg-black/90">
       <div className="absolute inset-0 bg-linear-to-r from-black via-transparent to-transparent z-10" />
       <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-transparent z-10" />
 
+      {/* Content Overlay */}
       <div className="absolute top-12 left-12 z-20 max-w-md">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-bold mb-4 backdrop-blur-md "></div>
         <h1 className="text-5xl font-black text-white tracking-tighter mb-4 drop-shadow-xl">
           Discover {totalCount > 0 ? totalCount : "thousands of"} unique
           roguelikes.
@@ -77,6 +83,7 @@ export function GameGrid() {
         </p>
       </div>
 
+      {/* Grid Columns */}
       <div className="grid grid-cols-3 gap-4 h-[150%] -mt-10 opacity-40 rotate-6 scale-110 origin-top-left">
         <Column items={col1} duration="40s" />
         <Column items={col2} duration="55s" />
