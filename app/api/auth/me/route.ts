@@ -24,7 +24,7 @@ export async function GET() {
   const user = await db.select({ 
     id: users.id, 
     email: users.email, 
-    name: users.name 
+    name: users.username 
   }).from(users).where(eq(users.email, payload.email)).get();
 
   if (!user) {

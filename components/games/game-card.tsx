@@ -17,16 +17,15 @@ import { Game } from "@/lib/types";
 
 interface GameCardProps {
   game: Game;
-  requireAuth: (action: () => void) => void;
 }
 
-export function GameCard({ game, requireAuth }: GameCardProps) {
+export function GameCard({ game }: GameCardProps) {
   const router = useRouter();
 
   return (
     <div
       className="group flex flex-col sm:flex-row gap-6 cursor-pointer"
-      onClick={() => requireAuth(() => router.push(`/games/${game.slug}`))}
+      onClick={() => router.push(`/games/${game.slug}`)}
     >
       <div className="w-full sm:w-70 h-40 bg-black shrink-0 relative overflow-hidden rounded-lg">
         {game.steamAppId ? (

@@ -16,7 +16,7 @@ export async function getCurrentUser() {
   const user = await db.select({
     id: users.id,
     email: users.email,
-    name: users.name
+    name: users.username
   }).from(users).where(eq(users.email, payload.email)).get();
 
   return user;

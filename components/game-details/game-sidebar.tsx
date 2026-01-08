@@ -20,10 +20,9 @@ import { Game } from "@/lib/types";
 
 interface GameSidebarProps {
   game: Game;
-  requireAuth: (action: () => void) => void;
 }
 
-export function GameSidebar({ game, requireAuth }: GameSidebarProps) {
+export function GameSidebar({ game }: GameSidebarProps) {
   const router = useRouter();
 
   const getPlatformIcon = (platform: string) => {
@@ -143,9 +142,7 @@ export function GameSidebar({ game, requireAuth }: GameSidebarProps) {
               {game.similarGames.map((simGame) => (
                 <div
                   key={simGame.id}
-                  onClick={() =>
-                    requireAuth(() => router.push(`/games/${simGame.slug}`))
-                  }
+                  onClick={() => router.push(`/games/${simGame.slug}`)}
                   className="flex gap-3 p-2 rounded-lg hover:bg-secondary/20 cursor-pointer transition-colors group border border-transparent hover:border-border/50"
                 >
                   <div className="h-16 w-24 bg-muted rounded overflow-hidden shrink-0 relative">

@@ -21,7 +21,7 @@ import { GameCard } from "@/components/games/game-card";
 import { GameFilters } from "@/components/games/game-filters";
 
 export default function GamesPage() {
-  const { requireAuth } = useAuth();
+  useAuth();
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -207,7 +207,7 @@ export default function GamesPage() {
               ) : (
                 filteredGames.map((game) => (
                   <div key={game.id}>
-                    <GameCard game={game} requireAuth={requireAuth} />
+                    <GameCard game={game} />
                     <Separator className="opacity-50 last:hidden" />
                   </div>
                 ))
