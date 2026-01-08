@@ -120,6 +120,50 @@ export const ownedGames = sqliteTable('owned_games', {
   pk: primaryKey({ columns: [t.userId, t.gameId] }),
 }));
 
+export const lists = sqliteTable('lists', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  description: text('description'),
+  isPublic: integer('is_public', { mode: 'boolean' }).default(true).notNull(),
+  averageRating: real('average_rating').default(0),
+  createdAt: text('created_at').$defaultFn(() => new Date().toISOString()),
+  updatedAt: text('updated_at').$defaultFn(() => new Date().toISOString()),
+});
+
+export const listItems = sqliteTable('list_items', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  listId: text('list_id').notNull().references(() => lists.id, { onDelete: 'cascade' }),
+  gameId: text('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
+  order: integer('order').default(0),
+  addedAt: text('added_at').$defaultFn(() => new Date().toISOString()),
+});
+
+export const listRatings = sqliteTable('list_ratings', {
+  listId: text('list_id').notNull().references(() => lists.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  rating: integer('rating').notNull(), 
+  createdAt: text('created_at').$defaultFn(() => new Date().toISOString()),
+}, (t) => ({
+  pk: primaryKey({ columns: [t.listId, t.userId] }),
+}));
+
+export const savedLists = sqliteTable('saved_lists', {
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  listId: text('list_id').notNull().references(() => lists.id, { onDelete: 'cascade' }),
+  savedAt: text('saved_at').$defaultFn(() => new Date().toISOString()),
+}, (t) => ({
+  pk: primaryKey({ columns: [t.userId, t.listId] }),
+}));
+
+export const rateLimits = sqliteTable('rate_limits', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  key: text('key').notNull(),
+  action: text('action').notNull(),
+  count: integer('count').notNull().default(1),
+  expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
+});
+
 export const gamesRelations = relations(games, ({ many }) => ({
   tags: many(gamesToTags),
   reviews: many(reviews),
@@ -129,12 +173,16 @@ export const gamesRelations = relations(games, ({ many }) => ({
   similarGames: many(similarGames, { relationName: 'isSimilarTo' }),
   favoritedBy: many(favorites),
   ownedBy: many(ownedGames),
+  listedIn: many(listItems),
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({
   favorites: many(favorites),
   ownedGames: many(ownedGames),
   reviews: many(reviews),
+  lists: many(lists),
+  listRatings: many(listRatings),
+  savedLists: many(savedLists),
 }));
 
 export const tagsRelations = relations(tags, ({ many }) => ({
@@ -178,10 +226,24 @@ export const ownedGamesRelations = relations(ownedGames, ({ one }) => ({
   game: one(games, { fields: [ownedGames.gameId], references: [games.id] }),
 }));
 
-export const rateLimits = sqliteTable('rate_limits', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  key: text('key').notNull(),
-  action: text('action').notNull(),
-  count: integer('count').notNull().default(1),
-  expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
-});
+export const listsRelations = relations(lists, ({ one, many }) => ({
+  creator: one(users, { fields: [lists.userId], references: [users.id] }),
+  items: many(listItems),
+  ratings: many(listRatings),
+  saves: many(savedLists),
+}));
+
+export const listItemsRelations = relations(listItems, ({ one }) => ({
+  list: one(lists, { fields: [listItems.listId], references: [lists.id] }),
+  game: one(games, { fields: [listItems.gameId], references: [games.id] }),
+}));
+
+export const listRatingsRelations = relations(listRatings, ({ one }) => ({
+  list: one(lists, { fields: [listRatings.listId], references: [lists.id] }),
+  user: one(users, { fields: [listRatings.userId], references: [users.id] }),
+}));
+
+export const savedListsRelations = relations(savedLists, ({ one }) => ({
+  list: one(lists, { fields: [savedLists.listId], references: [lists.id] }),
+  user: one(users, { fields: [savedLists.userId], references: [users.id] }),
+}));

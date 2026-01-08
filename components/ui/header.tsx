@@ -32,11 +32,28 @@ export function Header() {
 
   return (
     <header className="h-16 px-6 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50 border-b border-border/40">
-      <Link href="/games" className="flex items-center gap-3 group">
-        <span className="text-lg font-semibold tracking-wide group-hover:text-primary transition-colors">
-          Roguelike Index
-        </span>
-      </Link>
+      <div className="flex items-center gap-8">
+        <Link href="/games" className="flex items-center gap-3 group">
+          <span className="text-lg font-semibold tracking-wide group-hover:text-primary transition-colors">
+            Roguelike Index
+          </span>
+        </Link>
+
+        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+          <Link
+            href="/games"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Browse
+          </Link>
+          <Link
+            href="/lists"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Lists
+          </Link>
+        </nav>
+      </div>
 
       <div className="flex items-center gap-2">
         <Button
