@@ -58,16 +58,36 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/games/grid")
+    const fetchManifest = fetch("/game-images/grid-manifest.json")
       .then((res) => res.json())
-      .then((data) => {
-        if (data.games && Array.isArray(data.games)) {
-          setGames(data.games);
-          setTotalCount(data.totalCount || 0);
-        }
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      .catch((e) => {
+        console.error("Failed to load grid manifest:", e);
+        return [];
+      });
+
+    const fetchCount = fetch("/api/games/grid")
+      .then((res) => res.json())
+      .catch(() => ({ totalCount: 0 }));
+
+    Promise.all([fetchManifest, fetchCount]).then(([manifestData, apiData]) => {
+      // Handle manifestData being an array (your current format) OR an object
+      let loadedGames: GridGame[] = [];
+
+      if (Array.isArray(manifestData)) {
+        loadedGames = manifestData;
+      } else if (manifestData && Array.isArray(manifestData.games)) {
+        loadedGames = manifestData.games;
+      }
+
+      if (loadedGames.length > 0) {
+        setGames(loadedGames);
+      }
+
+      if (apiData.totalCount) {
+        setTotalCount(apiData.totalCount);
+      }
+      setLoading(false);
+    });
   }, []);
 
   // Use real games if available, otherwise generate placeholders for the visual effect
