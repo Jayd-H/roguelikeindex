@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { users } from '@/lib/schema';
+import { users, roles, usersToRoles } from '@/lib/schema';
 import { hashPassword, signToken } from '@/lib/auth';
-import { eq, or } from 'drizzle-orm';
+import { eq, or, count } from 'drizzle-orm';
 import { containsProfanity } from '@/lib/profanity';
 
 export async function POST(req: Request) {
@@ -46,6 +46,24 @@ export async function POST(req: Request) {
       password: hashedPassword,
       username,
     }).returning().get();
+
+    const userCountRes = await db.select({ value: count() }).from(users);
+    const totalUsers = userCountRes[0]?.value || 0;
+
+    if (totalUsers <= 100) {
+      let role = await db.select().from(roles).where(eq(roles.name, 'early-adopter')).get();
+      
+      if (!role) {
+        role = await db.insert(roles).values({ name: 'early-adopter' }).returning().get();
+      }
+
+      if (role) {
+        await db.insert(usersToRoles).values({
+          userId: newUser.id,
+          roleId: role.id
+        });
+      }
+    }
 
     const token = await signToken({ id: newUser.id, email: newUser.email });
 

@@ -24,6 +24,7 @@ import {
   TrashIcon,
   SignOutIcon,
   CrownIcon,
+  SparkleIcon,
 } from "@phosphor-icons/react";
 import { useAuth } from "@/components/auth-provider";
 import { ListCarousel } from "@/components/lists/list-carousel";
@@ -185,6 +186,7 @@ export default function ProfilePage() {
   } = profileData;
 
   const isAdmin = userInfo.roles.includes("admin");
+  const isEarlyAdopter = userInfo.roles.includes("early-adopter");
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
@@ -196,6 +198,8 @@ export default function ProfilePage() {
               className={`h-32 w-32 border-4 shadow-xl ${
                 isAdmin
                   ? "border-amber-400 shadow-amber-500/20"
+                  : isEarlyAdopter
+                  ? "border-blue-400 shadow-blue-500/20"
                   : "border-secondary"
               }`}
             >
@@ -203,6 +207,8 @@ export default function ProfilePage() {
                 className={`text-4xl font-bold ${
                   isAdmin
                     ? "bg-amber-500/10 text-amber-400"
+                    : isEarlyAdopter
+                    ? "bg-blue-500/10 text-blue-400"
                     : "bg-primary/10 text-primary"
                 }`}
               >
@@ -240,7 +246,7 @@ export default function ProfilePage() {
                     </Button>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-wrap">
                     <h1
                       className={`text-4xl font-black tracking-tighter flex items-center gap-3 group w-fit ${
                         isAdmin
@@ -262,6 +268,14 @@ export default function ProfilePage() {
                         className="border-amber-500/50 bg-amber-500/10 text-amber-400 font-bold px-2 py-0.5 flex gap-1 items-center"
                       >
                         <CrownIcon weight="fill" size={14} /> Admin
+                      </Badge>
+                    )}
+                    {isEarlyAdopter && (
+                      <Badge
+                        variant="outline"
+                        className="border-blue-500/50 bg-blue-500/10 text-blue-400 font-bold px-2 py-0.5 flex gap-1 items-center"
+                      >
+                        <SparkleIcon weight="fill" size={14} /> Early Adopter
                       </Badge>
                     )}
                   </div>
