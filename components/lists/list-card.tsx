@@ -70,55 +70,57 @@ export function ListCard({ list: initialList }: { list: GameList }) {
 
   const cardVariants: Variants = {
     initial: (i: number) => {
-      // Creates a visible "hand" fan immediately
       const center = (totalGames - 1) / 2;
       const offset = i - center;
       return {
-        x: offset * 24, // Significant overlap but visible spread
-        y: Math.abs(offset) * 4, // Slight arch
-        rotate: offset * 3, // Slight rotation
+        x: offset * 12,
+        y: Math.abs(offset) * 2,
+        rotate: offset * 1.5,
         scale: 1,
         zIndex: i,
-        transition: { duration: 0.4, ease: "easeOut" },
+        transition: { duration: 0.2 },
       };
     },
     hover: (i: number) => {
-      // Dramatic spray on hover
       const center = (totalGames - 1) / 2;
       const offset = i - center;
       return {
-        x: offset * 45,
-        y: Math.abs(offset) * 12 - 20,
-        rotate: offset * 12,
-        scale: 1.15,
+        x: offset * 22,
+        y: Math.abs(offset) * 8 - 16,
+        rotate: offset * 8,
+        scale: 1.1,
         zIndex: 20 + i,
-        transition: { type: "spring", stiffness: 220, damping: 18 },
+        transition: {
+          duration: 0.2,
+          type: "spring",
+          stiffness: 140,
+          damping: 18,
+        },
       };
     },
   };
 
   return (
-    <motion.div
-      className="relative w-80 h-[28rem] shrink-0 cursor-pointer snap-start group"
-      initial="initial"
-      whileHover="hover"
-    >
-      <div className="absolute inset-0 bg-transparent rounded-3xl transition-all duration-300 group-hover:bg-secondary/5 border border-transparent group-hover:border-white/5">
+    <div className="relative w-80 h-115 shrink-0 group cursor-pointer z-0 hover:z-50 transition-all duration-300">
+      <motion.div
+        className="absolute inset-0 bg-transparent rounded-3xl transition-all duration-300 group-hover:bg-secondary/5 border border-transparent group-hover:border-white/5"
+        initial="initial"
+        whileHover="hover"
+      >
         <div className="h-full flex flex-col p-5">
-          {/* Deck Area */}
           <div className="relative h-64 w-full mb-4 flex items-center justify-center perspective-1000">
             {totalGames > 0 ? (
-              <div className="relative w-full h-full flex items-center justify-center pt-8">
+              <div className="relative w-full h-full flex items-center justify-center pt-6">
                 {displayGames.map((game, i) => (
                   <motion.div
                     key={game.id}
                     custom={i}
                     variants={cardVariants}
-                    className="absolute h-48 w-32 rounded-xl shadow-2xl overflow-hidden bg-zinc-900 origin-bottom"
+                    className="absolute h-48 w-32 rounded-xl shadow-2xl overflow-hidden bg-zinc-900 ring-1 ring-white/10"
                     style={{
                       transformOrigin: "bottom center",
                       left: "50%",
-                      marginLeft: "-4rem", // Center anchor
+                      marginLeft: "-4rem",
                     }}
                   >
                     <div className="relative w-full h-full">
@@ -137,8 +139,7 @@ export function ListCard({ list: initialList }: { list: GameList }) {
                           </span>
                         </div>
                       )}
-                      {/* Shadow Overlay */}
-                      <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300" />
+                      <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-300" />
                     </div>
                   </motion.div>
                 ))}
@@ -150,7 +151,6 @@ export function ListCard({ list: initialList }: { list: GameList }) {
             )}
           </div>
 
-          {/* Info Area */}
           <div className="mt-auto space-y-4 px-1 relative z-30">
             <div>
               <div className="flex justify-between items-start gap-2">
@@ -160,7 +160,7 @@ export function ListCard({ list: initialList }: { list: GameList }) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`h-6 w-6 shrink-0 -mt-1 ${
+                  className={`h-6 w-6 shrink-0 -mt-1 transition-colors ${
                     list.isSaved
                       ? "text-primary"
                       : "text-muted-foreground hover:text-foreground"
@@ -180,7 +180,7 @@ export function ListCard({ list: initialList }: { list: GameList }) {
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1 group/stars">
+              <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
@@ -188,21 +188,17 @@ export function ListCard({ list: initialList }: { list: GameList }) {
                       e.stopPropagation();
                       handleRate(star);
                     }}
-                    className="focus:outline-none transition-transform hover:scale-110"
+                    className="focus:outline-none transition-transform hover:scale-110 active:scale-95"
                   >
                     <StarIcon
                       size={16}
                       weight={
-                        (list.userRating || Math.round(rating)) >= star
-                          ? "fill"
-                          : "regular"
+                        (list.userRating || 0) >= star ? "fill" : "regular"
                       }
                       className={`transition-colors ${
                         (list.userRating || 0) >= star
-                          ? "text-yellow-400"
-                          : Math.round(rating) >= star
-                          ? "text-yellow-500/50"
-                          : "text-muted-foreground/20"
+                          ? "text-green-500"
+                          : "text-green-500/30"
                       }`}
                     />
                   </button>
@@ -235,7 +231,7 @@ export function ListCard({ list: initialList }: { list: GameList }) {
             )}
           </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { lists, listRatings, savedLists } from '@/lib/schema';
-import { desc, eq, and } from 'drizzle-orm';
+import { lists, listRatings, savedLists, listItems } from '@/lib/schema';
+import { desc, eq, and, not, like, count } from 'drizzle-orm';
 import { getCurrentUser } from '@/lib/get-user';
 
 export const dynamic = 'force-dynamic';
@@ -19,7 +19,10 @@ export async function GET(request: Request) {
     const user = await getCurrentUser();
     
     const userLists = await db.query.lists.findMany({
-      where: eq(lists.isPublic, true),
+      where: and(
+        eq(lists.isPublic, true),
+        not(like(lists.id, 'auto-%'))
+      ),
       orderBy: desc(lists.createdAt),
       limit: limit,
       offset: offset,
@@ -39,7 +42,6 @@ export async function GET(request: Request) {
                 id: true,
                 slug: true,
                 title: true,
-                headerBlob: true,
               }
             }
           }
@@ -51,6 +53,11 @@ export async function GET(request: Request) {
         let isSaved = false;
         let userRating = 0;
         const isOwner = user ? list.creator.id === user.id : false;
+
+        const totalCount = await db.select({ value: count() })
+          .from(listItems)
+          .where(eq(listItems.listId, list.id))
+          .get();
 
         if (user) {
             try {
@@ -70,14 +77,16 @@ export async function GET(request: Request) {
             description: list.description,
             creator: list.creator.username,
             averageRating: list.averageRating,
-            gameCount: list.items.length, 
-            type: 'user',
+            gameCount: totalCount?.value || 0,
+            type: 'user' as const,
             isSaved,
             userRating,
             isOwner,
             games: list.items.map(item => ({
-                ...item.game,
-                image: item.game.headerBlob ? `data:image/jpeg;base64,${Buffer.from(item.game.headerBlob).toString('base64')}` : null
+                id: item.game.id,
+                slug: item.game.slug,
+                title: item.game.title,
+                image: `/api/games/${item.game.slug}/image/header`
             }))
         };
     }));

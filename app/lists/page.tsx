@@ -3,7 +3,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { Header } from "@/components/ui/header";
 import { Footer } from "@/components/ui/footer";
-import { ListDashes, Sparkle, UserList } from "@phosphor-icons/react";
+import {
+  ListDashesIcon,
+  SparkleIcon,
+  UserListIcon,
+  PlusIcon,
+} from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ListCarousel } from "@/components/lists/list-carousel";
@@ -55,12 +60,12 @@ export default function ListsPage() {
 
   const fetchUserLists = async (page: number) => {
     try {
-      const res = await fetch(`/api/lists/user?page=${page}&limit=10`);
+      const res = await fetch(`/api/lists/user?page=${page}&limit=15`);
       if (!res.ok) throw new Error("Failed");
       const data = await res.json();
 
       if (Array.isArray(data)) {
-        if (data.length < 10) setHasMoreUser(false);
+        if (data.length < 15) setHasMoreUser(false);
         setUserLists((prev) => (page === 1 ? data : [...prev, ...data]));
       }
     } catch (e) {
@@ -82,33 +87,39 @@ export default function ListsPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
       <Header />
-      <main className="flex-1 max-w-360 mx-auto w-full px-6 py-12 space-y-20">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-border/40 pb-8">
-          <div className="space-y-3">
-            <h1 className="text-5xl font-black tracking-tighter flex items-center gap-4">
-              <ListDashes className="text-primary" weight="fill" />
-              Curated Lists
-            </h1>
-            <p className="text-muted-foreground text-xl max-w-2xl font-light">
-              Discover collections curated by the Index algorithm and the
-              community.
-            </p>
+      <main className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-6 py-8">
+        <div className="w-full max-w-3xl mx-auto mb-12 text-center space-y-4">
+          <h1 className="text-4xl font-black tracking-tighter">
+            Curated Collections
+          </h1>
+          <p className="text-muted-foreground">
+            Discover collections curated by the Index algorithm and the
+            community.
+          </p>
+          <div className="pt-4">
+            <Button
+              size="lg"
+              className="font-bold text-base px-8 h-12 shadow-lg hover:shadow-primary/20 transition-all cursor-pointer rounded-full"
+            >
+              <PlusIcon weight="bold" className="mr-2" size={18} />
+              Create New List
+            </Button>
           </div>
-          <Button
-            size="lg"
-            className="font-bold text-base px-8 h-12 shadow-lg hover:shadow-primary/20 transition-all cursor-pointer"
-          >
-            Create New List
-          </Button>
         </div>
 
-        <section className="space-y-8">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-yellow-500/10 rounded-lg">
-              <Sparkle weight="fill" className="text-yellow-500" size={24} />
+        <section className=" mb-16 relative">
+          <div className="flex items-center gap-4 px-4 sm:px-0">
+            <div className="p-3 bg-yellow-500/10 rounded-xl">
+              <SparkleIcon
+                weight="fill"
+                className="text-yellow-500"
+                size={24}
+              />
             </div>
             <div>
-              <h2 className="text-2xl font-bold">Index Collections</h2>
+              <h2 className="text-2xl font-bold tracking-tight">
+                Index Collections
+              </h2>
               <p className="text-sm text-muted-foreground">
                 Automatically generated based on database stats
               </p>
@@ -116,13 +127,15 @@ export default function ListsPage() {
           </div>
 
           {loadingAuto ? (
-            <div className="flex gap-6 overflow-hidden py-16 px-4">
-              {[1, 2, 3, 4].map((i) => (
-                <Skeleton
-                  key={i}
-                  className="h-[28rem] w-80 rounded-3xl shrink-0"
-                />
-              ))}
+            <div className="overflow-hidden py-32 -mx-6">
+              <div className="flex gap-6 px-6">
+                {[1, 2, 3].map((i) => (
+                  <Skeleton
+                    key={i}
+                    className="h-112 w-80 rounded-3xl shrink-0"
+                  />
+                ))}
+              </div>
             </div>
           ) : (
             <ListCarousel>
@@ -133,13 +146,15 @@ export default function ListsPage() {
           )}
         </section>
 
-        <section className="space-y-8">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500/10 rounded-lg">
-              <UserList weight="fill" className="text-blue-500" size={24} />
+        <section className="space-y-8 mb-12 relative">
+          <div className="flex items-center gap-4 px-4 sm:px-0">
+            <div className="p-3 bg-blue-500/10 rounded-xl">
+              <UserListIcon weight="fill" className="text-blue-500" size={24} />
             </div>
             <div>
-              <h2 className="text-2xl font-bold">Community Lists</h2>
+              <h2 className="text-2xl font-bold tracking-tight">
+                Community Lists
+              </h2>
               <p className="text-sm text-muted-foreground">
                 Created and rated by other players
               </p>
@@ -147,13 +162,15 @@ export default function ListsPage() {
           </div>
 
           {loadingUser ? (
-            <div className="flex gap-6 overflow-hidden py-16 px-4">
-              {[1, 2, 3, 4].map((i) => (
-                <Skeleton
-                  key={i}
-                  className="h-[28rem] w-80 rounded-3xl shrink-0"
-                />
-              ))}
+            <div className="overflow-hidden py-32 -mx-6">
+              <div className="flex gap-6 px-6">
+                {[1, 2, 3].map((i) => (
+                  <Skeleton
+                    key={i}
+                    className="h-112 w-80 rounded-3xl shrink-0"
+                  />
+                ))}
+              </div>
             </div>
           ) : userLists.length > 0 ? (
             <ListCarousel onEndReached={handleLoadMoreUser}>
@@ -161,17 +178,25 @@ export default function ListsPage() {
                 <ListCard key={list.id} list={list} />
               ))}
               {isFetchingMore && (
-                <div className="h-[28rem] w-80 flex items-center justify-center shrink-0">
+                <div className="h-112 w-80 flex items-center justify-center shrink-0">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
               )}
             </ListCarousel>
           ) : (
-            <div className="py-20 text-center text-muted-foreground bg-secondary/5 rounded-3xl border border-dashed border-border/60">
-              <p className="text-lg">No community lists found yet.</p>
-              <Button variant="link" className="mt-2 text-primary">
-                Be the first to create one!
-              </Button>
+            <div className="py-24 text-center text-muted-foreground bg-secondary/5 rounded-3xl border border-dashed border-border/60">
+              <div className="flex flex-col items-center gap-2">
+                <ListDashesIcon size={32} className="opacity-20" />
+                <p className="text-lg font-medium">
+                  No community lists found yet.
+                </p>
+                <Button
+                  variant="link"
+                  className="mt-2 text-primary cursor-pointer"
+                >
+                  Be the first to create one!
+                </Button>
+              </div>
             </div>
           )}
         </section>
