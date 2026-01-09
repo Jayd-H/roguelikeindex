@@ -24,6 +24,7 @@ export interface Game {
   steamDeckVerified: boolean;
   rating: number;
   tags: Tag[];
+  steamAppId?: string | null;
   releaseDate?: string | null;
   developer?: string | null;
   publisher?: string | null;
@@ -66,6 +67,17 @@ export interface Review {
     title: string;
     slug: string;
   };
+  difficulty?: number;
+  replayability?: number;
+  synergyDepth?: number;
+  complexity?: number;
+  rngReliance?: number;
+  userFriendliness?: number;
+  avgRunLength?: string;
+  timeToFirstWin?: string;
+  timeTo100?: string;
+  combatType?: string;
+  narrativePresence?: string;
 }
 
 export interface List {
