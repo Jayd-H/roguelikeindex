@@ -24,6 +24,11 @@ export interface Review {
   
   narrativePresence?: string | null;
   combatType?: string | null;
+  
+  game?: {
+    title: string;
+    slug: string;
+  };
 }
 
 export interface PricePoint {
@@ -77,4 +82,26 @@ export interface Game {
   pricing: PricePoint[];
   externalRatings: ExternalRating[];
   similarGames: SimilarGame[];
+}
+
+export interface List {
+  id: string;
+  title: string;
+  description: string | null;
+  type: "automatic" | "user";
+  creator?: string;
+  averageRating?: number | null;
+  gameCount: number;
+  games: { id: string; slug: string; title: string; image: string | null }[];
+  isSaved?: boolean;
+  userRating?: number;
+  isOwner?: boolean;
+}
+
+export interface UserProfile {
+  id: string;
+  username: string;
+  email: string;
+  bio: string | null;
+  createdAt: string;
 }

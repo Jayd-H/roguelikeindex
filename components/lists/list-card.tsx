@@ -11,6 +11,7 @@ import {
 import { motion, Variants } from "framer-motion";
 import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface GamePreview {
   id: string;
@@ -22,10 +23,10 @@ interface GamePreview {
 interface GameList {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
   type: "automatic" | "user";
   creator?: string;
-  averageRating?: number;
+  averageRating?: number | null;
   gameCount: number;
   games: GamePreview[];
   isSaved?: boolean;
@@ -34,6 +35,7 @@ interface GameList {
 }
 
 export function ListCard({ list: initialList }: { list: GameList }) {
+  const router = useRouter();
   const { requireAuth, refreshUser } = useAuth();
   const [list, setList] = useState(initialList);
   const displayGames = list.games.slice(0, 10);
@@ -107,6 +109,13 @@ export function ListCard({ list: initialList }: { list: GameList }) {
       .replace(/[^\w ]+/g, "")
       .replace(/ +/g, "-")}`;
     window.location.href = `/lists/${listSlug}`;
+  };
+
+  const handleUserClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (list.creator) {
+      router.push(`/${list.creator}`);
+    }
   };
 
   return (
@@ -228,11 +237,16 @@ export function ListCard({ list: initialList }: { list: GameList }) {
 
             {list.type === "user" && (
               <div className="pt-3 border-t border-border/30 flex items-center justify-between text-muted-foreground">
-                <div className="flex items-center gap-2 text-xs font-medium hover:text-foreground transition-colors">
+                <div
+                  className="flex items-center gap-2 text-xs font-medium hover:text-foreground transition-colors cursor-pointer"
+                  onClick={handleUserClick}
+                >
                   <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center">
                     <User weight="fill" size={12} />
                   </div>
-                  <span className="truncate max-w-30">{list.creator}</span>
+                  <span className="truncate max-w-30 hover:underline">
+                    {list.creator}
+                  </span>
                 </div>
                 {list.isOwner && (
                   <div className="flex items-center gap-1 text-xs text-primary">

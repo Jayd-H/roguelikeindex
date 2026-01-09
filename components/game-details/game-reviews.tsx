@@ -1,15 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  StarIcon,
-  PencilIcon,
-  TimerIcon,
-  SwordIcon,
-  BookOpenIcon,
-  ChartBarIcon,
-  TrashIcon,
-} from "@phosphor-icons/react";
+import { StarIcon, PencilIcon, TrashIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Review, Game } from "@/lib/types";
+import { ReviewCard } from "@/components/reviews/review-card";
 
 interface GameReviewsProps {
   game: Game;
@@ -35,24 +28,6 @@ interface GameReviewsProps {
   refreshUser: () => void;
   onDeleteReview: () => void;
 }
-
-const StatBar = ({ label, value }: { label: string; value: number | null }) => {
-  if (value === null) return null;
-  return (
-    <div className="flex flex-col gap-1">
-      <div className="flex justify-between text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
-        <span>{label}</span>
-        <span>{value}/10</span>
-      </div>
-      <div className="h-1.5 w-full bg-secondary/30 rounded-full overflow-hidden">
-        <div
-          className="h-full bg-primary/80 rounded-full"
-          style={{ width: `${(value / 10) * 100}%` }}
-        />
-      </div>
-    </div>
-  );
-};
 
 export function GameReviews({
   game,
@@ -154,195 +129,6 @@ export function GameReviews({
     }
   };
 
-  const handleEditReview = () => {
-    setIsEditing(true);
-    setIsReviewFormOpen(true);
-  };
-
-  const renderReviewCard = (review: Review, isMine: boolean = false) => {
-    if (isMine && isEditing) return null;
-
-    const hasRatings = [
-      review.difficulty,
-      review.replayability,
-      review.synergyDepth,
-      review.complexity,
-      review.rngReliance,
-      review.userFriendliness,
-    ].some((v) => v !== null && v !== undefined);
-
-    const hasTimes =
-      review.avgRunLength || review.timeToFirstWin || review.timeTo100;
-    const hasTraits = review.narrativePresence || review.combatType;
-
-    return (
-      <Card
-        key={review.id}
-        className={`overflow-hidden transition-all duration-300 border-border/60 shadow-sm hover:shadow-md ${
-          isMine ? "bg-secondary/5 border-primary/20" : "bg-card"
-        }`}
-      >
-        <div className="p-6 pb-4 flex justify-between items-start">
-          <div className="flex items-center gap-3">
-            <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${
-                isMine
-                  ? "bg-primary/10 text-primary"
-                  : "bg-secondary text-muted-foreground"
-              }`}
-            >
-              {review.user ? review.user[0].toUpperCase() : "?"}
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h4 className="font-bold text-sm text-foreground">
-                  {isMine ? "Your Review" : review.user}
-                </h4>
-              </div>
-              <p className="text-xs text-muted-foreground">{review.date}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {isMine && (
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleEditReview}
-                  className="h-8 w-8 text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <PencilIcon size={16} />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onDeleteReview}
-                  className="h-8 w-8 text-muted-foreground hover:text-destructive transition-colors"
-                >
-                  <TrashIcon size={16} />
-                </Button>
-              </div>
-            )}
-            <div className="flex items-center gap-1 bg-yellow-500/10 px-3 py-1 rounded-full border border-yellow-500/20">
-              <StarIcon weight="fill" className="text-yellow-500" size={14} />
-              <span className="text-sm font-bold text-yellow-700 dark:text-yellow-400">
-                {review.rating}/5
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {review.comment && (
-          <div className="px-6 pb-6">
-            <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
-              {review.comment}
-            </p>
-          </div>
-        )}
-
-        {(hasRatings || hasTimes || hasTraits) && (
-          <div className="bg-muted/30 border-t border-border/50 p-5 grid grid-cols-1 md:grid-cols-12 gap-6 text-sm">
-            {hasRatings && (
-              <div className="md:col-span-6 space-y-3">
-                <div className="flex items-center gap-2 mb-2 text-xs font-semibold text-primary/80">
-                  <ChartBarIcon /> GAME FEEL
-                </div>
-                <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                  <StatBar
-                    label="Difficulty"
-                    value={review.difficulty ?? null}
-                  />
-                  <StatBar
-                    label="Complexity"
-                    value={review.complexity ?? null}
-                  />
-                  <StatBar
-                    label="Replayability"
-                    value={review.replayability ?? null}
-                  />
-                  <StatBar
-                    label="Synergy"
-                    value={review.synergyDepth ?? null}
-                  />
-                  <StatBar label="RNG" value={review.rngReliance ?? null} />
-                  <StatBar
-                    label="Friendliness"
-                    value={review.userFriendliness ?? null}
-                  />
-                </div>
-              </div>
-            )}
-
-            {hasTimes && (
-              <div className="md:col-span-3 space-y-3 border-t md:border-t-0 md:border-l border-border/50 pt-4 md:pt-0 md:pl-6">
-                <div className="flex items-center gap-2 mb-1 text-xs font-semibold text-primary/80">
-                  <TimerIcon /> TIME
-                </div>
-                <div className="space-y-2">
-                  {review.avgRunLength && (
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-muted-foreground">Run Length</span>
-                      <span className="font-medium">{review.avgRunLength}</span>
-                    </div>
-                  )}
-                  {review.timeToFirstWin && (
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-muted-foreground">First Win</span>
-                      <span className="font-medium">
-                        {review.timeToFirstWin}
-                      </span>
-                    </div>
-                  )}
-                  {review.timeTo100 && (
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-muted-foreground">100% Comp</span>
-                      <span className="font-medium">{review.timeTo100}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {hasTraits && (
-              <div className="md:col-span-3 space-y-3 border-t md:border-t-0 md:border-l border-border/50 pt-4 md:pt-0 md:pl-6">
-                <div className="flex items-center gap-2 mb-1 text-xs font-semibold text-primary/80">
-                  <BookOpenIcon /> TRAITS
-                </div>
-                <div className="flex flex-col gap-2">
-                  {review.narrativePresence && (
-                    <div className="text-xs">
-                      <span className="text-muted-foreground block mb-0.5">
-                        Narrative
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-background border border-border/50 font-medium">
-                        {review.narrativePresence}
-                      </span>
-                    </div>
-                  )}
-                  {review.combatType && (
-                    <div className="text-xs">
-                      <span className="text-muted-foreground block mb-0.5">
-                        Combat
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-background border border-border/50 font-medium">
-                        <SwordIcon
-                          size={12}
-                          className="text-muted-foreground"
-                        />
-                        {review.combatType}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </Card>
-    );
-  };
-
   return (
     <section>
       <div className="flex items-center justify-between mb-8">
@@ -397,7 +183,6 @@ export function GameReviews({
               >
                 <div className="overflow-hidden min-h-0 space-y-6">
                   <Separator className="mb-6" />
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-6">
                       {[
@@ -562,6 +347,7 @@ export function GameReviews({
                     {isEditing && (
                       <Button
                         variant="ghost"
+                        className="cursor-pointer"
                         onClick={() => {
                           setIsEditing(false);
                           setIsReviewFormOpen(false);
@@ -571,7 +357,7 @@ export function GameReviews({
                       </Button>
                     )}
                     <Button
-                      className="px-8"
+                      className="px-8 cursor-pointer"
                       disabled={!!timeError}
                       onClick={submitReview}
                     >
@@ -586,11 +372,38 @@ export function GameReviews({
       </Card>
 
       <div className="space-y-8">
-        {myReview && !isEditing && renderReviewCard(myReview, true)}
+        {myReview && !isEditing && (
+          <div className="relative group">
+            <ReviewCard review={myReview} />
+            <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setIsEditing(true);
+                  setIsReviewFormOpen(true);
+                }}
+                className="h-8 w-8 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+              >
+                <PencilIcon size={16} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onDeleteReview}
+                className="h-8 w-8 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+              >
+                <TrashIcon size={16} />
+              </Button>
+            </div>
+          </div>
+        )}
 
         {reviewsList
           .filter((r) => r.userId !== currentUser?.id)
-          .map((review) => renderReviewCard(review, false))}
+          .map((review) => (
+            <ReviewCard key={review.id} review={review} />
+          ))}
       </div>
     </section>
   );
