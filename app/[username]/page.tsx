@@ -7,12 +7,14 @@ import { Footer } from "@/components/ui/footer";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import {
   HeartIcon,
   GameControllerIcon,
   ListDashesIcon,
   ChatTextIcon,
   CalendarBlankIcon,
+  CrownIcon,
 } from "@phosphor-icons/react";
 import { ListCarousel } from "@/components/lists/list-carousel";
 import { ListCard } from "@/components/lists/list-card";
@@ -121,14 +123,28 @@ export default function PublicProfilePage() {
     reviews,
   } = profileData;
 
+  const isAdmin = userInfo.roles.includes("admin");
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
       <Header />
       <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-6">
         <section className="flex flex-col md:flex-row gap-8 items-start mb-8">
           <div className="shrink-0 relative group">
-            <Avatar className="h-32 w-32 border-4 border-secondary shadow-xl">
-              <AvatarFallback className="text-4xl font-bold bg-primary/10 text-primary">
+            <Avatar
+              className={`h-32 w-32 border-4 shadow-xl ${
+                isAdmin
+                  ? "border-amber-400 shadow-amber-500/20"
+                  : "border-secondary"
+              }`}
+            >
+              <AvatarFallback
+                className={`text-4xl font-bold ${
+                  isAdmin
+                    ? "bg-amber-500/10 text-amber-400"
+                    : "bg-primary/10 text-primary"
+                }`}
+              >
                 {userInfo.username[0].toUpperCase()}
               </AvatarFallback>
             </Avatar>
@@ -137,9 +153,25 @@ export default function PublicProfilePage() {
           <div className="flex-1 w-full space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="flex-1">
-                <h1 className="text-4xl font-black tracking-tighter flex items-center gap-3 group w-fit">
-                  {userInfo.username}
-                </h1>
+                <div className="flex items-center gap-3">
+                  <h1
+                    className={`text-4xl font-black tracking-tighter flex items-center gap-3 group w-fit ${
+                      isAdmin
+                        ? "text-amber-400 drop-shadow-[0_2px_10px_rgba(251,191,36,0.2)]"
+                        : ""
+                    }`}
+                  >
+                    {userInfo.username}
+                  </h1>
+                  {isAdmin && (
+                    <Badge
+                      variant="outline"
+                      className="border-amber-500/50 bg-amber-500/10 text-amber-400 font-bold px-2 py-0.5 flex gap-1 items-center"
+                    >
+                      <CrownIcon weight="fill" size={14} /> Admin
+                    </Badge>
+                  )}
+                </div>
                 <div className="flex items-center gap-2 text-muted-foreground text-sm font-medium mt-1">
                   <CalendarBlankIcon />
                   Joined {new Date(userInfo.createdAt).toLocaleDateString()}

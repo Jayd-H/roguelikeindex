@@ -10,16 +10,24 @@ export const users = sqliteTable('users', {
   createdAt: text('created_at').$defaultFn(() => new Date().toISOString()),
 });
 
+export const roles = sqliteTable('roles', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').unique().notNull(),
+});
+
+export const usersToRoles = sqliteTable('users_to_roles', {
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  roleId: integer('role_id').notNull().references(() => roles.id, { onDelete: 'cascade' }),
+}, (t) => ({
+  pk: primaryKey({ columns: [t.userId, t.roleId] }),
+}));
+
 export const passwordResetTokens = sqliteTable('password_reset_tokens', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   token: text('token').notNull().unique(),
   expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
 });
-
-export const passwordResetTokensRelations = relations(passwordResetTokens, ({ one }) => ({
-  user: one(users, { fields: [passwordResetTokens.userId], references: [users.id] }),
-}));
 
 export const games = sqliteTable('games', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -198,6 +206,31 @@ export const suggestionVotes = sqliteTable('suggestion_votes', {
   pk: primaryKey({ columns: [t.suggestionId, t.userId] }),
 }));
 
+export const usersRelations = relations(users, ({ many }) => ({
+  roles: many(usersToRoles),
+  favorites: many(favorites),
+  ownedGames: many(ownedGames),
+  reviews: many(reviews),
+  lists: many(lists),
+  listRatings: many(listRatings),
+  savedLists: many(savedLists),
+  suggestions: many(suggestions),
+  suggestionVotes: many(suggestionVotes),
+}));
+
+export const rolesRelations = relations(roles, ({ many }) => ({
+  users: many(usersToRoles),
+}));
+
+export const usersToRolesRelations = relations(usersToRoles, ({ one }) => ({
+  user: one(users, { fields: [usersToRoles.userId], references: [users.id] }),
+  role: one(roles, { fields: [usersToRoles.roleId], references: [roles.id] }),
+}));
+
+export const passwordResetTokensRelations = relations(passwordResetTokens, ({ one }) => ({
+  user: one(users, { fields: [passwordResetTokens.userId], references: [users.id] }),
+}));
+
 export const gamesRelations = relations(games, ({ many }) => ({
   tags: many(gamesToTags),
   reviews: many(reviews),
@@ -209,17 +242,6 @@ export const gamesRelations = relations(games, ({ many }) => ({
   ownedBy: many(ownedGames),
   listedIn: many(listItems),
   suggestions: many(suggestions),
-}));
-
-export const usersRelations = relations(users, ({ many }) => ({
-  favorites: many(favorites),
-  ownedGames: many(ownedGames),
-  reviews: many(reviews),
-  lists: many(lists),
-  listRatings: many(listRatings),
-  savedLists: many(savedLists),
-  suggestions: many(suggestions),
-  suggestionVotes: many(suggestionVotes),
 }));
 
 export const tagsRelations = relations(tags, ({ many }) => ({

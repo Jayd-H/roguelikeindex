@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { containsProfanity } from "@/lib/profanity";
 
 interface SuggestionModalProps {
   isOpen: boolean;
@@ -46,10 +47,27 @@ export function SuggestionModal({
 
   if (!isOpen) return null;
 
+  const validateInput = () => {
+    const values = Object.values(formData);
+    for (const val of values) {
+      if (typeof val === "string" && containsProfanity(val)) {
+        return "Please remove inappropriate content.";
+      }
+    }
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
+
+    const profanityError = validateInput();
+    if (profanityError) {
+      setError(profanityError);
+      return;
+    }
+
+    setLoading(true);
 
     const payload: SuggestionPayload = {
       targetField: field,
@@ -73,14 +91,20 @@ export function SuggestionModal({
         headers: { "Content-Type": "application/json" },
       });
 
+      const json = await res.json();
+
       if (res.ok) {
         setIsSuccess(true);
-        setTimeout(() => {
-          onClose();
-          setIsSuccess(false);
-        }, 1500);
+        if (json.status === "approved") {
+          // If admin instant approval, reload page after delay
+          setTimeout(() => window.location.reload(), 1500);
+        } else {
+          setTimeout(() => {
+            onClose();
+            setIsSuccess(false);
+          }, 2000);
+        }
       } else {
-        const json = await res.json();
         setError(json.error || "Failed to submit");
       }
     } catch {
@@ -106,43 +130,52 @@ export function SuggestionModal({
     | undefined;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in">
-      <div className="w-full max-w-md bg-background border border-border/50 rounded-xl p-6 shadow-2xl relative animate-in zoom-in-95">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md bg-background/95 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl relative animate-in zoom-in-95 duration-300"
+        onClick={(e) => e.stopPropagation()}
+      >
         <Button
           variant="ghost"
           size="icon"
           onClick={onClose}
-          className="absolute right-4 top-4"
+          className="absolute right-4 top-4 rounded-full hover:bg-secondary/50 cursor-pointer"
         >
-          <XIcon />
+          <XIcon size={20} />
         </Button>
 
         {isSuccess ? (
           <div className="flex flex-col items-center justify-center py-8 animate-in fade-in zoom-in duration-300">
-            <CheckCircleIcon
-              size={64}
-              weight="fill"
-              className="text-green-500 mb-4"
-            />
-            <h3 className="text-xl font-bold text-foreground">
-              Suggestion Submitted!
-            </h3>
-            <p className="text-muted-foreground mt-2 text-center">
-              Thanks for helping improve the database.
+            <div className="h-16 w-16 bg-green-500/10 rounded-full flex items-center justify-center mb-4">
+              <CheckCircleIcon
+                size={32}
+                weight="fill"
+                className="text-green-500"
+              />
+            </div>
+            <h3 className="text-xl font-bold text-foreground">Submitted!</h3>
+            <p className="text-muted-foreground mt-2 text-center text-sm">
+              Your suggestion has been recorded.
             </p>
           </div>
         ) : (
           <>
-            <h2 className="text-xl font-bold mb-4">{getTitle()}</h2>
+            <h2 className="text-xl font-bold mb-6 tracking-tight">
+              {getTitle()}
+            </h2>
 
             {(field === "metaProgression" || field === "steamDeckVerified") && (
-              <p className="mb-6 text-muted-foreground">
+              <p className="mb-8 text-muted-foreground text-sm leading-relaxed">
                 Current status:{" "}
-                <span className="font-bold text-foreground">
+                <span className="font-bold text-foreground bg-secondary/50 px-2 py-0.5 rounded">
                   {currentData ? "Yes" : "No"}
                 </span>
-                . Do you want to suggest changing this to{" "}
-                <span className="font-bold text-foreground">
+                . <br />
+                Do you want to suggest changing this to{" "}
+                <span className="font-bold text-foreground bg-secondary/50 px-2 py-0.5 rounded">
                   {!currentData ? "Yes" : "No"}
                 </span>
                 ?
@@ -150,21 +183,22 @@ export function SuggestionModal({
             )}
 
             {field === "tags" && type === "add" && (
-              <div className="space-y-4 mb-6">
+              <div className="space-y-5 mb-8">
                 <div className="space-y-2">
                   <Label>Tag Name</Label>
                   <Input
                     placeholder="e.g. Pixel Art"
                     onChange={(e) => setFormData({ name: e.target.value })}
+                    className="bg-secondary/20 border-white/10 h-11"
                   />
                 </div>
               </div>
             )}
 
             {field === "tags" && type === "remove" && safeData && (
-              <p className="mb-6 text-muted-foreground">
+              <p className="mb-8 text-muted-foreground text-sm">
                 Are you sure you want to suggest removing the tag{" "}
-                <span className="font-bold text-foreground">
+                <span className="font-bold text-foreground bg-secondary/50 px-2 py-0.5 rounded">
                   {String(safeData.name)}
                 </span>
                 ?
@@ -172,7 +206,7 @@ export function SuggestionModal({
             )}
 
             {field === "pricing" && type !== "remove" && (
-              <div className="space-y-4 mb-6">
+              <div className="space-y-5 mb-8">
                 <div className="space-y-2">
                   <Label>Platform</Label>
                   <Select
@@ -182,15 +216,28 @@ export function SuggestionModal({
                     defaultValue={safeData?.platform as string}
                     disabled={type === "edit"}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-secondary/20 border-white/10 h-11 cursor-pointer">
                       <SelectValue placeholder="Select Platform" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="PC">PC</SelectItem>
-                      <SelectItem value="PlayStation">PlayStation</SelectItem>
-                      <SelectItem value="Xbox">Xbox</SelectItem>
-                      <SelectItem value="Switch">Switch</SelectItem>
-                      <SelectItem value="Mobile">Mobile</SelectItem>
+                      <SelectItem value="PC" className="cursor-pointer">
+                        PC
+                      </SelectItem>
+                      <SelectItem
+                        value="PlayStation"
+                        className="cursor-pointer"
+                      >
+                        PlayStation
+                      </SelectItem>
+                      <SelectItem value="Xbox" className="cursor-pointer">
+                        Xbox
+                      </SelectItem>
+                      <SelectItem value="Switch" className="cursor-pointer">
+                        Switch
+                      </SelectItem>
+                      <SelectItem value="Mobile" className="cursor-pointer">
+                        Mobile
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -202,6 +249,7 @@ export function SuggestionModal({
                     onChange={(e) =>
                       setFormData({ ...formData, store: e.target.value })
                     }
+                    className="bg-secondary/20 border-white/10 h-11"
                   />
                 </div>
                 <div className="space-y-2">
@@ -212,6 +260,7 @@ export function SuggestionModal({
                     onChange={(e) =>
                       setFormData({ ...formData, price: e.target.value })
                     }
+                    className="bg-secondary/20 border-white/10 h-11"
                   />
                 </div>
                 <div className="space-y-2">
@@ -222,13 +271,14 @@ export function SuggestionModal({
                     onChange={(e) =>
                       setFormData({ ...formData, url: e.target.value })
                     }
+                    className="bg-secondary/20 border-white/10 h-11"
                   />
                 </div>
               </div>
             )}
 
             {field === "externalRatings" && type !== "remove" && (
-              <div className="space-y-4 mb-6">
+              <div className="space-y-5 mb-8">
                 <div className="space-y-2">
                   <Label>Source Name</Label>
                   <Input
@@ -237,6 +287,7 @@ export function SuggestionModal({
                     onChange={(e) =>
                       setFormData({ ...formData, source: e.target.value })
                     }
+                    className="bg-secondary/20 border-white/10 h-11"
                   />
                 </div>
                 <div className="space-y-2">
@@ -247,6 +298,7 @@ export function SuggestionModal({
                     onChange={(e) =>
                       setFormData({ ...formData, score: e.target.value })
                     }
+                    className="bg-secondary/20 border-white/10 h-11"
                   />
                 </div>
                 <div className="space-y-2">
@@ -257,18 +309,31 @@ export function SuggestionModal({
                     onChange={(e) =>
                       setFormData({ ...formData, url: e.target.value })
                     }
+                    className="bg-secondary/20 border-white/10 h-11"
                   />
                 </div>
               </div>
             )}
 
-            {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+            {error && (
+              <p className="text-red-500 text-sm font-medium mb-4 px-3 py-2 bg-red-500/10 rounded-md border border-red-500/20">
+                {error}
+              </p>
+            )}
 
-            <div className="flex justify-end gap-2">
-              <Button variant="ghost" onClick={onClose}>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="ghost"
+                onClick={onClose}
+                className="cursor-pointer hover:bg-secondary/50"
+              >
                 Cancel
               </Button>
-              <Button onClick={handleSubmit} disabled={loading}>
+              <Button
+                onClick={handleSubmit}
+                disabled={loading}
+                className="cursor-pointer font-semibold px-6"
+              >
                 {loading ? "Submitting..." : "Submit Suggestion"}
               </Button>
             </div>

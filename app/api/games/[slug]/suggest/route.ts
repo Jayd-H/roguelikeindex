@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { suggestions, games, rateLimits } from '@/lib/schema';
-import { eq, and, lt } from 'drizzle-orm';
+import { suggestions, games, rateLimits, usersToRoles, roles } from '@/lib/schema';
+import { eq, and, lt, sql } from 'drizzle-orm';
 import { getCurrentUser } from '@/lib/get-user';
 import { containsProfanity } from '@/lib/profanity';
+import { applyChange } from '@/lib/suggestions';
 
 export async function POST(
   request: Request,
@@ -20,14 +21,63 @@ export async function POST(
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
     }
 
+    const checkValue = (val: unknown): boolean => {
+      if (typeof val === 'string') return containsProfanity(val);
+      if (typeof val === 'object' && val !== null) {
+        return Object.values(val as Record<string, unknown>).some(v => checkValue(v));
+      }
+      return false;
+    };
+
+    if (checkValue(suggestedValue)) {
+      return NextResponse.json({ error: 'Inappropriate content detected' }, { status: 400 });
+    }
+
+    const game = await db.select().from(games).where(eq(games.slug, params.slug)).get();
+    if (!game) return NextResponse.json({ error: 'Game not found' }, { status: 404 });
+
+    // Check if user is admin
+    const isAdmin = await db.select()
+        .from(usersToRoles)
+        .innerJoin(roles, eq(usersToRoles.roleId, roles.id))
+        .where(and(eq(usersToRoles.userId, user.id), eq(roles.name, 'admin')))
+        .get();
+
+    const safeOriginalValue = originalValue === undefined ? null : originalValue;
+    const suggestedSql = sql`${JSON.stringify(suggestedValue)}`;
+    const originalSql = safeOriginalValue ? sql`${JSON.stringify(safeOriginalValue)}` : null;
+
+    if (isAdmin) {
+        // Admin Bypass: Apply immediately
+        await applyChange({
+            gameId: game.id,
+            targetField,
+            operation,
+            suggestedValue,
+            originalValue: safeOriginalValue
+        });
+
+        // Log as approved suggestion for history
+        await db.insert(suggestions).values({
+            gameId: game.id,
+            userId: user.id,
+            targetField,
+            operation,
+            originalValue: originalSql,
+            suggestedValue: suggestedSql,
+            voteCount: 999,
+            status: 'approved'
+        });
+
+        return NextResponse.json({ success: true, status: 'approved' });
+    }
+
+    // Normal User Flow with Rate Limit
     const userId = user.id;
     const RATE_LIMIT_WINDOW = 60 * 60 * 1000;
     const MAX_ATTEMPTS = 10;
-
     const now = new Date();
     
-    // Clean up expired rate limits
-    // Fixed: Use Drizzle's lt() operator instead of sql template with Date object
     await db.delete(rateLimits).where(
       and(
         eq(rateLimits.key, userId), 
@@ -56,21 +106,6 @@ export async function POST(
       });
     }
 
-    const checkValue = (val: unknown): boolean => {
-      if (typeof val === 'string') return containsProfanity(val);
-      if (typeof val === 'object' && val !== null) {
-        return Object.values(val as Record<string, unknown>).some(v => checkValue(v));
-      }
-      return false;
-    };
-
-    if (checkValue(suggestedValue)) {
-      return NextResponse.json({ error: 'Inappropriate content detected' }, { status: 400 });
-    }
-
-    const game = await db.select().from(games).where(eq(games.slug, params.slug)).get();
-    if (!game) return NextResponse.json({ error: 'Game not found' }, { status: 404 });
-
     const existing = await db.select().from(suggestions).where(
         and(
             eq(suggestions.gameId, game.id),
@@ -84,20 +119,17 @@ export async function POST(
         return NextResponse.json({ error: 'You already have a pending suggestion for this field' }, { status: 400 });
     }
 
-    // Ensure undefined becomes null for SQLite binding
-    const safeOriginalValue = originalValue === undefined ? null : originalValue;
-
     await db.insert(suggestions).values({
       gameId: game.id,
       userId: user.id,
       targetField,
       operation,
-      originalValue: safeOriginalValue,
-      suggestedValue,
+      originalValue: originalSql,
+      suggestedValue: suggestedSql,
       voteCount: 1 
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, status: 'pending' });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Failed to submit suggestion' }, { status: 500 });

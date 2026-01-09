@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { users, favorites, ownedGames, lists, savedLists, reviews, listItems } from '@/lib/schema';
+import { users, favorites, ownedGames, lists, reviews, listItems } from '@/lib/schema';
 import { eq, desc, count } from 'drizzle-orm';
 import { getCurrentUser } from '@/lib/get-user';
 import { UserProfile, Game, List, Review } from '@/lib/types';
@@ -56,21 +56,23 @@ interface RawList {
 
 export async function GET() {
   const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const userInfo = await db.query.users.findFirst({
       where: eq(users.id, user.id),
-      columns: {
-        id: true,
-        email: true,
-        username: true,
-        bio: true,
-        createdAt: true
+      with: {
+        roles: {
+          with: {
+            role: true
+          }
+        }
       }
     });
+
+    if (!userInfo) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
 
     const favoritesData = await db.query.favorites.findMany({
       where: eq(favorites.userId, user.id),
@@ -130,7 +132,7 @@ export async function GET() {
       }
     });
 
-    const formatList = async (listObj: RawList, isSavedItem = false): Promise<List> => {
+    const formatList = async (listObj: RawList): Promise<List> => {
         const totalCount = await db.select({ value: count() })
           .from(listItems)
           .where(eq(listItems.listId, listObj.id))
@@ -144,9 +146,9 @@ export async function GET() {
             creator: listObj.creator.username,
             averageRating: listObj.averageRating,
             gameCount: totalCount?.value || 0,
-            isSaved: isSavedItem, 
+            isSaved: false, 
             userRating: 0, 
-            isOwner: !isSavedItem,
+            isOwner: true,
             games: listObj.items.map((item) => ({
                 id: item.game.id,
                 slug: item.game.slug,
@@ -158,8 +160,17 @@ export async function GET() {
 
     const formattedCreatedLists = await Promise.all(createdLists.map((l) => formatList(l as unknown as RawList)));
 
+    const userProfile: UserProfile = {
+      id: userInfo.id,
+      username: userInfo.username,
+      email: userInfo.email,
+      bio: userInfo.bio,
+      createdAt: userInfo.createdAt || new Date().toISOString(),
+      roles: userInfo.roles.map(r => r.role.name)
+    };
+
     return NextResponse.json({
-      user: userInfo as UserProfile,
+      user: userProfile,
       favorites: favoritesData.map((f) => ({ ...f.game, tags: f.game.tags.map((t) => t.tag) })) as Game[],
       owned: ownedData.map((o) => ({ ...o.game, tags: o.game.tags.map((t) => t.tag) })) as Game[],
       createdLists: formattedCreatedLists,

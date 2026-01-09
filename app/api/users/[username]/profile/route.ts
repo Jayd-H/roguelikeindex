@@ -73,6 +73,13 @@ export async function GET(
         username: true,
         bio: true,
         createdAt: true
+      },
+      with: {
+        roles: {
+          with: {
+            role: true
+          }
+        }
       }
     });
 
@@ -171,7 +178,8 @@ export async function GET(
         username: userInfo.username,
         email: "", 
         bio: userInfo.bio,
-        createdAt: userInfo.createdAt || new Date().toISOString()
+        createdAt: userInfo.createdAt || new Date().toISOString(),
+        roles: userInfo.roles.map(r => r.role.name)
     };
 
     return NextResponse.json({
