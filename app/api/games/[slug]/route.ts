@@ -3,6 +3,8 @@ import { db } from '@/lib/db';
 import { eq } from 'drizzle-orm';
 import { games } from '@/lib/schema';
 
+export const revalidate = 3600;
+
 const gameColumns = {
   id: true,
   slug: true,

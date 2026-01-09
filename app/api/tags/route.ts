@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { tags, gamesToTags, games } from '@/lib/schema';
 import { eq, count, desc } from 'drizzle-orm';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
 
 export async function GET() {
   try {

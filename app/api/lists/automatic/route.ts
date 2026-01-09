@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { games, tags, gamesToTags, externalRatings, lists, listItems, users, savedLists, listRatings } from '@/lib/schema';
+import { games, tags, gamesToTags, externalRatings, lists, listItems, users, listRatings } from '@/lib/schema';
 import { desc, eq, and, gte, inArray, like, sql } from 'drizzle-orm';
-import { getCurrentUser } from '@/lib/get-user';
 
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 interface PartialGame {
   id: string;
@@ -15,8 +14,6 @@ interface PartialGame {
 
 export async function GET() {
   try {
-    const currentUser = await getCurrentUser();
-    
     const SYSTEM_USER_ID = 'system-auto-list-creator';
     const systemUser = await db.select().from(users).where(eq(users.id, SYSTEM_USER_ID)).get();
     if (!systemUser) {
@@ -106,7 +103,6 @@ export async function GET() {
       { id: 'auto-deckbuilder', title: 'Master Deckbuilders', desc: 'Draft your way to victory with these card-based hits.', games: deckbuilders },
       { id: 'auto-turnbased', title: 'Tactical Thinkers', desc: 'Take your time and plan every move carefully.', games: turnBasedRoguelikes },
       { id: 'auto-traditional', title: 'Classic Roguelikes', desc: 'The purest form of the genre.', games: traditionalRoguelikes },
-      // Removed Progressive Journey (Metaprogression)
       { id: 'auto-ign', title: 'IGN Editor\'s Choice', desc: 'Critically acclaimed titles scoring 8+ on IGN.', games: ignGames },
       { id: 'auto-metacritic', title: 'Metacritic Must-Plays', desc: 'Games with a Metascore of 85 or higher.', games: metaGames },
       { id: 'auto-strat', title: 'Strategic Minds', desc: 'For those who prefer planning over reflexes.', games: strategyGames },
@@ -145,9 +141,6 @@ export async function GET() {
             );
         }
 
-        let isSaved = false;
-        let userRating = 0;
-        
         const ratingResult = await db.select({ value: sql<number>`avg(rating)` })
             .from(listRatings)
             .where(eq(listRatings.listId, def.id))
@@ -155,13 +148,6 @@ export async function GET() {
         const avgRating = ratingResult?.value || 0;
 
         await db.update(lists).set({ averageRating: avgRating }).where(eq(lists.id, def.id));
-
-        if (currentUser) {
-            const saved = await db.select().from(savedLists).where(and(eq(savedLists.userId, currentUser.id), eq(savedLists.listId, def.id))).get();
-            isSaved = !!saved;
-            const myRating = await db.select().from(listRatings).where(and(eq(listRatings.userId, currentUser.id), eq(listRatings.listId, def.id))).get();
-            userRating = myRating ? myRating.rating : 0;
-        }
 
         return {
             id: def.id,
@@ -171,8 +157,8 @@ export async function GET() {
             creator: 'RoguelikeIndex',
             averageRating: avgRating,
             gameCount: def.games.length,
-            isSaved,
-            userRating,
+            isSaved: false,
+            userRating: 0,
             games: formatGames(def.games)
         };
     }));
