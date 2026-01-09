@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -203,33 +204,70 @@ export default function GamesPage() {
         </div>
         <div className="flex flex-col lg:flex-row gap-12">
           <aside className="w-full lg:w-72 shrink-0">
-            <GameFilters
-              availableTags={availableTags}
-              selectedTags={selectedTags}
-              selectedCombat={selectedCombat}
-              selectedNarrative={selectedNarrative}
-              minRating={minRating}
-              complexity={complexity}
-              metaProgression={metaProgression}
-              deckVerified={deckVerified}
-              hasActiveFilters={hasActiveFilters}
-              onTagToggle={handleTagToggle}
-              onCombatToggle={handleCombatToggle}
-              onNarrativeToggle={handleNarrativeToggle}
-              onMinRatingChange={setMinRating}
-              onComplexityChange={setComplexity}
-              onMetaProgressionChange={setMetaProgression}
-              onDeckVerifiedChange={setDeckVerified}
-              onClearFilters={clearFilters}
-            />
+            {availableTags.length === 0 ? (
+              <div className="space-y-8 pr-2">
+                <div className="flex justify-between items-center">
+                  <Skeleton className="h-4 w-20" />
+                </div>
+                <div className="space-y-3">
+                  <Skeleton className="h-4 w-16" />
+                  <div className="flex flex-wrap gap-2">
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                      <Skeleton key={i} className="h-7 w-20 rounded-md" />
+                    ))}
+                  </div>
+                </div>
+                <Separator />
+                <div className="space-y-3">
+                  <Skeleton className="h-4 w-24" />
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex gap-2 items-center">
+                      <Skeleton className="h-4 w-4" />
+                      <Skeleton className="h-4 w-24" />
+                    </div>
+                  ))}
+                </div>
+                <Separator />
+                <div className="space-y-4">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-12 w-full" />
+                </div>
+              </div>
+            ) : (
+              <GameFilters
+                availableTags={availableTags}
+                selectedTags={selectedTags}
+                selectedCombat={selectedCombat}
+                selectedNarrative={selectedNarrative}
+                minRating={minRating}
+                complexity={complexity}
+                metaProgression={metaProgression}
+                deckVerified={deckVerified}
+                hasActiveFilters={hasActiveFilters}
+                onTagToggle={handleTagToggle}
+                onCombatToggle={handleCombatToggle}
+                onNarrativeToggle={handleNarrativeToggle}
+                onMinRatingChange={setMinRating}
+                onComplexityChange={setComplexity}
+                onMetaProgressionChange={setMetaProgression}
+                onDeckVerifiedChange={setDeckVerified}
+                onClearFilters={clearFilters}
+              />
+            )}
           </aside>
           <section className="flex-1 space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-background/50 backdrop-blur-sm sticky top-16 lg:static z-20 py-2">
               <div className="text-muted-foreground text-sm font-medium">
-                <span className="text-foreground font-bold">
-                  {loading && totalGames === 0 ? "..." : totalGames}
-                </span>{" "}
-                Games Found
+                {loading && totalGames === 0 ? (
+                  <Skeleton className="h-5 w-32" />
+                ) : (
+                  <>
+                    <span className="text-foreground font-bold">
+                      {totalGames}
+                    </span>{" "}
+                    Games Found
+                  </>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 <Label className="text-xs text-muted-foreground mr-1">
@@ -261,6 +299,7 @@ export default function GamesPage() {
               {error && (
                 <div className="text-center py-20 text-red-500">{error}</div>
               )}
+
               {games.map((game, index) => (
                 <div
                   key={game.id}
@@ -270,9 +309,35 @@ export default function GamesPage() {
                   <Separator className="opacity-50 last:hidden" />
                 </div>
               ))}
+
               {(loading || loadingMore) && (
-                <div className="text-center py-10">Loading games...</div>
+                <div className="space-y-8 mt-2">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="flex flex-col sm:flex-row gap-6">
+                      <Skeleton className="w-full sm:w-70 h-40 rounded-lg shrink-0" />
+                      <div className="flex-1 py-1 space-y-4">
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-start">
+                            <Skeleton className="h-8 w-2/3" />
+                            <Skeleton className="h-6 w-12" />
+                          </div>
+                          <Skeleton className="h-4 w-full" />
+                          <Skeleton className="h-4 w-5/6" />
+                        </div>
+                        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                          <div className="flex gap-4">
+                            <Skeleton className="h-4 w-16" />
+                            <Skeleton className="h-4 w-16" />
+                            <Skeleton className="h-4 w-16" />
+                          </div>
+                          <Skeleton className="h-4 w-24" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
+
               {!loading && !error && games.length === 0 && (
                 <div className="text-center py-24 text-muted-foreground bg-secondary/5 rounded-xl border border-dashed border-border/60">
                   <div className="flex flex-col items-center gap-2">

@@ -60,15 +60,46 @@ export default function PublicProfilePage() {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-screen bg-background flex flex-col font-sans">
         <Header />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-4">
-            <Skeleton className="h-24 w-24 rounded-full" />
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="h-4 w-64" />
+        <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-6">
+          <div className="flex flex-col md:flex-row gap-8 items-start mb-8">
+            <Skeleton className="h-32 w-32 rounded-full shrink-0" />
+            <div className="flex-1 w-full space-y-4">
+              <div className="space-y-2">
+                <Skeleton className="h-10 w-48" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+              <Skeleton className="h-20 w-full max-w-3xl" />
+              <div className="flex gap-4 pt-2">
+                <Skeleton className="h-14 w-28 rounded-lg" />
+                <Skeleton className="h-14 w-28 rounded-lg" />
+                <Skeleton className="h-14 w-28 rounded-lg" />
+                <Skeleton className="h-14 w-28 rounded-lg" />
+              </div>
+            </div>
           </div>
-        </div>
+
+          <Separator className="mb-10" />
+
+          <div className="space-y-12">
+            <div className="space-y-6">
+              <Skeleton className="h-8 w-32" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Skeleton className="h-48 w-full rounded-xl" />
+                <Skeleton className="h-48 w-full rounded-xl" />
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <Skeleton className="h-8 w-32" />
+              <div className="flex gap-6 overflow-hidden">
+                <Skeleton className="h-112 w-80 rounded-3xl shrink-0" />
+                <Skeleton className="h-112 w-80 rounded-3xl shrink-0" />
+              </div>
+            </div>
+          </div>
+        </main>
       </div>
     );
 

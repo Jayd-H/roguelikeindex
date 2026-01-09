@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Game, Tag } from "@/lib/types";
 import { GameCard } from "@/components/games/game-card";
 import { GameFilters } from "@/components/games/game-filters";
@@ -211,7 +212,6 @@ export default function ListDetailPage() {
 
   const handleRemoveGame = async (gameId: string) => {
     if (!listData) return;
-    // Removed confirmation for game deletion as requested
     try {
       const res = await fetch(`/api/lists/${listData.id}/remove`, {
         method: "POST",
@@ -263,8 +263,66 @@ export default function ListDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        Loading...
+      <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
+        <Header />
+        <main className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-6 py-8">
+          <div className="w-full max-w-4xl mx-auto mb-12 space-y-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div className="flex-1 w-full space-y-4">
+                <Skeleton className="h-10 w-2/3" />
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-5/6" />
+              </div>
+              <Skeleton className="h-10 w-32" />
+            </div>
+            <Skeleton className="h-20 w-full rounded-xl" />
+            <Skeleton className="h-12 w-xl mx-auto rounded-full" />
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-12">
+            <aside className="w-full lg:w-72 shrink-0 space-y-8">
+              <div className="space-y-4">
+                <Skeleton className="h-4 w-24" />
+                <div className="flex flex-wrap gap-2">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <Skeleton key={i} className="h-7 w-16" />
+                  ))}
+                </div>
+              </div>
+              <Separator />
+              <div className="space-y-4">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-24 w-full" />
+              </div>
+            </aside>
+            <section className="flex-1 space-y-6">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex flex-col sm:flex-row gap-6">
+                  <Skeleton className="w-full sm:w-70 h-40 rounded-lg shrink-0" />
+                  <div className="flex-1 py-1 space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-start">
+                        <Skeleton className="h-8 w-2/3" />
+                        <Skeleton className="h-6 w-12" />
+                      </div>
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-5/6" />
+                    </div>
+                    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                      <div className="flex gap-4">
+                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-4 w-16" />
+                      </div>
+                      <Skeleton className="h-4 w-24" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </section>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }
