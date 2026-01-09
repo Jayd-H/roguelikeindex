@@ -3,35 +3,35 @@ import { db } from '@/lib/db';
 import { games, gamesToTags, tags } from '@/lib/schema';
 import { and, eq, gte, inArray, like, desc, asc, count } from 'drizzle-orm';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 const gameColumns = {
-  id: true,
-  slug: true,
-  title: true,
-  description: true,
-  subgenre: true,
-  combatType: true,
-  narrativePresence: true,
-  avgRunLength: true,
-  timeToFirstWin: true,
-  timeTo100: true,
-  difficulty: true,
-  rngReliance: true,
-  userFriendliness: true,
-  complexity: true,
-  synergyDepth: true,
-  replayability: true,
-  metaProgression: true,
-  steamDeckVerified: true,
-  rating: true,
-  releaseDate: true,
-  developer: true,
-  publisher: true,
-  steamAppId: true,
-  achievementsCount: true,
-  websiteUrl: true,
-  supportEmail: true,
+  id: games.id,
+  slug: games.slug,
+  title: games.title,
+  description: games.description,
+  subgenre: games.subgenre,
+  combatType: games.combatType,
+  narrativePresence: games.narrativePresence,
+  avgRunLength: games.avgRunLength,
+  timeToFirstWin: games.timeToFirstWin,
+  timeTo100: games.timeTo100,
+  difficulty: games.difficulty,
+  rngReliance: games.rngReliance,
+  userFriendliness: games.userFriendliness,
+  complexity: games.complexity,
+  synergyDepth: games.synergyDepth,
+  replayability: games.replayability,
+  metaProgression: games.metaProgression,
+  steamDeckVerified: games.steamDeckVerified,
+  rating: games.rating,
+  releaseDate: games.releaseDate,
+  developer: games.developer,
+  publisher: games.publisher,
+  steamAppId: games.steamAppId,
+  achievementsCount: games.achievementsCount,
+  websiteUrl: games.websiteUrl,
+  supportEmail: games.supportEmail,
 };
 
 export async function GET(request: Request) {
@@ -93,24 +93,39 @@ export async function GET(request: Request) {
         orderBy = desc(games.rating);
     }
 
-    const data = await db.query.games.findMany({
-      where: and(...conditions),
-      limit: limit,
-      offset: (page - 1) * limit,
-      columns: gameColumns,
-      with: {
-        tags: {
-          with: {
-            tag: true
-          }
-        }
-      },
-      orderBy: orderBy
-    });
+    const offset = (page - 1) * limit;
+    
+    const gamesList = await db.select(gameColumns)
+      .from(games)
+      .where(and(...conditions))
+      .limit(limit)
+      .offset(offset)
+      .orderBy(orderBy);
 
-    const formattedData = data.map(game => ({
+    if (gamesList.length === 0) {
+      return NextResponse.json({ games: [], total: 0 });
+    }
+
+    const gameIds = gamesList.map(g => g.id);
+    
+    const gameTags = await db.select({
+      gameId: gamesToTags.gameId,
+      tagId: tags.id,
+      tagName: tags.name,
+    })
+    .from(gamesToTags)
+    .innerJoin(tags, eq(gamesToTags.tagId, tags.id))
+    .where(inArray(gamesToTags.gameId, gameIds));
+
+    const tagsByGame = gameTags.reduce((acc, { gameId, tagId, tagName }) => {
+      if (!acc[gameId]) acc[gameId] = [];
+      acc[gameId].push({ id: tagId, name: tagName });
+      return acc;
+    }, {} as Record<string, { id: number; name: string }[]>);
+
+    const formattedData = gamesList.map(game => ({
       ...game,
-      tags: game.tags.map(t => t.tag)
+      tags: tagsByGame[game.id] || []
     }));
 
     const totalResult = await db.select({ value: count() })

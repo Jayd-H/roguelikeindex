@@ -1,58 +1,11 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { users, favorites, ownedGames, lists, reviews, listItems } from '@/lib/schema';
-import { eq, desc, count } from 'drizzle-orm';
+import { users, favorites, ownedGames, lists, reviews, listItems, games, gamesToTags, tags } from '@/lib/schema';
+import { eq, desc, count, inArray } from 'drizzle-orm';
 import { getCurrentUser } from '@/lib/get-user';
-import { UserProfile, Game, List, Review } from '@/lib/types';
+import { UserProfile, Game } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
-
-const gameColumns = {
-  id: true,
-  slug: true,
-  title: true,
-  description: true,
-  subgenre: true,
-  combatType: true,
-  narrativePresence: true,
-  avgRunLength: true,
-  timeToFirstWin: true,
-  timeTo100: true,
-  difficulty: true,
-  rngReliance: true,
-  userFriendliness: true,
-  complexity: true,
-  synergyDepth: true,
-  replayability: true,
-  metaProgression: true,
-  steamDeckVerified: true,
-  rating: true,
-  releaseDate: true,
-  developer: true,
-  publisher: true,
-  steamAppId: true,
-};
-
-interface RawListItem {
-  game: {
-    id: string;
-    slug: string;
-    title: string;
-  };
-}
-
-interface RawList {
-  id: string;
-  title: string;
-  description: string | null;
-  isPublic: boolean;
-  averageRating: number | null;
-  createdAt: string;
-  creator: {
-    username: string;
-  };
-  items: RawListItem[];
-}
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -61,10 +14,21 @@ export async function GET() {
   try {
     const userInfo = await db.query.users.findFirst({
       where: eq(users.id, user.id),
+      columns: {
+        id: true,
+        email: true,
+        username: true,
+        bio: true,
+        createdAt: true
+      },
       with: {
         roles: {
           with: {
-            role: true
+            role: {
+              columns: {
+                name: true
+              }
+            }
           }
         }
       }
@@ -74,91 +38,171 @@ export async function GET() {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const favoritesData = await db.query.favorites.findMany({
-      where: eq(favorites.userId, user.id),
-      with: {
-        game: {
-          columns: gameColumns,
-          with: {
-            tags: { with: { tag: true } }
-          }
-        }
+    const [favoritesData, ownedData, createdLists, reviewsData] = await Promise.all([
+      db.select({
+        gameId: favorites.gameId
+      })
+      .from(favorites)
+      .where(eq(favorites.userId, user.id)),
+      
+      db.select({
+        gameId: ownedGames.gameId
+      })
+      .from(ownedGames)
+      .where(eq(ownedGames.userId, user.id)),
+      
+      db.select({
+        id: lists.id,
+        title: lists.title,
+        description: lists.description,
+        isPublic: lists.isPublic,
+        averageRating: lists.averageRating,
+        createdAt: lists.createdAt,
+      })
+      .from(lists)
+      .where(eq(lists.userId, user.id))
+      .orderBy(desc(lists.createdAt)),
+      
+      db.select({
+        id: reviews.id,
+        user: reviews.user,
+        userId: reviews.userId,
+        rating: reviews.rating,
+        comment: reviews.comment,
+        date: reviews.date,
+        gameId: reviews.gameId,
+        difficulty: reviews.difficulty,
+        replayability: reviews.replayability,
+        synergyDepth: reviews.synergyDepth,
+        complexity: reviews.complexity,
+        rngReliance: reviews.rngReliance,
+        userFriendliness: reviews.userFriendliness,
+        avgRunLength: reviews.avgRunLength,
+        timeToFirstWin: reviews.timeToFirstWin,
+        timeTo100: reviews.timeTo100,
+        combatType: reviews.combatType,
+        narrativePresence: reviews.narrativePresence,
+        gameTitle: games.title,
+        gameSlug: games.slug,
+      })
+      .from(reviews)
+      .innerJoin(games, eq(reviews.gameId, games.id))
+      .where(eq(reviews.userId, user.id))
+      .orderBy(desc(reviews.date))
+    ]);
+
+    const allGameIds = [
+      ...favoritesData.map(f => f.gameId),
+      ...ownedData.map(o => o.gameId)
+    ];
+
+    const gamesData = allGameIds.length > 0 ? await db.select({
+      id: games.id,
+      slug: games.slug,
+      title: games.title,
+      description: games.description,
+      subgenre: games.subgenre,
+      combatType: games.combatType,
+      narrativePresence: games.narrativePresence,
+      avgRunLength: games.avgRunLength,
+      timeToFirstWin: games.timeToFirstWin,
+      timeTo100: games.timeTo100,
+      difficulty: games.difficulty,
+      rngReliance: games.rngReliance,
+      userFriendliness: games.userFriendliness,
+      complexity: games.complexity,
+      synergyDepth: games.synergyDepth,
+      replayability: games.replayability,
+      metaProgression: games.metaProgression,
+      steamDeckVerified: games.steamDeckVerified,
+      rating: games.rating,
+      releaseDate: games.releaseDate,
+      developer: games.developer,
+      publisher: games.publisher,
+      steamAppId: games.steamAppId,
+    })
+    .from(games)
+    .where(inArray(games.id, allGameIds)) : [];
+
+    const gameTags = allGameIds.length > 0 ? await db.select({
+      gameId: gamesToTags.gameId,
+      tagId: tags.id,
+      tagName: tags.name,
+    })
+    .from(gamesToTags)
+    .innerJoin(tags, eq(gamesToTags.tagId, tags.id))
+    .where(inArray(gamesToTags.gameId, allGameIds)) : [];
+
+    const tagsByGame: Record<string, { id: number; name: string }[]> = {};
+    gameTags.forEach(({ gameId, tagId, tagName }) => {
+      if (!tagsByGame[gameId]) tagsByGame[gameId] = [];
+      tagsByGame[gameId].push({ id: tagId, name: tagName });
+    });
+
+    const gamesMap: Record<string, Game> = {};
+    gamesData.forEach(game => {
+      gamesMap[game.id] = {
+        ...game,
+        tags: tagsByGame[game.id] || [],
+        pricing: [],
+        externalRatings: [],
+        reviews: [],
+        similarGames: []
+      };
+    });
+
+    const listItemCounts = createdLists.length > 0 ? await db.select({
+      listId: listItems.listId,
+      count: count()
+    })
+    .from(listItems)
+    .where(inArray(listItems.listId, createdLists.map(l => l.id)))
+    .groupBy(listItems.listId) : [];
+
+    const listItemsByList = createdLists.length > 0 ? await db.select({
+      listId: listItems.listId,
+      gameId: listItems.gameId,
+      gameSlug: games.slug,
+      gameTitle: games.title,
+      order: listItems.order,
+    })
+    .from(listItems)
+    .innerJoin(games, eq(listItems.gameId, games.id))
+    .where(inArray(listItems.listId, createdLists.map(l => l.id)))
+    .orderBy(listItems.order)
+    .limit(4 * createdLists.length) : [];
+
+    const itemsByListId: Record<string, { id: string; slug: string; title: string; image: string }[]> = {};
+    listItemsByList.forEach(item => {
+      if (!itemsByListId[item.listId]) itemsByListId[item.listId] = [];
+      if (itemsByListId[item.listId].length < 4) {
+        itemsByListId[item.listId].push({
+          id: item.gameId,
+          slug: item.gameSlug,
+          title: item.gameTitle,
+          image: `/api/games/${item.gameSlug}/image/header`
+        });
       }
     });
 
-    const ownedData = await db.query.ownedGames.findMany({
-      where: eq(ownedGames.userId, user.id),
-      with: {
-        game: {
-            columns: gameColumns,
-            with: {
-                tags: { with: { tag: true } }
-            }
-        }
-      }
+    const countsMap: Record<string, number> = {};
+    listItemCounts.forEach(({ listId, count: itemCount }) => {
+      countsMap[listId] = itemCount;
     });
 
-    const createdLists = await db.query.lists.findMany({
-      where: eq(lists.userId, user.id),
-      orderBy: desc(lists.createdAt),
-      with: {
-        creator: true,
-        items: {
-          orderBy: (listItems, { asc }) => [asc(listItems.order)],
-          limit: 4,
-          with: {
-            game: {
-                columns: {
-                    id: true,
-                    slug: true,
-                    title: true
-                }
-            }
-          }
-        }
-      }
-    });
-
-    const reviewsData = await db.query.reviews.findMany({
-      where: eq(reviews.userId, user.id),
-      orderBy: desc(reviews.date),
-      with: {
-        game: {
-          columns: {
-            title: true,
-            slug: true
-          }
-        }
-      }
-    });
-
-    const formatList = async (listObj: RawList): Promise<List> => {
-        const totalCount = await db.select({ value: count() })
-          .from(listItems)
-          .where(eq(listItems.listId, listObj.id))
-          .get();
-        
-        return {
-            id: listObj.id,
-            title: listObj.title,
-            description: listObj.description,
-            type: 'user',
-            creator: listObj.creator.username,
-            averageRating: listObj.averageRating,
-            gameCount: totalCount?.value || 0,
-            isSaved: false, 
-            userRating: 0, 
-            isOwner: true,
-            games: listObj.items.map((item) => ({
-                id: item.game.id,
-                slug: item.game.slug,
-                title: item.game.title,
-                image: `/api/games/${item.game.slug}/image/header`
-            }))
-        };
-    };
-
-    const formattedCreatedLists = await Promise.all(createdLists.map((l) => formatList(l as unknown as RawList)));
+    const formattedCreatedLists = createdLists.map(list => ({
+      id: list.id,
+      title: list.title,
+      description: list.description,
+      type: 'user' as const,
+      creator: userInfo.username,
+      averageRating: list.averageRating,
+      gameCount: countsMap[list.id] || 0,
+      isSaved: false,
+      userRating: 0,
+      isOwner: true,
+      games: itemsByListId[list.id] || []
+    }));
 
     const userProfile: UserProfile = {
       id: userInfo.id,
@@ -171,10 +215,13 @@ export async function GET() {
 
     return NextResponse.json({
       user: userProfile,
-      favorites: favoritesData.map((f) => ({ ...f.game, tags: f.game.tags.map((t) => t.tag) })) as Game[],
-      owned: ownedData.map((o) => ({ ...o.game, tags: o.game.tags.map((t) => t.tag) })) as Game[],
+      favorites: favoritesData.map(f => gamesMap[f.gameId]).filter(Boolean),
+      owned: ownedData.map(o => gamesMap[o.gameId]).filter(Boolean),
       createdLists: formattedCreatedLists,
-      reviews: reviewsData as Review[]
+      reviews: reviewsData.map(r => ({
+        ...r,
+        game: { title: r.gameTitle, slug: r.gameSlug }
+      }))
     });
 
   } catch (error) {
