@@ -11,14 +11,16 @@ export async function PATCH(req: Request) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const { username, email, bio, newPassword, currentPassword } = await req.json();
+    const { username: rawUsername, email, bio, newPassword, currentPassword } = await req.json();
 
     const currentUserRecord = await db.select().from(users).where(eq(users.id, user.id)).get();
     if (!currentUserRecord) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const updates: Partial<typeof users.$inferInsert> = {};
 
-    if (username && username !== user.name) {
+    if (rawUsername && rawUsername !== user.name) {
+      const username = rawUsername.toLowerCase();
+      
       if (username.length < 3 || username.length > 16) {
         return NextResponse.json({ error: 'Username must be between 3 and 16 characters' }, { status: 400 });
       }

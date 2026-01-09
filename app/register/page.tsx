@@ -97,9 +97,9 @@ export default function RegisterPage() {
                 <Input
                   id="username"
                   name="username"
-                  placeholder="RogueOne"
+                  placeholder="rogueone"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) => setUsername(e.target.value.toLowerCase())}
                   className={
                     username && !isUsernameValid
                       ? "border-red-500 focus-visible:ring-red-500"

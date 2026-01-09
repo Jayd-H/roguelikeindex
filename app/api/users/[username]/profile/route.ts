@@ -58,7 +58,7 @@ export async function GET(
   props: { params: Promise<{ username: string }> }
 ) {
   const params = await props.params;
-  const username = params.username;
+  const username = params.username.toLowerCase();
 
   if (!username) {
     return NextResponse.json({ error: 'Username required' }, { status: 400 });

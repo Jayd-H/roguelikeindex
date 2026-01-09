@@ -171,7 +171,9 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-2 max-w-sm">
                     <Input
                       value={tempValue}
-                      onChange={(e) => setTempValue(e.target.value)}
+                      onChange={(e) =>
+                        setTempValue(e.target.value.toLowerCase())
+                      }
                       className="text-2xl font-bold h-10"
                       autoFocus
                     />
