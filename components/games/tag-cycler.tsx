@@ -26,7 +26,7 @@ export function TagCycler({ tags }: TagCyclerProps) {
       <TagIcon size={14} weight="fill" className="shrink-0" />
       <span
         key={index}
-        className="truncate max-w-25 animate-in fade-in slide-in-from-bottom-1 duration-500 text-right"
+        className="text-right truncate duration-500 max-w-25 animate-in fade-in slide-in-from-bottom-1"
       >
         {tags[index]}
       </span>

@@ -145,7 +145,6 @@ export async function GET(
       tagsByGame[gameId].push({ id: tagId, name: tagName });
     });
 
-    // Add a lightweight type for this route (we don't fetch pricing/externalRatings/etc here)
     type ProfileGame = Omit<Game, 'pricing' | 'externalRatings' | 'reviews' | 'similarGames'>;
 
     const gamesMap: Record<string, ProfileGame> = {};

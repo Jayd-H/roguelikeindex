@@ -151,7 +151,7 @@ export function GameReviews({
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       key={star}
-                      className="focus:outline-none transition-transform hover:scale-110 active:scale-95 cursor-pointer"
+                      className="transition-transform cursor-pointer focus:outline-none hover:scale-110 active:scale-95"
                       onMouseEnter={() => setHoverRating(star)}
                       onMouseLeave={() => setHoverRating(0)}
                       onClick={() => handleRatingClick(star)}
@@ -181,9 +181,9 @@ export function GameReviews({
                     : "grid-rows-[0fr] opacity-0 mt-0"
                 }`}
               >
-                <div className="overflow-hidden min-h-0 space-y-6">
+                <div className="min-h-0 space-y-6 overflow-hidden">
                   <Separator className="mb-6" />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                     <div className="space-y-6">
                       {[
                         {
@@ -227,10 +227,10 @@ export function GameReviews({
                           <div className="flex justify-between text-sm">
                             <Label>{stat.label}</Label>
                             <div className="flex items-center gap-2">
-                              <span className="text-muted-foreground text-xs">
+                              <span className="text-xs text-muted-foreground">
                                 {stat.desc}
                               </span>
-                              <span className="font-bold w-4 text-right">
+                              <span className="w-4 font-bold text-right">
                                 {stat.value}
                               </span>
                             </div>
@@ -254,7 +254,7 @@ export function GameReviews({
                             value={narrativePresence}
                             onValueChange={setNarrativePresence}
                           >
-                            <SelectTrigger className="h-9 text-xs">
+                            <SelectTrigger className="text-xs h-9">
                               <SelectValue placeholder="Select..." />
                             </SelectTrigger>
                             <SelectContent>
@@ -275,7 +275,7 @@ export function GameReviews({
                             value={combatType}
                             onValueChange={setCombatType}
                           >
-                            <SelectTrigger className="h-9 text-xs">
+                            <SelectTrigger className="text-xs h-9">
                               <SelectValue placeholder="Select..." />
                             </SelectTrigger>
                             <SelectContent>
@@ -326,7 +326,7 @@ export function GameReviews({
                         </div>
                       </div>
                       {timeError && (
-                        <p className="text-xs text-red-500 font-medium">
+                        <p className="text-xs font-medium text-red-500">
                           {timeError}
                         </p>
                       )}
@@ -337,13 +337,13 @@ export function GameReviews({
                           value={reviewText}
                           onChange={(e) => setReviewText(e.target.value)}
                           placeholder="Share your thoughts..."
-                          className="resize-none h-32"
+                          className="h-32 resize-none"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex justify-end pt-2 gap-2">
+                  <div className="flex justify-end gap-2 pt-2">
                     {isEditing && (
                       <Button
                         variant="ghost"
@@ -375,7 +375,7 @@ export function GameReviews({
         {myReview && !isEditing && (
           <div className="relative group">
             <ReviewCard review={myReview} />
-            <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute flex items-center gap-1 transition-opacity opacity-0 top-3 right-3 group-hover:opacity-100">
               <Button
                 variant="ghost"
                 size="icon"
@@ -383,7 +383,7 @@ export function GameReviews({
                   setIsEditing(true);
                   setIsReviewFormOpen(true);
                 }}
-                className="h-8 w-8 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                className="w-8 h-8 transition-colors cursor-pointer text-muted-foreground hover:text-primary"
               >
                 <PencilIcon size={16} />
               </Button>
@@ -391,7 +391,7 @@ export function GameReviews({
                 variant="ghost"
                 size="icon"
                 onClick={onDeleteReview}
-                className="h-8 w-8 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                className="w-8 h-8 transition-colors cursor-pointer text-muted-foreground hover:text-destructive"
               >
                 <TrashIcon size={16} />
               </Button>

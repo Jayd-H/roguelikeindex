@@ -263,58 +263,58 @@ export default function ListDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
+      <div className="flex flex-col min-h-screen font-sans bg-background text-foreground">
         <Header />
-        <main className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-6 py-8">
+        <main className="flex flex-col flex-1 w-full px-6 py-8 mx-auto max-w-7xl">
           <div className="w-full max-w-4xl mx-auto mb-12 space-y-6">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
               <div className="flex-1 w-full space-y-4">
-                <Skeleton className="h-10 w-2/3" />
-                <Skeleton className="h-6 w-full" />
-                <Skeleton className="h-6 w-5/6" />
+                <Skeleton className="w-2/3 h-10" />
+                <Skeleton className="w-full h-6" />
+                <Skeleton className="w-5/6 h-6" />
               </div>
-              <Skeleton className="h-10 w-32" />
+              <Skeleton className="w-32 h-10" />
             </div>
-            <Skeleton className="h-20 w-full rounded-xl" />
-            <Skeleton className="h-12 w-xl mx-auto rounded-full" />
+            <Skeleton className="w-full h-20 rounded-xl" />
+            <Skeleton className="h-12 mx-auto rounded-full w-xl" />
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-12">
-            <aside className="w-full lg:w-72 shrink-0 space-y-8">
+          <div className="flex flex-col gap-12 lg:flex-row">
+            <aside className="w-full space-y-8 lg:w-72 shrink-0">
               <div className="space-y-4">
-                <Skeleton className="h-4 w-24" />
+                <Skeleton className="w-24 h-4" />
                 <div className="flex flex-wrap gap-2">
                   {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <Skeleton key={i} className="h-7 w-16" />
+                    <Skeleton key={i} className="w-16 h-7" />
                   ))}
                 </div>
               </div>
               <Separator />
               <div className="space-y-4">
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-24 w-full" />
+                <Skeleton className="w-32 h-4" />
+                <Skeleton className="w-full h-24" />
               </div>
             </aside>
             <section className="flex-1 space-y-6">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="flex flex-col sm:flex-row gap-6">
-                  <Skeleton className="w-full sm:w-70 h-40 rounded-lg shrink-0" />
+                <div key={i} className="flex flex-col gap-6 sm:flex-row">
+                  <Skeleton className="w-full h-40 rounded-lg sm:w-70 shrink-0" />
                   <div className="flex-1 py-1 space-y-4">
                     <div className="space-y-2">
-                      <div className="flex justify-between items-start">
-                        <Skeleton className="h-8 w-2/3" />
-                        <Skeleton className="h-6 w-12" />
+                      <div className="flex items-start justify-between">
+                        <Skeleton className="w-2/3 h-8" />
+                        <Skeleton className="w-12 h-6" />
                       </div>
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-5/6" />
+                      <Skeleton className="w-full h-4" />
+                      <Skeleton className="w-5/6 h-4" />
                     </div>
-                    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                    <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
                       <div className="flex gap-4">
-                        <Skeleton className="h-4 w-16" />
-                        <Skeleton className="h-4 w-16" />
-                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="w-16 h-4" />
+                        <Skeleton className="w-16 h-4" />
+                        <Skeleton className="w-16 h-4" />
                       </div>
-                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="w-24 h-4" />
                     </div>
                   </div>
                 </div>
@@ -329,9 +329,9 @@ export default function ListDetailPage() {
 
   if (error || !listData) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">List not found</h2>
+          <h2 className="mb-2 text-2xl font-bold">List not found</h2>
           <Button onClick={() => router.push("/lists")}>Back to Lists</Button>
         </div>
       </div>
@@ -339,23 +339,23 @@ export default function ListDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
+    <div className="flex flex-col min-h-screen font-sans bg-background text-foreground">
       <Header />
-      <main className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-6 py-8">
+      <main className="flex flex-col flex-1 w-full px-6 py-8 mx-auto max-w-7xl">
         <div className="w-full max-w-4xl mx-auto mb-12 space-y-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
             <div className="flex-1 w-full">
               {/* Title Section */}
               <div className="flex items-center gap-2 mb-2 group">
                 {isEditingTitle ? (
-                  <div className="flex items-center gap-2 w-full max-w-md">
+                  <div className="flex items-center w-full max-w-md gap-2">
                     <Input
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") handleUpdateList();
                       }}
-                      className="text-3xl font-black h-12"
+                      className="h-12 text-3xl font-black"
                       autoFocus
                     />
                     <Button
@@ -386,7 +386,7 @@ export default function ListDetailPage() {
                     {listData.isOwner && (
                       <button
                         onClick={() => setIsEditingTitle(true)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary cursor-pointer"
+                        className="transition-opacity opacity-0 cursor-pointer group-hover:opacity-100 text-muted-foreground hover:text-primary"
                       >
                         <PencilSimpleIcon size={24} />
                       </button>
@@ -396,9 +396,9 @@ export default function ListDetailPage() {
               </div>
 
               {/* Description Section */}
-              <div className="group relative">
+              <div className="relative group">
                 {isEditingDesc ? (
-                  <div className="flex items-start gap-2 w-full max-w-2xl mt-2">
+                  <div className="flex items-start w-full max-w-2xl gap-2 mt-2">
                     <Textarea
                       value={editDesc}
                       onChange={(e) => setEditDesc(e.target.value)}
@@ -433,12 +433,12 @@ export default function ListDetailPage() {
                     </div>
                   </div>
                 ) : (
-                  <p className="text-muted-foreground flex items-center gap-2 whitespace-pre-wrap">
+                  <p className="flex items-center gap-2 whitespace-pre-wrap text-muted-foreground">
                     {listData.description || "No description provided."}
                     {listData.isOwner && (
                       <button
                         onClick={() => setIsEditingDesc(true)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary cursor-pointer"
+                        className="transition-opacity opacity-0 cursor-pointer group-hover:opacity-100 text-muted-foreground hover:text-primary"
                       >
                         <PencilSimpleIcon size={16} />
                       </button>
@@ -473,7 +473,7 @@ export default function ListDetailPage() {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 bg-secondary/10 rounded-xl border border-border/40">
+          <div className="flex flex-col items-start justify-between gap-4 p-6 border sm:flex-row sm:items-center bg-secondary/10 rounded-xl border-border/40">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <UserIcon size={16} weight="fill" />
@@ -491,7 +491,7 @@ export default function ListDetailPage() {
                       weight="fill"
                       className="text-primary"
                     />
-                    <span className="font-bold text-sm">
+                    <span className="text-sm font-bold">
                       {listData.averageRating.toFixed(1)}
                     </span>
                     <span className="text-xs text-muted-foreground">
@@ -511,7 +511,7 @@ export default function ListDetailPage() {
                   <button
                     key={star}
                     onClick={() => handleRate(star)}
-                    className="focus:outline-none transition-transform hover:scale-110 active:scale-95 cursor-pointer"
+                    className="transition-transform cursor-pointer focus:outline-none hover:scale-110 active:scale-95"
                   >
                     <StarIcon
                       size={20}
@@ -528,21 +528,21 @@ export default function ListDetailPage() {
             </div>
           </div>
 
-          <div className="relative group max-w-xl mx-auto">
+          <div className="relative max-w-xl mx-auto group">
             <MagnifyingGlassIcon
               size={20}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors"
+              className="absolute transition-colors -translate-y-1/2 left-4 top-1/2 text-muted-foreground group-focus-within:text-primary"
             />
             <Input
               placeholder="Search games in this list..."
-              className="pl-11 h-12 bg-secondary/30 border-transparent rounded-full text-base focus-visible:ring-1 focus-visible:ring-primary shadow-sm transition-all hover:bg-secondary/50 focus-visible:bg-background"
+              className="h-12 text-base transition-all border-transparent rounded-full shadow-sm pl-11 bg-secondary/30 focus-visible:ring-1 focus-visible:ring-primary hover:bg-secondary/50 focus-visible:bg-background"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-12">
+        <div className="flex flex-col gap-12 lg:flex-row">
           <aside className="w-full lg:w-72 shrink-0">
             <GameFilters
               availableTags={availableTags}
@@ -566,9 +566,9 @@ export default function ListDetailPage() {
           </aside>
 
           <section className="flex-1 space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-background/50 backdrop-blur-sm sticky top-16 lg:static z-20 py-2">
-              <div className="text-muted-foreground text-sm font-medium">
-                <span className="text-foreground font-bold">
+            <div className="sticky z-20 flex flex-col items-start justify-between gap-4 py-2 sm:flex-row sm:items-center bg-background/50 backdrop-blur-sm top-16 lg:static">
+              <div className="text-sm font-medium text-muted-foreground">
+                <span className="font-bold text-foreground">
                   {games.length}
                 </span>{" "}
                 Games in List
@@ -577,7 +577,7 @@ export default function ListDetailPage() {
 
             <div className="flex flex-col gap-6">
               {error && (
-                <div className="text-center py-20 text-red-500">{error}</div>
+                <div className="py-20 text-center text-red-500">{error}</div>
               )}
               {games.map((game) => (
                 <div key={game.id} className="relative group/card">
@@ -588,7 +588,7 @@ export default function ListDetailPage() {
                     <Button
                       size="icon"
                       variant="destructive"
-                      className="absolute top-2 right-2 sm:right-auto sm:left-58 z-20 opacity-0 group-hover/card:opacity-100 transition-opacity shadow-lg cursor-pointer"
+                      className="absolute z-20 transition-opacity shadow-lg opacity-0 cursor-pointer top-2 right-2 sm:right-auto sm:left-58 group-hover/card:opacity-100"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleRemoveGame(game.id);
@@ -598,18 +598,18 @@ export default function ListDetailPage() {
                       <TrashIcon size={18} />
                     </Button>
                   )}
-                  <Separator className="opacity-50 last:hidden mt-6" />
+                  <Separator className="mt-6 opacity-50 last:hidden" />
                 </div>
               ))}
               {!loading && !error && games.length === 0 && (
-                <div className="text-center py-24 text-muted-foreground bg-secondary/5 rounded-xl border border-dashed border-border/60">
+                <div className="py-24 text-center border border-dashed text-muted-foreground bg-secondary/5 rounded-xl border-border/60">
                   <div className="flex flex-col items-center gap-2">
                     <MagnifyingGlassIcon size={32} className="opacity-20" />
                     <p className="text-lg font-medium">No games found</p>
                     <Button
                       variant="link"
                       onClick={clearFilters}
-                      className="text-primary mt-2 cursor-pointer"
+                      className="mt-2 cursor-pointer text-primary"
                     >
                       Clear all filters
                     </Button>

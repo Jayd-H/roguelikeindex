@@ -84,10 +84,10 @@ export default function ListsPage() {
   }, [hasMoreUser, isFetchingMore, userPage]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
+    <div className="flex flex-col min-h-screen font-sans bg-background text-foreground">
       <Header />
-      <main className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-6 py-8">
-        <div className="w-full max-w-3xl mx-auto mb-12 text-center space-y-4">
+      <main className="flex flex-col flex-1 w-full px-6 py-8 mx-auto max-w-7xl">
+        <div className="w-full max-w-3xl mx-auto mb-12 space-y-4 text-center">
           <h1 className="text-4xl font-black tracking-tighter">
             Curated Collections
           </h1>
@@ -97,7 +97,7 @@ export default function ListsPage() {
           </p>
         </div>
 
-        <section className=" mb-8 relative">
+        <section className="relative mb-8 ">
           <div className="flex items-center gap-4 px-4 sm:px-0">
             <div className="p-3 bg-yellow-500/10 rounded-xl">
               <SparkleIcon
@@ -117,7 +117,7 @@ export default function ListsPage() {
           </div>
 
           {loadingAuto ? (
-            <div className="overflow-hidden py-32 -mx-6">
+            <div className="py-32 -mx-6 overflow-hidden">
               <div className="flex gap-6 px-6">
                 {[1, 2, 3].map((i) => (
                   <Skeleton
@@ -136,7 +136,7 @@ export default function ListsPage() {
           )}
         </section>
 
-        <section className="mb-12 relative">
+        <section className="relative mb-12">
           <div className="flex items-center gap-4 px-4 sm:px-0">
             <div className="p-3 bg-blue-500/10 rounded-xl">
               <UserListIcon weight="fill" className="text-blue-500" size={24} />
@@ -152,7 +152,7 @@ export default function ListsPage() {
           </div>
 
           {loadingUser ? (
-            <div className="overflow-hidden py-32 -mx-6">
+            <div className="py-32 -mx-6 overflow-hidden">
               <div className="flex gap-6 px-6">
                 {[1, 2, 3].map((i) => (
                   <Skeleton
@@ -168,13 +168,13 @@ export default function ListsPage() {
                 <ListCard key={list.id} list={list} />
               ))}
               {isFetchingMore && (
-                <div className="h-112 w-80 flex items-center justify-center shrink-0">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <div className="flex items-center justify-center h-112 w-80 shrink-0">
+                  <div className="w-8 h-8 border-b-2 rounded-full animate-spin border-primary"></div>
                 </div>
               )}
             </ListCarousel>
           ) : (
-            <div className="py-24 text-center text-muted-foreground bg-secondary/5 rounded-3xl border border-dashed border-border/60">
+            <div className="py-24 text-center border border-dashed text-muted-foreground bg-secondary/5 rounded-3xl border-border/60">
               <div className="flex flex-col items-center gap-2">
                 <ListDashesIcon size={32} className="opacity-20" />
                 <p className="text-lg font-medium">
@@ -182,7 +182,7 @@ export default function ListsPage() {
                 </p>
                 <Button
                   variant="link"
-                  className="mt-2 text-primary cursor-pointer"
+                  className="mt-2 cursor-pointer text-primary"
                 >
                   Be the first to create one!
                 </Button>

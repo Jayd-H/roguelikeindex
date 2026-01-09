@@ -53,20 +53,20 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md p-4 animate-in zoom-in-95 slide-in-from-bottom-5 duration-300">
-        <div className="bg-background border border-border/50 shadow-2xl rounded-xl overflow-hidden relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center duration-200 bg-black/60 backdrop-blur-sm animate-in fade-in">
+      <div className="relative w-full max-w-md p-4 duration-300 animate-in zoom-in-95 slide-in-from-bottom-5">
+        <div className="relative overflow-hidden border shadow-2xl bg-background border-border/50 rounded-xl">
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-4 top-4 z-10 text-muted-foreground hover:text-foreground cursor-pointer"
+            className="absolute z-10 cursor-pointer right-4 top-4 text-muted-foreground hover:text-foreground"
             onClick={onClose}
           >
             <XIcon size={20} />
           </Button>
 
           <div className="p-8 sm:p-10">
-            <div className="space-y-2 mb-8">
+            <div className="mb-8 space-y-2">
               <h2 className="text-3xl font-black tracking-tighter">
                 Welcome back
               </h2>
@@ -109,14 +109,14 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
               </div>
 
               {error && (
-                <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm font-medium border border-destructive/20">
+                <div className="p-3 text-sm font-medium border rounded-md bg-destructive/10 text-destructive border-destructive/20">
                   {error}
                 </div>
               )}
 
               <Button
                 type="submit"
-                className="w-full h-11 text-base font-semibold cursor-pointer"
+                className="w-full text-base font-semibold cursor-pointer h-11"
                 disabled={loading}
               >
                 {loading ? "Signing in..." : "Login"}{" "}
@@ -124,11 +124,11 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
               </Button>
             </form>
 
-            <div className="mt-8 text-center text-sm text-muted-foreground">
+            <div className="mt-8 text-sm text-center text-muted-foreground">
               Don&apos;t have an account?{" "}
               <Link
                 href="/register"
-                className="underline font-medium text-foreground hover:text-primary transition-colors"
+                className="font-medium underline transition-colors text-foreground hover:text-primary"
                 onClick={onClose}
               >
                 Sign up

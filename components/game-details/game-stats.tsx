@@ -43,8 +43,8 @@ export function GameStats({ game }: { game: Game }) {
 
   return (
     <section className="space-y-6">
-      <h3 className="text-2xl font-bold flex items-center gap-2">Overview</h3>
-      <p className="text-lg text-muted-foreground leading-relaxed whitespace-pre-wrap">
+      <h3 className="flex items-center gap-2 text-2xl font-bold">Overview</h3>
+      <p className="text-lg leading-relaxed whitespace-pre-wrap text-muted-foreground">
         {game.description}
       </p>
       <div className="p-8 space-y-8">
@@ -86,7 +86,7 @@ export function GameStats({ game }: { game: Game }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
           <div>
             <div className="flex justify-between mb-2 text-sm">
-              <span className="flex items-center gap-2 text-muted-foreground font-medium">
+              <span className="flex items-center gap-2 font-medium text-muted-foreground">
                 <InfinityIcon size={16} weight="fill" /> Replayability
               </span>
               <span className="font-semibold text-foreground">
@@ -100,7 +100,7 @@ export function GameStats({ game }: { game: Game }) {
           </div>
           <div>
             <div className="flex justify-between mb-2 text-sm">
-              <span className="flex items-center gap-2 text-muted-foreground font-medium">
+              <span className="flex items-center gap-2 font-medium text-muted-foreground">
                 <LightningIcon size={16} weight="fill" /> Synergy Depth
               </span>
               <span className="font-semibold text-foreground">
@@ -114,7 +114,7 @@ export function GameStats({ game }: { game: Game }) {
           </div>
           <div>
             <div className="flex justify-between mb-2 text-sm">
-              <span className="flex items-center gap-2 text-muted-foreground font-medium">
+              <span className="flex items-center gap-2 font-medium text-muted-foreground">
                 <PuzzlePieceIcon size={16} weight="fill" /> Complexity
               </span>
               <span className="font-semibold text-foreground">
@@ -128,7 +128,7 @@ export function GameStats({ game }: { game: Game }) {
           </div>
           <div>
             <div className="flex justify-between mb-2 text-sm">
-              <span className="flex items-center gap-2 text-muted-foreground font-medium">
+              <span className="flex items-center gap-2 font-medium text-muted-foreground">
                 <DiceFiveIcon size={16} weight="fill" /> RNG Reliance
               </span>
               <span className="font-semibold text-foreground">
@@ -142,7 +142,7 @@ export function GameStats({ game }: { game: Game }) {
           </div>
           <div>
             <div className="flex justify-between mb-2 text-sm">
-              <span className="flex items-center gap-2 text-muted-foreground font-medium">
+              <span className="flex items-center gap-2 font-medium text-muted-foreground">
                 <SmileyIcon size={16} weight="fill" /> User Friendliness
               </span>
               <span className="font-semibold text-foreground">
@@ -154,7 +154,7 @@ export function GameStats({ game }: { game: Game }) {
               className="h-2 bg-secondary"
             />
           </div>
-          <div className="flex gap-8 items-center pt-2">
+          <div className="flex items-center gap-8 pt-2">
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <HourglassIcon size={16} weight="fill" /> Time to First Win
@@ -172,7 +172,7 @@ export function GameStats({ game }: { game: Game }) {
           </div>
         </div>
       </div>
-      <div className="flex flex-wrap gap-2 items-center group">
+      <div className="flex flex-wrap items-center gap-2 group">
         {game.tags.map((tag) => (
           <Badge
             key={tag.name}
@@ -182,7 +182,7 @@ export function GameStats({ game }: { game: Game }) {
             {tag.name}
             <button
               onClick={() => openSuggest("tags", "remove", tag)}
-              className="ml-2 opacity-0 group-hover/tag:opacity-100 hover:text-destructive transition-opacity cursor-pointer"
+              className="ml-2 transition-opacity opacity-0 cursor-pointer group-hover/tag:opacity-100 hover:text-destructive"
             >
               <XIcon size={12} weight="bold" />
             </button>

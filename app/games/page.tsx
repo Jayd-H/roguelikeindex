@@ -178,10 +178,10 @@ export default function GamesPage() {
     searchQuery.length > 0;
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
+    <div className="flex flex-col min-h-screen font-sans bg-background text-foreground">
       <Header />
-      <main className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-6 py-8">
-        <div className="w-full max-w-3xl mx-auto mb-12 text-center space-y-4">
+      <main className="flex flex-col flex-1 w-full px-6 py-8 mx-auto max-w-7xl">
+        <div className="w-full max-w-3xl mx-auto mb-12 space-y-4 text-center">
           <h2 className="text-4xl font-black tracking-tighter">
             Discover Your Next Run
           </h2>
@@ -189,48 +189,48 @@ export default function GamesPage() {
             Search through the comprehensive database of roguelikes and
             roguelites.
           </p>
-          <div className="relative group max-w-xl mx-auto">
+          <div className="relative max-w-xl mx-auto group">
             <MagnifyingGlassIcon
               size={20}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors"
+              className="absolute transition-colors -translate-y-1/2 left-4 top-1/2 text-muted-foreground group-focus-within:text-primary"
             />
             <Input
               placeholder="Search by title..."
-              className="pl-11 h-12 bg-secondary/30 border-transparent rounded-full text-base focus-visible:ring-1 focus-visible:ring-primary shadow-sm transition-all hover:bg-secondary/50 focus-visible:bg-background"
+              className="h-12 text-base transition-all border-transparent rounded-full shadow-sm pl-11 bg-secondary/30 focus-visible:ring-1 focus-visible:ring-primary hover:bg-secondary/50 focus-visible:bg-background"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
         </div>
-        <div className="flex flex-col lg:flex-row gap-12">
+        <div className="flex flex-col gap-12 lg:flex-row">
           <aside className="w-full lg:w-72 shrink-0">
             {availableTags.length === 0 ? (
-              <div className="space-y-8 pr-2">
-                <div className="flex justify-between items-center">
-                  <Skeleton className="h-4 w-20" />
+              <div className="pr-2 space-y-8">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="w-20 h-4" />
                 </div>
                 <div className="space-y-3">
-                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="w-16 h-4" />
                   <div className="flex flex-wrap gap-2">
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                      <Skeleton key={i} className="h-7 w-20 rounded-md" />
+                      <Skeleton key={i} className="w-20 rounded-md h-7" />
                     ))}
                   </div>
                 </div>
                 <Separator />
                 <div className="space-y-3">
-                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="w-24 h-4" />
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex gap-2 items-center">
-                      <Skeleton className="h-4 w-4" />
-                      <Skeleton className="h-4 w-24" />
+                    <div key={i} className="flex items-center gap-2">
+                      <Skeleton className="w-4 h-4" />
+                      <Skeleton className="w-24 h-4" />
                     </div>
                   ))}
                 </div>
                 <Separator />
                 <div className="space-y-4">
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="w-32 h-4" />
+                  <Skeleton className="w-full h-12" />
                 </div>
               </div>
             ) : (
@@ -256,13 +256,13 @@ export default function GamesPage() {
             )}
           </aside>
           <section className="flex-1 space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-background/50 backdrop-blur-sm sticky top-16 lg:static z-20 py-2">
-              <div className="text-muted-foreground text-sm font-medium">
+            <div className="sticky z-20 flex flex-col items-start justify-between gap-4 py-2 sm:flex-row sm:items-center bg-background/50 backdrop-blur-sm top-16 lg:static">
+              <div className="text-sm font-medium text-muted-foreground">
                 {loading && totalGames === 0 ? (
-                  <Skeleton className="h-5 w-32" />
+                  <Skeleton className="w-32 h-5" />
                 ) : (
                   <>
-                    <span className="text-foreground font-bold">
+                    <span className="font-bold text-foreground">
                       {totalGames}
                     </span>{" "}
                     Games Found
@@ -270,11 +270,11 @@ export default function GamesPage() {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <Label className="text-xs text-muted-foreground mr-1">
+                <Label className="mr-1 text-xs text-muted-foreground">
                   Sort by:
                 </Label>
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-45 h-9 text-sm cursor-pointer">
+                  <SelectTrigger className="text-sm cursor-pointer w-45 h-9">
                     <SortAscendingIcon size={16} className="mr-2" />
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
@@ -297,7 +297,7 @@ export default function GamesPage() {
             </div>
             <div className="flex flex-col gap-6">
               {error && (
-                <div className="text-center py-20 text-red-500">{error}</div>
+                <div className="py-20 text-center text-red-500">{error}</div>
               )}
 
               {games.map((game, index) => (
@@ -311,26 +311,26 @@ export default function GamesPage() {
               ))}
 
               {(loading || loadingMore) && (
-                <div className="space-y-8 mt-2">
+                <div className="mt-2 space-y-8">
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="flex flex-col sm:flex-row gap-6">
-                      <Skeleton className="w-full sm:w-70 h-40 rounded-lg shrink-0" />
+                    <div key={i} className="flex flex-col gap-6 sm:flex-row">
+                      <Skeleton className="w-full h-40 rounded-lg sm:w-70 shrink-0" />
                       <div className="flex-1 py-1 space-y-4">
                         <div className="space-y-2">
-                          <div className="flex justify-between items-start">
-                            <Skeleton className="h-8 w-2/3" />
-                            <Skeleton className="h-6 w-12" />
+                          <div className="flex items-start justify-between">
+                            <Skeleton className="w-2/3 h-8" />
+                            <Skeleton className="w-12 h-6" />
                           </div>
-                          <Skeleton className="h-4 w-full" />
-                          <Skeleton className="h-4 w-5/6" />
+                          <Skeleton className="w-full h-4" />
+                          <Skeleton className="w-5/6 h-4" />
                         </div>
-                        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
                           <div className="flex gap-4">
-                            <Skeleton className="h-4 w-16" />
-                            <Skeleton className="h-4 w-16" />
-                            <Skeleton className="h-4 w-16" />
+                            <Skeleton className="w-16 h-4" />
+                            <Skeleton className="w-16 h-4" />
+                            <Skeleton className="w-16 h-4" />
                           </div>
-                          <Skeleton className="h-4 w-24" />
+                          <Skeleton className="w-24 h-4" />
                         </div>
                       </div>
                     </div>
@@ -339,14 +339,14 @@ export default function GamesPage() {
               )}
 
               {!loading && !error && games.length === 0 && (
-                <div className="text-center py-24 text-muted-foreground bg-secondary/5 rounded-xl border border-dashed border-border/60">
+                <div className="py-24 text-center border border-dashed text-muted-foreground bg-secondary/5 rounded-xl border-border/60">
                   <div className="flex flex-col items-center gap-2">
                     <MagnifyingGlassIcon size={32} className="opacity-20" />
                     <p className="text-lg font-medium">No games found</p>
                     <Button
                       variant="link"
                       onClick={clearFilters}
-                      className="text-primary mt-2 cursor-pointer"
+                      className="mt-2 cursor-pointer text-primary"
                     >
                       Clear all filters
                     </Button>

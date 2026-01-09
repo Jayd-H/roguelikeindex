@@ -1,32 +1,38 @@
-import { GithubLogo, TwitterLogo, DiscordLogo } from "@phosphor-icons/react/dist/ssr";
+import { GithubLogoIcon } from "@phosphor-icons/react/dist/ssr";
+import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border/40 bg-secondary/5 py-12 mt-20">
-      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+    <footer className="py-12 mt-20 border-t border-border/40 bg-secondary/5">
+      <div className="flex flex-col items-center justify-between gap-6 px-6 mx-auto max-w-7xl md:flex-row">
         <div className="flex flex-col gap-2">
-          <span className="font-bold text-lg">RoguelikeIndex</span>
-          <p className="text-sm text-muted-foreground max-w-xs">
-            The definitive structured database for roguelike and roguelite enthusiasts.
+          <span className="text-lg font-bold">RoguelikeIndex</span>
+          <p className="max-w-xs text-sm text-muted-foreground">
+            The definitive structured database for roguelike and roguelite
+            enthusiasts.
           </p>
         </div>
-        
-        <div className="flex gap-6 text-sm text-muted-foreground font-medium">
-          <a href="#" className="hover:text-primary transition-colors">About</a>
-          <a href="#" className="hover:text-primary transition-colors">API</a>
-          <a href="#" className="hover:text-primary transition-colors">Privacy</a>
-          <a href="#" className="hover:text-primary transition-colors">Contact</a>
+
+        <div className="flex gap-6 text-sm font-medium text-muted-foreground">
+          <Link href="/about">
+            <a className="transition-colors hover:text-primary">About</a>
+          </Link>
+          <Link href="/apidocs">
+            <a href="#" className="transition-colors hover:text-primary">
+              API
+            </a>
+          </Link>
+          <a href="#" className="transition-colors hover:text-primary">
+            Privacy
+          </a>
         </div>
 
         <div className="flex gap-4">
-          <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-            <GithubLogo size={24} />
-          </a>
-          <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-            <TwitterLogo size={24} />
-          </a>
-          <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-            <DiscordLogo size={24} />
+          <a
+            href="https://github.com/Jayd-H/roguelikeindex"
+            className="transition-colors text-muted-foreground hover:text-foreground"
+          >
+            <GithubLogoIcon size={24} />
           </a>
         </div>
       </div>

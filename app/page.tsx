@@ -30,19 +30,19 @@ function Column({
       {[...items, ...items].map((game, i) => (
         <div
           key={`${game.id}-${i}`}
-          className="relative w-full aspect-video rounded-lg overflow-hidden bg-zinc-500 border border-white/5 shadow-lg shrink-0"
+          className="relative w-full overflow-hidden border rounded-lg shadow-lg aspect-video bg-zinc-500 border-white/5 shrink-0"
         >
           {game.image ? (
             <Image
               src={game.image}
               alt="Game"
               fill
-              className="object-cover opacity-80 hover:opacity-100 transition-opacity duration-500"
+              className="object-cover transition-opacity duration-500 opacity-80 hover:opacity-100"
               sizes="20vw"
               unoptimized
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-zinc-800">
+            <div className="flex items-center justify-center w-full h-full bg-zinc-800">
               <GameControllerIcon size={32} className="text-zinc-700" />
             </div>
           )}
@@ -110,16 +110,16 @@ export default function Home() {
   const columns = chunks.length > 0 ? chunks : [[], [], [], [], [], [], []];
 
   return (
-    <div className="relative min-h-screen bg-black overflow-hidden flex flex-col font-sans">
+    <div className="relative flex flex-col min-h-screen overflow-hidden font-sans bg-black">
       <div className="z-50">
         <Header />
       </div>
 
       {/* Background Grid */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-black/70 z-10" />
-        <div className="absolute inset-0 bg-linear-to-b from-black via-transparent to-black z-10" />
-        <div className="absolute inset-0 bg-linear-to-r from-black via-transparent to-black z-10" />
+        <div className="absolute inset-0 z-10 bg-black/70" />
+        <div className="absolute inset-0 z-10 bg-linear-to-b from-black via-transparent to-black" />
+        <div className="absolute inset-0 z-10 bg-linear-to-r from-black via-transparent to-black" />
 
         <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-4 h-[150%] -mt-20 opacity-90 rotate-3 scale-105 origin-center">
           <Column items={columns[0] || []} duration="45s" />
@@ -149,13 +149,13 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <main className="relative z-20 flex-1 flex flex-col items-center justify-center px-6 text-center">
-        <div className="max-w-4xl space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
+      <main className="relative z-20 flex flex-col items-center justify-center flex-1 px-6 text-center">
+        <div className="max-w-4xl space-y-8 duration-700 animate-in fade-in slide-in-from-bottom-8">
           <div className="space-y-4">
-            <h1 className="text-6xl md:text-8xl font-black text-white tracking-tighter drop-shadow-2xl">
+            <h1 className="text-6xl font-black tracking-tighter text-white md:text-8xl drop-shadow-2xl">
               Roguelike<span className="text-primary">Index</span>
             </h1>
-            <p className="text-xl md:text-2xl text-zinc-400 max-w-2xl mx-auto font-medium leading-relaxed">
+            <p className="max-w-2xl mx-auto text-xl font-medium leading-relaxed md:text-2xl text-zinc-400">
               The centralized database for roguelike and roguelite games.
             </p>
           </div>

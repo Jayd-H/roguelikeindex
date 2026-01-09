@@ -74,11 +74,11 @@ export function SecurityModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center duration-200 bg-black/60 backdrop-blur-sm animate-in fade-in"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md bg-background border border-border/50 shadow-2xl rounded-xl overflow-hidden p-6 animate-in zoom-in-95 duration-300"
+        className="relative w-full max-w-md p-6 overflow-hidden duration-300 border shadow-2xl bg-background border-border/50 rounded-xl animate-in zoom-in-95"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
@@ -93,14 +93,14 @@ export function SecurityModal({
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="h-8 w-8"
+            className="w-8 h-8"
           >
             <XIcon size={16} />
           </Button>
         </div>
 
         {type === "delete" && (
-          <div className="flex items-center gap-3 bg-destructive/10 p-4 rounded-lg text-destructive mb-6">
+          <div className="flex items-center gap-3 p-4 mb-6 rounded-lg bg-destructive/10 text-destructive">
             <WarningCircleIcon size={32} />
             <p className="text-sm font-medium">
               This action is permanent. All your data will be wiped.
@@ -135,7 +135,7 @@ export function SecurityModal({
           </div>
 
           {error && (
-            <div className="text-sm text-red-500 font-medium p-2 bg-red-500/10 rounded">
+            <div className="p-2 text-sm font-medium text-red-500 rounded bg-red-500/10">
               {error}
             </div>
           )}

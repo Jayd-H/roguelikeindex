@@ -52,9 +52,9 @@ export function GameFilters({
   const narrativeTypes = ["None", "Environmental", "Light", "Story-Rich"];
 
   return (
-    <div className="sticky top-24 space-y-8 pr-2">
+    <div className="sticky pr-2 space-y-8 top-24">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 font-bold text-sm uppercase tracking-widest text-primary">
+        <div className="flex items-center gap-2 text-sm font-bold tracking-widest uppercase text-primary">
           <FunnelIcon size={16} weight="bold" /> Filters
         </div>
         {hasActiveFilters && (
@@ -62,7 +62,7 @@ export function GameFilters({
             variant="ghost"
             size="sm"
             onClick={onClearFilters}
-            className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+            className="h-6 px-2 text-xs cursor-pointer text-muted-foreground hover:text-foreground"
           >
             Clear All <XIcon size={12} className="ml-1" />
           </Button>
@@ -70,7 +70,7 @@ export function GameFilters({
       </div>
       <div className="space-y-6">
         <div className="space-y-3">
-          <h3 className="font-semibold text-sm">Tags</h3>
+          <h3 className="text-sm font-semibold">Tags</h3>
           <div className="max-h-36 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
             <div className="flex flex-wrap gap-2">
               {availableTags.map((tag) => (
@@ -91,7 +91,7 @@ export function GameFilters({
         </div>
         <Separator />
         <div className="space-y-3">
-          <h3 className="font-semibold text-sm">Combat Style</h3>
+          <h3 className="text-sm font-semibold">Combat Style</h3>
           <div className="space-y-2">
             {combatTypes.map((type) => (
               <div key={type} className="flex items-center space-x-2">
@@ -113,7 +113,7 @@ export function GameFilters({
         </div>
         <Separator />
         <div className="space-y-3">
-          <h3 className="font-semibold text-sm">Narrative Depth</h3>
+          <h3 className="text-sm font-semibold">Narrative Depth</h3>
           <div className="space-y-2">
             {narrativeTypes.map((type) => (
               <div key={type} className="flex items-center space-x-2">
@@ -136,8 +136,8 @@ export function GameFilters({
         <Separator />
         <div className="space-y-6">
           <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="font-semibold text-sm">Min Rating</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold">Min Rating</h3>
               <span className="text-xs font-medium text-primary">
                 {minRating[0]} / 5
               </span>
@@ -151,8 +151,8 @@ export function GameFilters({
             />
           </div>
           <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="font-semibold text-sm">Min Complexity</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold">Min Complexity</h3>
               <span className="text-xs font-medium text-primary">
                 {complexity[0]} / 10
               </span>
@@ -185,7 +185,7 @@ export function GameFilters({
           <div className="flex items-center justify-between">
             <Label
               htmlFor="deck-verified"
-              className="text-sm font-medium cursor-pointer flex items-center gap-2"
+              className="flex items-center gap-2 text-sm font-medium cursor-pointer"
             >
               <GameControllerIcon size={16} /> Deck Verified
             </Label>

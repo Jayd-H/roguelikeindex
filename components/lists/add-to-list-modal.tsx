@@ -188,7 +188,7 @@ export function AddToListModal({
           ))}
         </div>
         <div
-          className="flex text-yellow-500 absolute top-0 left-0 overflow-hidden"
+          className="absolute top-0 left-0 flex overflow-hidden text-yellow-500"
           style={{ width: `${(rating / 5) * 100}%` }}
         >
           {[...Array(5)].map((_, i) => (
@@ -203,7 +203,7 @@ export function AddToListModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-200 cursor-pointer"
+      className="fixed inset-0 z-50 flex items-center justify-center duration-200 cursor-pointer bg-black/60 backdrop-blur-md animate-in fade-in"
       onClick={onClose}
     >
       <div
@@ -211,7 +211,7 @@ export function AddToListModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-border/40 bg-secondary/5 shrink-0">
-          <h2 className="text-lg font-bold tracking-tight flex items-center gap-2">
+          <h2 className="flex items-center gap-2 text-lg font-bold tracking-tight">
             {view === "select" && (
               <>
                 <BookmarkSimpleIcon className="text-primary" weight="fill" />{" "}
@@ -235,18 +235,18 @@ export function AddToListModal({
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="h-8 w-8 rounded-full hover:bg-secondary/50 cursor-pointer"
+            className="w-8 h-8 rounded-full cursor-pointer hover:bg-secondary/50"
           >
             <XIcon size={16} />
           </Button>
         </div>
 
-        <div className="flex-1 overflow-hidden flex flex-col">
+        <div className="flex flex-col flex-1 overflow-hidden">
           {view === "select" ? (
             <>
               <div className="p-4 border-b border-border/40 bg-background/50">
                 <Button
-                  className="w-full justify-start text-muted-foreground hover:text-foreground h-14 gap-4 bg-secondary/30 hover:bg-secondary/60 border border-dashed border-border/60 hover:border-primary/50 transition-all group cursor-pointer"
+                  className="justify-start w-full gap-4 transition-all border border-dashed cursor-pointer text-muted-foreground hover:text-foreground h-14 bg-secondary/30 hover:bg-secondary/60 border-border/60 hover:border-primary/50 group"
                   variant="ghost"
                   onClick={() => {
                     setFormData({ title: "", description: "" });
@@ -254,11 +254,11 @@ export function AddToListModal({
                     setView("create");
                   }}
                 >
-                  <div className="bg-background border border-border rounded-full h-8 w-8 flex items-center justify-center group-hover:border-primary/50 group-hover:text-primary transition-colors">
+                  <div className="flex items-center justify-center w-8 h-8 transition-colors border rounded-full bg-background border-border group-hover:border-primary/50 group-hover:text-primary">
                     <PlusIcon size={16} weight="bold" />
                   </div>
                   <div className="flex flex-col items-start gap-0.5">
-                    <span className="font-semibold text-sm text-foreground">
+                    <span className="text-sm font-semibold text-foreground">
                       Create New Collection
                     </span>
                     <span className="text-[10px] opacity-70">
@@ -279,8 +279,8 @@ export function AddToListModal({
                     ))}
                   </div>
                 ) : lists.length === 0 ? (
-                  <div className="text-center py-12 text-muted-foreground flex flex-col items-center gap-3">
-                    <div className="h-12 w-12 rounded-full bg-secondary/30 flex items-center justify-center">
+                  <div className="flex flex-col items-center gap-3 py-12 text-center text-muted-foreground">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-secondary/30">
                       <BookmarkSimpleIcon size={24} className="opacity-50" />
                     </div>
                     <p>You haven&apos;t created any lists yet.</p>
@@ -303,8 +303,8 @@ export function AddToListModal({
                         }
                       >
                         {deleteConfirmId === list.id ? (
-                          <div className="absolute inset-0 z-20 bg-destructive/10 backdrop-blur-sm flex items-center justify-between px-6 animate-in fade-in duration-200">
-                            <div className="flex items-center gap-3 text-destructive font-bold text-sm">
+                          <div className="absolute inset-0 z-20 flex items-center justify-between px-6 duration-200 bg-destructive/10 backdrop-blur-sm animate-in fade-in">
+                            <div className="flex items-center gap-3 text-sm font-bold text-destructive">
                               <WarningCircleIcon size={24} weight="fill" />
                               Delete this list?
                             </div>
@@ -312,7 +312,7 @@ export function AddToListModal({
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                className="h-8 hover:bg-white/20 cursor-pointer"
+                                className="h-8 cursor-pointer hover:bg-white/20"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setDeleteConfirmId(null);
@@ -335,14 +335,14 @@ export function AddToListModal({
                           </div>
                         ) : null}
 
-                        <div className="flex items-center gap-4 p-3 relative z-10">
+                        <div className="relative z-10 flex items-center gap-4 p-3">
                           {/* Overlapping Cards Preview */}
-                          <div className="h-12 w-12 shrink-0 relative mr-2">
+                          <div className="relative w-12 h-12 mr-2 shrink-0">
                             {list.previewImages.length > 0 ? (
                               list.previewImages.slice(0, 3).map((img, i) => (
                                 <div
                                   key={i}
-                                  className="absolute top-0 left-0 h-12 w-12 rounded-lg border-2 border-background shadow-sm overflow-hidden bg-zinc-900"
+                                  className="absolute top-0 left-0 w-12 h-12 overflow-hidden border-2 rounded-lg shadow-sm border-background bg-zinc-900"
                                   style={{
                                     transform: `translateX(${
                                       i * 6
@@ -362,7 +362,7 @@ export function AddToListModal({
                                 </div>
                               ))
                             ) : (
-                              <div className="h-12 w-12 rounded-lg bg-secondary/40 flex items-center justify-center border-2 border-background">
+                              <div className="flex items-center justify-center w-12 h-12 border-2 rounded-lg bg-secondary/40 border-background">
                                 <GameControllerIcon
                                   size={20}
                                   className="opacity-20"
@@ -386,7 +386,7 @@ export function AddToListModal({
                               {list.hasGame && (
                                 <CheckIcon
                                   weight="bold"
-                                  className="text-primary text-xs shrink-0"
+                                  className="text-xs text-primary shrink-0"
                                 />
                               )}
                             </div>
@@ -411,11 +411,11 @@ export function AddToListModal({
                           </div>
 
                           {!list.hasGame && !deleteConfirmId && (
-                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity absolute right-3 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm p-1 rounded-lg shadow-sm border border-border/50">
+                            <div className="absolute flex gap-1 p-1 transition-opacity -translate-y-1/2 border rounded-lg shadow-sm opacity-0 group-hover:opacity-100 right-3 top-1/2 bg-background/80 backdrop-blur-sm border-border/50">
                               <Button
                                 size="icon"
                                 variant="ghost"
-                                className="h-7 w-7 text-muted-foreground hover:text-foreground cursor-pointer"
+                                className="cursor-pointer h-7 w-7 text-muted-foreground hover:text-foreground"
                                 onClick={(e) => openEdit(list, e)}
                               >
                                 <PencilSimpleIcon size={14} />
@@ -423,7 +423,7 @@ export function AddToListModal({
                               <Button
                                 size="icon"
                                 variant="ghost"
-                                className="h-7 w-7 text-muted-foreground hover:text-red-500 cursor-pointer"
+                                className="cursor-pointer h-7 w-7 text-muted-foreground hover:text-red-500"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setDeleteConfirmId(list.id);
@@ -441,7 +441,7 @@ export function AddToListModal({
               </ScrollArea>
             </>
           ) : (
-            <div className="p-6 space-y-6 flex-1 flex flex-col">
+            <div className="flex flex-col flex-1 p-6 space-y-6">
               <div className="space-y-5">
                 <div className="space-y-2">
                   <Label>List Name</Label>
@@ -461,13 +461,13 @@ export function AddToListModal({
                 <div className="space-y-2">
                   <Label>
                     Description{" "}
-                    <span className="text-muted-foreground font-normal ml-1">
+                    <span className="ml-1 font-normal text-muted-foreground">
                       (Optional)
                     </span>
                   </Label>
                   <Textarea
                     placeholder="What makes this collection special?"
-                    className="resize-none h-32 bg-secondary/20 leading-relaxed"
+                    className="h-32 leading-relaxed resize-none bg-secondary/20"
                     value={formData.description}
                     onChange={(e) =>
                       setFormData((prev) => ({
@@ -478,12 +478,12 @@ export function AddToListModal({
                   />
                 </div>
                 {error && (
-                  <div className="text-sm text-red-500 font-medium px-1">
+                  <div className="px-1 text-sm font-medium text-red-500">
                     {error}
                   </div>
                 )}
               </div>
-              <div className="flex justify-end gap-3 mt-auto pt-6 border-t border-border/40">
+              <div className="flex justify-end gap-3 pt-6 mt-auto border-t border-border/40">
                 <Button
                   variant="ghost"
                   onClick={() => setView("select")}

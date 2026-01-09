@@ -13,7 +13,6 @@ export function GameCarousel({ children }: GameCarouselProps) {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
-  // Adjusted for new MiniGameCard width (w-44 = 176px) + Gap (16px) = 192px
   const ITEM_WIDTH = 176;
   const GAP = 16;
   const SCROLL_AMOUNT = (ITEM_WIDTH + GAP) * 2;
@@ -75,7 +74,7 @@ export function GameCarousel({ children }: GameCarouselProps) {
         <Button
           variant="secondary"
           size="icon"
-          className="absolute -left-4 top-1/2 -translate-y-1/2 z-20 rounded-full h-8 w-8 shadow-xl bg-background/80 backdrop-blur-md border border-border/50 hover:scale-110 hover:bg-background transition-all cursor-pointer"
+          className="absolute z-20 w-8 h-8 transition-all -translate-y-1/2 border rounded-full shadow-xl cursor-pointer -left-4 top-1/2 bg-background/80 backdrop-blur-md border-border/50 hover:scale-110 hover:bg-background"
           onClick={() => scroll("left")}
         >
           <CaretLeft size={16} weight="bold" />
@@ -107,7 +106,7 @@ export function GameCarousel({ children }: GameCarouselProps) {
         <Button
           variant="secondary"
           size="icon"
-          className="absolute -right-4 top-1/2 -translate-y-1/2 z-20 rounded-full h-8 w-8 shadow-xl bg-background/80 backdrop-blur-md border border-border/50 hover:scale-110 hover:bg-background transition-all cursor-pointer"
+          className="absolute z-20 w-8 h-8 transition-all -translate-y-1/2 border rounded-full shadow-xl cursor-pointer -right-4 top-1/2 bg-background/80 backdrop-blur-md border-border/50 hover:scale-110 hover:bg-background"
           onClick={() => scroll("right")}
         >
           <CaretRight size={16} weight="bold" />

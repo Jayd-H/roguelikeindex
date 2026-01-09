@@ -62,11 +62,11 @@ export function GameHero({
   };
 
   return (
-    <div className="relative w-full h-100 md:h-125 overflow-hidden bg-black/90 group">
+    <div className="relative w-full overflow-hidden h-100 md:h-125 bg-black/90 group">
       {heroUrl ? (
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute inset-0 bg-linear-to-t from-background via-background/20 to-transparent z-10" />
-          <div className="absolute inset-0 bg-linear-to-r from-background/80 via-transparent to-transparent z-10" />
+          <div className="absolute inset-0 z-10 bg-linear-to-t from-background via-background/20 to-transparent" />
+          <div className="absolute inset-0 z-10 bg-linear-to-r from-background/80 via-transparent to-transparent" />
           <Image
             src={heroUrl}
             alt={`${game.title} Hero`}
@@ -76,24 +76,24 @@ export function GameHero({
           />
         </div>
       ) : (
-        <div className="absolute inset-0 bg-linear-to-br from-secondary/20 to-primary/10 pointer-events-none" />
+        <div className="absolute inset-0 pointer-events-none bg-linear-to-br from-secondary/20 to-primary/10" />
       )}
-      <div className="absolute bottom-0 left-0 w-full z-20 pb-8">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
-          <div className="max-w-2xl w-full">
+      <div className="absolute bottom-0 left-0 z-20 w-full pb-8">
+        <div className="flex flex-col items-start justify-between gap-6 px-6 mx-auto max-w-7xl md:flex-row md:items-end">
+          <div className="w-full max-w-2xl">
             {logoUrl ? (
-              <div className="relative h-24 md:h-36 w-auto max-w-100 mb-6 origin-left">
+              <div className="relative w-auto h-24 mb-6 origin-left md:h-36 max-w-100">
                 <Image
                   src={logoUrl}
                   alt={game.title}
                   width={400}
                   height={160}
-                  className="h-full w-auto object-contain drop-shadow-2xl"
+                  className="object-contain w-auto h-full drop-shadow-2xl"
                   unoptimized
                 />
               </div>
             ) : (
-              <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white drop-shadow-lg mb-4">
+              <h1 className="mb-4 text-5xl font-black tracking-tighter text-white md:text-7xl drop-shadow-lg">
                 {game.title}
               </h1>
             )}
@@ -126,7 +126,7 @@ export function GameHero({
               </Badge>
             </div>
 
-            <div className="flex flex-wrap gap-x-6 gap-y-2 py-2 text-sm text-white/80 font-medium">
+            <div className="flex flex-wrap py-2 text-sm font-medium gap-x-6 gap-y-2 text-white/80">
               {game.developer && (
                 <div className="flex items-center gap-2">
                   <CodeIcon size={18} className="text-primary" />
@@ -185,14 +185,14 @@ export function GameHero({
               </>
             ) : (
               <>
-                <div className="h-12 w-40 rounded-full bg-secondary/50 animate-pulse" />
-                <div className="h-12 w-32 rounded-full bg-secondary/50 animate-pulse" />
+                <div className="w-40 h-12 rounded-full bg-secondary/50 animate-pulse" />
+                <div className="w-32 h-12 rounded-full bg-secondary/50 animate-pulse" />
               </>
             )}
             <Button
               onClick={onAddToList}
               variant="secondary"
-              className="rounded-full h-12 px-6 gap-2 backdrop-blur-md bg-secondary/80 hover:bg-secondary text-foreground border border-white/5 cursor-pointer"
+              className="h-12 gap-2 px-6 border rounded-full cursor-pointer backdrop-blur-md bg-secondary/80 hover:bg-secondary text-foreground border-white/5"
             >
               <ListPlusIcon size={20} /> Add to List
             </Button>
@@ -200,7 +200,7 @@ export function GameHero({
               onClick={handleShare}
               variant="secondary"
               size="icon"
-              className="rounded-full h-12 w-12 backdrop-blur-md bg-secondary/80 hover:bg-secondary text-foreground border border-white/5 cursor-pointer"
+              className="w-12 h-12 border rounded-full cursor-pointer backdrop-blur-md bg-secondary/80 hover:bg-secondary text-foreground border-white/5"
             >
               {copied ? (
                 <CheckIcon size={20} weight="bold" className="text-green-500" />

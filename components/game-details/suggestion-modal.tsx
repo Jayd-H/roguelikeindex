@@ -131,25 +131,25 @@ export function SuggestionModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center duration-200 bg-black/70 backdrop-blur-md animate-in fade-in"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md bg-background/95 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl relative animate-in zoom-in-95 duration-300"
+        className="relative w-full max-w-md p-8 duration-300 border shadow-2xl bg-background/95 backdrop-blur-xl border-white/10 rounded-2xl animate-in zoom-in-95"
         onClick={(e) => e.stopPropagation()}
       >
         <Button
           variant="ghost"
           size="icon"
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-full hover:bg-secondary/50 cursor-pointer"
+          className="absolute rounded-full cursor-pointer right-4 top-4 hover:bg-secondary/50"
         >
           <XIcon size={20} />
         </Button>
 
         {isSuccess ? (
-          <div className="flex flex-col items-center justify-center py-8 animate-in fade-in zoom-in duration-300">
-            <div className="h-16 w-16 bg-green-500/10 rounded-full flex items-center justify-center mb-4">
+          <div className="flex flex-col items-center justify-center py-8 duration-300 animate-in fade-in zoom-in">
+            <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-green-500/10">
               <CheckCircleIcon
                 size={32}
                 weight="fill"
@@ -157,18 +157,18 @@ export function SuggestionModal({
               />
             </div>
             <h3 className="text-xl font-bold text-foreground">Submitted!</h3>
-            <p className="text-muted-foreground mt-2 text-center text-sm">
+            <p className="mt-2 text-sm text-center text-muted-foreground">
               Your suggestion has been recorded.
             </p>
           </div>
         ) : (
           <>
-            <h2 className="text-xl font-bold mb-6 tracking-tight">
+            <h2 className="mb-6 text-xl font-bold tracking-tight">
               {getTitle()}
             </h2>
 
             {(field === "metaProgression" || field === "steamDeckVerified") && (
-              <p className="mb-8 text-muted-foreground text-sm leading-relaxed">
+              <p className="mb-8 text-sm leading-relaxed text-muted-foreground">
                 Current status:{" "}
                 <span className="font-bold text-foreground bg-secondary/50 px-2 py-0.5 rounded">
                   {currentData ? "Yes" : "No"}
@@ -183,7 +183,7 @@ export function SuggestionModal({
             )}
 
             {field === "tags" && type === "add" && (
-              <div className="space-y-5 mb-8">
+              <div className="mb-8 space-y-5">
                 <div className="space-y-2">
                   <Label>Tag Name</Label>
                   <Input
@@ -196,7 +196,7 @@ export function SuggestionModal({
             )}
 
             {field === "tags" && type === "remove" && safeData && (
-              <p className="mb-8 text-muted-foreground text-sm">
+              <p className="mb-8 text-sm text-muted-foreground">
                 Are you sure you want to suggest removing the tag{" "}
                 <span className="font-bold text-foreground bg-secondary/50 px-2 py-0.5 rounded">
                   {String(safeData.name)}
@@ -206,7 +206,7 @@ export function SuggestionModal({
             )}
 
             {field === "pricing" && type !== "remove" && (
-              <div className="space-y-5 mb-8">
+              <div className="mb-8 space-y-5">
                 <div className="space-y-2">
                   <Label>Platform</Label>
                   <Select
@@ -216,7 +216,7 @@ export function SuggestionModal({
                     defaultValue={safeData?.platform as string}
                     disabled={type === "edit"}
                   >
-                    <SelectTrigger className="bg-secondary/20 border-white/10 h-11 cursor-pointer">
+                    <SelectTrigger className="cursor-pointer bg-secondary/20 border-white/10 h-11">
                       <SelectValue placeholder="Select Platform" />
                     </SelectTrigger>
                     <SelectContent>
@@ -278,7 +278,7 @@ export function SuggestionModal({
             )}
 
             {field === "externalRatings" && type !== "remove" && (
-              <div className="space-y-5 mb-8">
+              <div className="mb-8 space-y-5">
                 <div className="space-y-2">
                   <Label>Source Name</Label>
                   <Input
@@ -316,7 +316,7 @@ export function SuggestionModal({
             )}
 
             {error && (
-              <p className="text-red-500 text-sm font-medium mb-4 px-3 py-2 bg-red-500/10 rounded-md border border-red-500/20">
+              <p className="px-3 py-2 mb-4 text-sm font-medium text-red-500 border rounded-md bg-red-500/10 border-red-500/20">
                 {error}
               </p>
             )}
@@ -332,7 +332,7 @@ export function SuggestionModal({
               <Button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="cursor-pointer font-semibold px-6"
+                className="px-6 font-semibold cursor-pointer"
               >
                 {loading ? "Submitting..." : "Submit Suggestion"}
               </Button>

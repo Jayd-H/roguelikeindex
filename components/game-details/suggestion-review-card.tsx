@@ -85,11 +85,11 @@ export function SuggestionReviewCard({
           </div>
         );
       return (
-        <div className="text-sm space-y-1">
+        <div className="space-y-1 text-sm">
           <div>
             <strong>{operation === "add" ? "New Store" : "Edit Store"}</strong>
           </div>
-          <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground bg-secondary/20 p-2 rounded">
+          <div className="grid grid-cols-2 gap-2 p-2 text-xs rounded text-muted-foreground bg-secondary/20">
             <span>Store: {val.store}</span>
             <span>Price: {val.price}</span>
             <span className="col-span-2 truncate">URL: {val.url}</span>
@@ -107,13 +107,13 @@ export function SuggestionReviewCard({
           </div>
         );
       return (
-        <div className="text-sm space-y-1">
+        <div className="space-y-1 text-sm">
           <div>
             <strong>
               {operation === "add" ? "New Review" : "Edit Review"}
             </strong>
           </div>
-          <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground bg-secondary/20 p-2 rounded">
+          <div className="grid grid-cols-2 gap-2 p-2 text-xs rounded text-muted-foreground bg-secondary/20">
             <span>Source: {val.source}</span>
             <span>Score: {val.score}</span>
           </div>
@@ -125,8 +125,8 @@ export function SuggestionReviewCard({
   };
 
   return (
-    <div className="p-4 border border-border/50 rounded-lg bg-card/50 flex flex-col gap-3 cursor-default">
-      <div className="flex justify-between items-start">
+    <div className="flex flex-col gap-3 p-4 border rounded-lg cursor-default border-border/50 bg-card/50">
+      <div className="flex items-start justify-between">
         <div className="flex flex-col gap-1">
           <span className="text-xs text-muted-foreground">
             Proposed by{" "}
@@ -136,7 +136,7 @@ export function SuggestionReviewCard({
           </span>
           {renderDiff()}
         </div>
-        <div className="flex items-center gap-1 bg-secondary/30 px-2 py-1 rounded text-xs font-bold">
+        <div className="flex items-center gap-1 px-2 py-1 text-xs font-bold rounded bg-secondary/30">
           Votes: {suggestion.voteCount}
         </div>
       </div>
@@ -146,7 +146,7 @@ export function SuggestionReviewCard({
           <Button
             size="sm"
             variant="outline"
-            className="flex-1 h-8 gap-2 text-green-500 hover:text-green-600 hover:bg-green-500/10 cursor-pointer"
+            className="flex-1 h-8 gap-2 text-green-500 cursor-pointer hover:text-green-600 hover:bg-green-500/10"
             onClick={() => handleVote(1)}
             disabled={voting}
           >
@@ -155,7 +155,7 @@ export function SuggestionReviewCard({
           <Button
             size="sm"
             variant="outline"
-            className="flex-1 h-8 gap-2 text-red-500 hover:text-red-600 hover:bg-red-500/10 cursor-pointer"
+            className="flex-1 h-8 gap-2 text-red-500 cursor-pointer hover:text-red-600 hover:bg-red-500/10"
             onClick={() => handleVote(-1)}
             disabled={voting}
           >
@@ -164,7 +164,7 @@ export function SuggestionReviewCard({
         </div>
       )}
       {hasVoted && (
-        <div className="text-xs text-center text-muted-foreground mt-1">
+        <div className="mt-1 text-xs text-center text-muted-foreground">
           You voted
         </div>
       )}

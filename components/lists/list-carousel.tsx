@@ -89,7 +89,7 @@ export function ListCarousel({
         <Button
           variant="secondary"
           size="icon"
-          className="absolute -left-6 top-1/2 -translate-y-1/2 z-50 rounded-full h-14 w-14 shadow-2xl bg-background/80 backdrop-blur-md border border-border/50 hover:scale-110 hover:bg-background transition-all cursor-pointer"
+          className="absolute z-50 transition-all -translate-y-1/2 border rounded-full shadow-2xl cursor-pointer -left-6 top-1/2 h-14 w-14 bg-background/80 backdrop-blur-md border-border/50 hover:scale-110 hover:bg-background"
           onClick={() => scroll("left")}
         >
           <CaretLeft size={28} weight="bold" />
@@ -97,7 +97,7 @@ export function ListCarousel({
       )}
 
       <div
-        className="py-32 -my-16 relative"
+        className="relative py-32 -my-16"
         style={{
           marginLeft: `-${HOVER_BUFFER}px`,
           marginRight: `-${HOVER_BUFFER}px`,
@@ -121,7 +121,7 @@ export function ListCarousel({
         <Button
           variant="secondary"
           size="icon"
-          className="absolute -right-6 top-1/2 -translate-y-1/2 z-50 rounded-full h-14 w-14 shadow-2xl bg-background/80 backdrop-blur-md border border-border/50 hover:scale-110 hover:bg-background transition-all cursor-pointer"
+          className="absolute z-50 transition-all -translate-y-1/2 border rounded-full shadow-2xl cursor-pointer -right-6 top-1/2 h-14 w-14 bg-background/80 backdrop-blur-md border-border/50 hover:scale-110 hover:bg-background"
           onClick={() => scroll("right")}
         >
           <CaretRight size={28} weight="bold" />

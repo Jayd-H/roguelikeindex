@@ -132,22 +132,22 @@ export default function ProfilePage() {
 
   if (authLoading || loading)
     return (
-      <div className="min-h-screen bg-background flex flex-col font-sans">
+      <div className="flex flex-col min-h-screen font-sans bg-background">
         <Header />
-        <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-6">
-          <div className="flex flex-col md:flex-row gap-8 items-start mb-8">
-            <Skeleton className="h-32 w-32 rounded-full shrink-0" />
+        <main className="flex-1 w-full px-6 py-6 mx-auto max-w-7xl">
+          <div className="flex flex-col items-start gap-8 mb-8 md:flex-row">
+            <Skeleton className="w-32 h-32 rounded-full shrink-0" />
             <div className="flex-1 w-full space-y-4">
               <div className="space-y-2">
-                <Skeleton className="h-10 w-48" />
-                <Skeleton className="h-4 w-32" />
+                <Skeleton className="w-48 h-10" />
+                <Skeleton className="w-32 h-4" />
               </div>
-              <Skeleton className="h-20 w-full max-w-3xl" />
+              <Skeleton className="w-full h-20 max-w-3xl" />
               <div className="flex gap-4 pt-2">
-                <Skeleton className="h-14 w-28 rounded-lg" />
-                <Skeleton className="h-14 w-28 rounded-lg" />
-                <Skeleton className="h-14 w-28 rounded-lg" />
-                <Skeleton className="h-14 w-28 rounded-lg" />
+                <Skeleton className="rounded-lg h-14 w-28" />
+                <Skeleton className="rounded-lg h-14 w-28" />
+                <Skeleton className="rounded-lg h-14 w-28" />
+                <Skeleton className="rounded-lg h-14 w-28" />
               </div>
             </div>
           </div>
@@ -156,15 +156,15 @@ export default function ProfilePage() {
 
           <div className="space-y-12">
             <div className="space-y-6">
-              <Skeleton className="h-8 w-32" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Skeleton className="h-48 w-full rounded-xl" />
-                <Skeleton className="h-48 w-full rounded-xl" />
+              <Skeleton className="w-32 h-8" />
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <Skeleton className="w-full h-48 rounded-xl" />
+                <Skeleton className="w-full h-48 rounded-xl" />
               </div>
             </div>
 
             <div className="space-y-6">
-              <Skeleton className="h-8 w-32" />
+              <Skeleton className="w-32 h-8" />
               <div className="flex gap-6 overflow-hidden">
                 <Skeleton className="h-112 w-80 rounded-3xl shrink-0" />
                 <Skeleton className="h-112 w-80 rounded-3xl shrink-0" />
@@ -189,11 +189,11 @@ export default function ProfilePage() {
   const isEarlyAdopter = userInfo.roles.includes("early-adopter");
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
+    <div className="flex flex-col min-h-screen font-sans bg-background text-foreground">
       <Header />
-      <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-6">
-        <section className="flex flex-col md:flex-row gap-8 items-start mb-8">
-          <div className="shrink-0 relative group">
+      <main className="flex-1 w-full px-6 py-6 mx-auto max-w-7xl">
+        <section className="flex flex-col items-start gap-8 mb-8 md:flex-row">
+          <div className="relative shrink-0 group">
             <Avatar
               className={`h-32 w-32 border-4 shadow-xl ${
                 isAdmin
@@ -218,21 +218,21 @@ export default function ProfilePage() {
           </div>
 
           <div className="flex-1 w-full space-y-4">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
               <div className="flex-1">
                 {editingField === "username" ? (
-                  <div className="flex items-center gap-2 max-w-sm">
+                  <div className="flex items-center max-w-sm gap-2">
                     <Input
                       value={tempValue}
                       onChange={(e) => setTempValue(e.target.value)}
-                      className="text-2xl font-bold h-10"
+                      className="h-10 text-2xl font-bold"
                       autoFocus
                     />
                     <Button
                       size="icon"
                       onClick={() => handleUpdate("username", tempValue)}
                       disabled={isUpdating}
-                      className="h-10 w-10 shrink-0 cursor-pointer"
+                      className="w-10 h-10 cursor-pointer shrink-0"
                     >
                       <CheckIcon />
                     </Button>
@@ -240,13 +240,13 @@ export default function ProfilePage() {
                       size="icon"
                       variant="ghost"
                       onClick={() => setEditingField(null)}
-                      className="h-10 w-10 shrink-0 cursor-pointer"
+                      className="w-10 h-10 cursor-pointer shrink-0"
                     >
                       <XIcon />
                     </Button>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-3 flex-wrap">
+                  <div className="flex flex-wrap items-center gap-3">
                     <h1
                       className={`text-4xl font-black tracking-tighter flex items-center gap-3 group w-fit ${
                         isAdmin
@@ -257,7 +257,7 @@ export default function ProfilePage() {
                       {userInfo.username}
                       <button
                         onClick={() => startEdit("username", userInfo.username)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary cursor-pointer"
+                        className="transition-opacity opacity-0 cursor-pointer group-hover:opacity-100 text-muted-foreground hover:text-primary"
                       >
                         <PencilSimpleIcon size={20} />
                       </button>
@@ -280,7 +280,7 @@ export default function ProfilePage() {
                     )}
                   </div>
                 )}
-                <div className="flex items-center gap-2 text-muted-foreground text-sm font-medium mt-1">
+                <div className="flex items-center gap-2 mt-1 text-sm font-medium text-muted-foreground">
                   <CalendarBlankIcon />
                   Joined {new Date(userInfo.createdAt).toLocaleDateString()}
                 </div>
@@ -328,10 +328,10 @@ export default function ProfilePage() {
                   <Textarea
                     value={tempBio}
                     onChange={(e) => setTempBio(e.target.value)}
-                    className="min-h-24 resize-none bg-background"
+                    className="resize-none min-h-24 bg-background"
                     placeholder="Write something about yourself..."
                   />
-                  <div className="flex gap-2 justify-end">
+                  <div className="flex justify-end gap-2">
                     <Button
                       size="sm"
                       variant="ghost"
@@ -351,13 +351,13 @@ export default function ProfilePage() {
                   </div>
                 </div>
               ) : (
-                <div className="text-lg text-muted-foreground max-w-3xl leading-relaxed whitespace-pre-wrap">
+                <div className="max-w-3xl text-lg leading-relaxed whitespace-pre-wrap text-muted-foreground">
                   {userInfo.bio ? (
                     <span className="inline">
                       {userInfo.bio}
                       <button
                         onClick={() => startEdit("bio", userInfo.bio || "")}
-                        className="inline-flex align-middle ml-2 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary cursor-pointer"
+                        className="inline-flex ml-2 align-middle transition-opacity opacity-0 cursor-pointer group-hover:opacity-100 text-muted-foreground hover:text-primary"
                         title="Edit Bio"
                       >
                         <PencilSimpleIcon size={18} />
@@ -366,7 +366,7 @@ export default function ProfilePage() {
                   ) : (
                     <button
                       onClick={() => startEdit("bio", "")}
-                      className="text-sm italic text-muted-foreground/60 hover:text-primary transition-colors flex items-center gap-2 cursor-pointer"
+                      className="flex items-center gap-2 text-sm italic transition-colors cursor-pointer text-muted-foreground/60 hover:text-primary"
                     >
                       Add a bio... <PencilSimpleIcon size={14} />
                     </button>
@@ -379,7 +379,7 @@ export default function ProfilePage() {
               <div className="flex items-center gap-2 px-3 py-1">
                 <HeartIcon weight="fill" className="text-red-500" size={20} />
                 <div className="flex flex-col leading-none">
-                  <span className="font-bold text-lg">{favorites.length}</span>
+                  <span className="text-lg font-bold">{favorites.length}</span>
                   <span className="text-[10px] text-muted-foreground uppercase font-bold">
                     Favorites
                   </span>
@@ -392,7 +392,7 @@ export default function ProfilePage() {
                   size={20}
                 />
                 <div className="flex flex-col leading-none">
-                  <span className="font-bold text-lg">{owned.length}</span>
+                  <span className="text-lg font-bold">{owned.length}</span>
                   <span className="text-[10px] text-muted-foreground uppercase font-bold">
                     Owned
                   </span>
@@ -405,7 +405,7 @@ export default function ProfilePage() {
                   size={20}
                 />
                 <div className="flex flex-col leading-none">
-                  <span className="font-bold text-lg">
+                  <span className="text-lg font-bold">
                     {createdLists.length}
                   </span>
                   <span className="text-[10px] text-muted-foreground uppercase font-bold">
@@ -420,7 +420,7 @@ export default function ProfilePage() {
                   size={20}
                 />
                 <div className="flex flex-col leading-none">
-                  <span className="font-bold text-lg">{reviews.length}</span>
+                  <span className="text-lg font-bold">{reviews.length}</span>
                   <span className="text-[10px] text-muted-foreground uppercase font-bold">
                     Reviews
                   </span>
@@ -436,13 +436,13 @@ export default function ProfilePage() {
           {reviews.length > 0 && (
             <section className="space-y-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-yellow-500/10 rounded-lg text-yellow-500">
+                <div className="p-2 text-yellow-500 rounded-lg bg-yellow-500/10">
                   <ChatTextIcon size={24} weight="fill" />
                 </div>
                 <h2 className="text-2xl font-bold">Reviews</h2>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
                 {reviews.map((review) => (
                   <ReviewCard
                     key={review.id}
@@ -457,7 +457,7 @@ export default function ProfilePage() {
           {createdLists.length > 0 && (
             <section className="space-y-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-500/10 rounded-lg text-blue-500">
+                <div className="p-2 text-blue-500 rounded-lg bg-blue-500/10">
                   <ListDashesIcon size={24} weight="fill" />
                 </div>
                 <h2 className="text-2xl font-bold">Your Lists</h2>
@@ -476,7 +476,7 @@ export default function ProfilePage() {
           {(favorites.length > 0 || owned.length > 0) && (
             <section className="space-y-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                <div className="p-2 rounded-lg bg-primary/10 text-primary">
                   <GameControllerIcon size={24} weight="fill" />
                 </div>
                 <h2 className="text-2xl font-bold">Library</h2>
@@ -484,7 +484,7 @@ export default function ProfilePage() {
 
               {favorites.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest pl-1">
+                  <h3 className="pl-1 text-sm font-bold tracking-widest uppercase text-muted-foreground">
                     Favorites
                   </h3>
                   <GameCarousel>
@@ -497,7 +497,7 @@ export default function ProfilePage() {
 
               {owned.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest pl-1">
+                  <h3 className="pl-1 text-sm font-bold tracking-widest uppercase text-muted-foreground">
                     Owned
                   </h3>
                   <GameCarousel>

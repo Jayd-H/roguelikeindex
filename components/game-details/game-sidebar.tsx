@@ -80,15 +80,15 @@ export function GameSidebar({ game }: GameSidebarProps) {
   };
 
   return (
-    <aside className="lg:col-span-4 space-y-8">
-      <Card className="bg-secondary/10 border-none shadow-none overflow-hidden group">
-        <div className="bg-secondary/30 p-6 flex flex-col gap-4">
-          <div className="flex justify-between items-end">
+    <aside className="space-y-8 lg:col-span-4">
+      <Card className="overflow-hidden border-none shadow-none bg-secondary/10 group">
+        <div className="flex flex-col gap-4 p-6 bg-secondary/30">
+          <div className="flex items-end justify-between">
             <div>
-              <div className="text-5xl font-black text-primary tracking-tighter">
+              <div className="text-5xl font-black tracking-tighter text-primary">
                 {game.rating}
               </div>
-              <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mt-1">
+              <div className="mt-1 text-xs font-bold tracking-wider uppercase text-muted-foreground">
                 Index Score
               </div>
             </div>
@@ -106,29 +106,29 @@ export function GameSidebar({ game }: GameSidebarProps) {
         </div>
         <div className="p-4 space-y-2">
           {game.externalRatings.map((ex, i) => (
-            <div key={i} className="flex gap-2 items-center">
+            <div key={i} className="flex items-center gap-2">
               <a
                 href={ex.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex justify-between text-sm items-center p-3 rounded-md bg-background/50 hover:bg-background transition-colors cursor-pointer group/link"
+                className="flex items-center justify-between flex-1 p-3 text-sm transition-colors rounded-md cursor-pointer bg-background/50 hover:bg-background group/link"
               >
-                <span className="font-medium text-muted-foreground group-hover/link:text-primary transition-colors flex items-center gap-2">
+                <span className="flex items-center gap-2 font-medium transition-colors text-muted-foreground group-hover/link:text-primary">
                   {ex.source}{" "}
                   <ArrowSquareOutIcon size={12} className="opacity-50" />
                 </span>
                 <span className="font-bold text-foreground">{ex.score}</span>
               </a>
-              <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex flex-col gap-1 transition-opacity opacity-0 group-hover:opacity-100">
                 <button
                   onClick={() => openSuggest("externalRatings", "edit", ex)}
-                  className="text-muted-foreground hover:text-primary cursor-pointer"
+                  className="cursor-pointer text-muted-foreground hover:text-primary"
                 >
                   <PencilSimpleIcon size={14} />
                 </button>
                 <button
                   onClick={() => openSuggest("externalRatings", "remove", ex)}
-                  className="text-muted-foreground hover:text-destructive cursor-pointer"
+                  className="cursor-pointer text-muted-foreground hover:text-destructive"
                 >
                   <TrashIcon size={14} />
                 </button>
@@ -138,23 +138,23 @@ export function GameSidebar({ game }: GameSidebarProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="w-full text-xs text-muted-foreground dashed border border-border/50 mt-2 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+            className="w-full mt-2 text-xs transition-opacity border opacity-0 cursor-pointer text-muted-foreground dashed border-border/50 group-hover:opacity-100"
             onClick={() => openSuggest("externalRatings", "add")}
           >
             <PlusIcon className="mr-1" /> Add Rating
           </Button>
         </div>
       </Card>
-      <Card className="border-none shadow-none bg-transparent group">
+      <Card className="bg-transparent border-none shadow-none group">
         <CardContent className="px-0 pt-0">
-          <div className="flex justify-between items-center mb-4 px-2">
-            <h4 className="font-bold text-lg flex items-center gap-2">
+          <div className="flex items-center justify-between px-2 mb-4">
+            <h4 className="flex items-center gap-2 text-lg font-bold">
               <CheckIcon size={20} className="text-primary" /> Availability
             </h4>
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 w-6 p-0 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer"
+              className="w-6 h-6 p-0 rounded-full opacity-0 cursor-pointer group-hover:opacity-100"
               onClick={() => openSuggest("pricing", "add")}
             >
               <PlusIcon />
@@ -163,7 +163,7 @@ export function GameSidebar({ game }: GameSidebarProps) {
           <div className="space-y-6">
             {game.pricing.map((platformData, idx) => (
               <div key={idx}>
-                <div className="flex items-center gap-2 mb-3 px-2 text-sm font-bold text-muted-foreground uppercase tracking-wide">
+                <div className="flex items-center gap-2 px-2 mb-3 text-sm font-bold tracking-wide uppercase text-muted-foreground">
                   {getPlatformIcon(platformData.platform)}
                   {platformData.platform}
                 </div>
@@ -171,17 +171,17 @@ export function GameSidebar({ game }: GameSidebarProps) {
                   {platformData.stores.map((store: Store, sIdx: number) => (
                     <div
                       key={sIdx}
-                      className="flex gap-1 items-center group/store"
+                      className="flex items-center gap-1 group/store"
                     >
                       <a
                         href={store.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 flex items-center justify-between text-sm cursor-pointer hover:bg-secondary/50 p-2 rounded transition-colors"
+                        className="flex items-center justify-between flex-1 p-2 text-sm transition-colors rounded cursor-pointer hover:bg-secondary/50"
                       >
                         <div className="flex items-center gap-2">
                           {getStoreIcon(store.store)}
-                          <span className="font-medium hover:text-foreground transition-colors">
+                          <span className="font-medium transition-colors hover:text-foreground">
                             {store.store}
                           </span>
                         </div>
@@ -192,7 +192,7 @@ export function GameSidebar({ game }: GameSidebarProps) {
                           {store.price}
                         </Badge>
                       </a>
-                      <div className="flex flex-col gap-1 opacity-0 group-hover/store:opacity-100 transition-opacity w-6">
+                      <div className="flex flex-col w-6 gap-1 transition-opacity opacity-0 group-hover/store:opacity-100">
                         <button
                           onClick={() =>
                             openSuggest("pricing", "edit", {
@@ -200,7 +200,7 @@ export function GameSidebar({ game }: GameSidebarProps) {
                               platform: platformData.platform,
                             })
                           }
-                          className="text-muted-foreground hover:text-primary cursor-pointer"
+                          className="cursor-pointer text-muted-foreground hover:text-primary"
                         >
                           <PencilSimpleIcon size={12} />
                         </button>
@@ -211,7 +211,7 @@ export function GameSidebar({ game }: GameSidebarProps) {
                               platform: platformData.platform,
                             })
                           }
-                          className="text-muted-foreground hover:text-destructive cursor-pointer"
+                          className="cursor-pointer text-muted-foreground hover:text-destructive"
                         >
                           <TrashIcon size={12} />
                         </button>
@@ -230,16 +230,16 @@ export function GameSidebar({ game }: GameSidebarProps) {
 
       {game.similarGames.length > 0 && (
         <div>
-          <h4 className="font-bold text-lg mb-4">Similar Games</h4>
-          <ScrollArea className="h-100 pr-4">
+          <h4 className="mb-4 text-lg font-bold">Similar Games</h4>
+          <ScrollArea className="pr-4 h-100">
             <div className="space-y-3">
               {game.similarGames.map((simGame) => (
                 <div
                   key={simGame.id}
                   onClick={() => router.push(`/games/${simGame.slug}`)}
-                  className="flex gap-3 p-2 rounded-lg hover:bg-secondary/20 cursor-pointer transition-colors group border border-transparent hover:border-border/50"
+                  className="flex gap-3 p-2 transition-colors border border-transparent rounded-lg cursor-pointer hover:bg-secondary/20 group hover:border-border/50"
                 >
-                  <div className="h-16 w-24 bg-muted rounded overflow-hidden shrink-0 relative">
+                  <div className="relative w-24 h-16 overflow-hidden rounded bg-muted shrink-0">
                     {simGame.steamAppId && (
                       <Image
                         src={`https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${simGame.steamAppId}/header.jpg`}
@@ -251,7 +251,7 @@ export function GameSidebar({ game }: GameSidebarProps) {
                     )}
                   </div>
                   <div className="flex flex-col justify-center">
-                    <span className="font-bold text-sm group-hover:text-primary transition-colors line-clamp-1">
+                    <span className="text-sm font-bold transition-colors group-hover:text-primary line-clamp-1">
                       {simGame.title}
                     </span>
                     <span className="text-xs text-muted-foreground">

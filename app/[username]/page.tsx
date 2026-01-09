@@ -63,22 +63,22 @@ export default function PublicProfilePage() {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-background flex flex-col font-sans">
+      <div className="flex flex-col min-h-screen font-sans bg-background">
         <Header />
-        <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-6">
-          <div className="flex flex-col md:flex-row gap-8 items-start mb-8">
-            <Skeleton className="h-32 w-32 rounded-full shrink-0" />
+        <main className="flex-1 w-full px-6 py-6 mx-auto max-w-7xl">
+          <div className="flex flex-col items-start gap-8 mb-8 md:flex-row">
+            <Skeleton className="w-32 h-32 rounded-full shrink-0" />
             <div className="flex-1 w-full space-y-4">
               <div className="space-y-2">
-                <Skeleton className="h-10 w-48" />
-                <Skeleton className="h-4 w-32" />
+                <Skeleton className="w-48 h-10" />
+                <Skeleton className="w-32 h-4" />
               </div>
-              <Skeleton className="h-20 w-full max-w-3xl" />
+              <Skeleton className="w-full h-20 max-w-3xl" />
               <div className="flex gap-4 pt-2">
-                <Skeleton className="h-14 w-28 rounded-lg" />
-                <Skeleton className="h-14 w-28 rounded-lg" />
-                <Skeleton className="h-14 w-28 rounded-lg" />
-                <Skeleton className="h-14 w-28 rounded-lg" />
+                <Skeleton className="rounded-lg h-14 w-28" />
+                <Skeleton className="rounded-lg h-14 w-28" />
+                <Skeleton className="rounded-lg h-14 w-28" />
+                <Skeleton className="rounded-lg h-14 w-28" />
               </div>
             </div>
           </div>
@@ -87,15 +87,15 @@ export default function PublicProfilePage() {
 
           <div className="space-y-12">
             <div className="space-y-6">
-              <Skeleton className="h-8 w-32" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Skeleton className="h-48 w-full rounded-xl" />
-                <Skeleton className="h-48 w-full rounded-xl" />
+              <Skeleton className="w-32 h-8" />
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <Skeleton className="w-full h-48 rounded-xl" />
+                <Skeleton className="w-full h-48 rounded-xl" />
               </div>
             </div>
 
             <div className="space-y-6">
-              <Skeleton className="h-8 w-32" />
+              <Skeleton className="w-32 h-8" />
               <div className="flex gap-6 overflow-hidden">
                 <Skeleton className="h-112 w-80 rounded-3xl shrink-0" />
                 <Skeleton className="h-112 w-80 rounded-3xl shrink-0" />
@@ -108,9 +108,9 @@ export default function PublicProfilePage() {
 
   if (error || !profileData)
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="flex flex-col min-h-screen bg-background">
         <Header />
-        <div className="flex-1 flex items-center justify-center text-muted-foreground">
+        <div className="flex items-center justify-center flex-1 text-muted-foreground">
           <p className="text-xl font-bold">{error || "User not found"}</p>
         </div>
       </div>
@@ -128,11 +128,11 @@ export default function PublicProfilePage() {
   const isEarlyAdopter = userInfo.roles.includes("early-adopter");
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
+    <div className="flex flex-col min-h-screen font-sans bg-background text-foreground">
       <Header />
-      <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-6">
-        <section className="flex flex-col md:flex-row gap-8 items-start mb-8">
-          <div className="shrink-0 relative group">
+      <main className="flex-1 w-full px-6 py-6 mx-auto max-w-7xl">
+        <section className="flex flex-col items-start gap-8 mb-8 md:flex-row">
+          <div className="relative shrink-0 group">
             <Avatar
               className={`h-32 w-32 border-4 shadow-xl ${
                 isAdmin
@@ -157,9 +157,9 @@ export default function PublicProfilePage() {
           </div>
 
           <div className="flex-1 w-full space-y-4">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
               <div className="flex-1">
-                <div className="flex items-center gap-3 flex-wrap">
+                <div className="flex flex-wrap items-center gap-3">
                   <h1
                     className={`text-4xl font-black tracking-tighter flex items-center gap-3 group w-fit ${
                       isAdmin
@@ -186,7 +186,7 @@ export default function PublicProfilePage() {
                     </Badge>
                   )}
                 </div>
-                <div className="flex items-center gap-2 text-muted-foreground text-sm font-medium mt-1">
+                <div className="flex items-center gap-2 mt-1 text-sm font-medium text-muted-foreground">
                   <CalendarBlankIcon />
                   Joined {new Date(userInfo.createdAt).toLocaleDateString()}
                 </div>
@@ -194,42 +194,42 @@ export default function PublicProfilePage() {
             </div>
 
             <div className="relative group">
-              <div className="text-lg text-muted-foreground max-w-3xl leading-relaxed whitespace-pre-wrap">
+              <div className="max-w-3xl text-lg leading-relaxed whitespace-pre-wrap text-muted-foreground">
                 {userInfo.bio || "No bio yet."}
               </div>
             </div>
 
             <div className="flex flex-wrap gap-4 pt-2">
-              <div className="bg-secondary/20 rounded-lg px-4 py-2 flex items-center gap-3">
+              <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-secondary/20">
                 <HeartIcon weight="fill" className="text-red-500" size={20} />
                 <div className="flex flex-col leading-none">
-                  <span className="font-bold text-lg">{favorites.length}</span>
+                  <span className="text-lg font-bold">{favorites.length}</span>
                   <span className="text-[10px] text-muted-foreground uppercase font-bold">
                     Favorites
                   </span>
                 </div>
               </div>
-              <div className="bg-secondary/20 rounded-lg px-4 py-2 flex items-center gap-3">
+              <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-secondary/20">
                 <GameControllerIcon
                   weight="fill"
                   className="text-primary"
                   size={20}
                 />
                 <div className="flex flex-col leading-none">
-                  <span className="font-bold text-lg">{owned.length}</span>
+                  <span className="text-lg font-bold">{owned.length}</span>
                   <span className="text-[10px] text-muted-foreground uppercase font-bold">
                     Owned
                   </span>
                 </div>
               </div>
-              <div className="bg-secondary/20 rounded-lg px-4 py-2 flex items-center gap-3">
+              <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-secondary/20">
                 <ListDashesIcon
                   weight="fill"
                   className="text-blue-500"
                   size={20}
                 />
                 <div className="flex flex-col leading-none">
-                  <span className="font-bold text-lg">
+                  <span className="text-lg font-bold">
                     {createdLists.length}
                   </span>
                   <span className="text-[10px] text-muted-foreground uppercase font-bold">
@@ -237,14 +237,14 @@ export default function PublicProfilePage() {
                   </span>
                 </div>
               </div>
-              <div className="bg-secondary/20 rounded-lg px-4 py-2 flex items-center gap-3">
+              <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-secondary/20">
                 <ChatTextIcon
                   weight="fill"
                   className="text-yellow-500"
                   size={20}
                 />
                 <div className="flex flex-col leading-none">
-                  <span className="font-bold text-lg">{reviews.length}</span>
+                  <span className="text-lg font-bold">{reviews.length}</span>
                   <span className="text-[10px] text-muted-foreground uppercase font-bold">
                     Reviews
                   </span>
@@ -260,13 +260,13 @@ export default function PublicProfilePage() {
           {reviews.length > 0 && (
             <section className="space-y-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-yellow-500/10 rounded-lg text-yellow-500">
+                <div className="p-2 text-yellow-500 rounded-lg bg-yellow-500/10">
                   <ChatTextIcon size={24} weight="fill" />
                 </div>
                 <h2 className="text-2xl font-bold">Reviews</h2>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
                 {reviews.map((review) => (
                   <ReviewCard
                     key={review.id}
@@ -281,7 +281,7 @@ export default function PublicProfilePage() {
           {createdLists.length > 0 && (
             <section className="space-y-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-500/10 rounded-lg text-blue-500">
+                <div className="p-2 text-blue-500 rounded-lg bg-blue-500/10">
                   <ListDashesIcon size={24} weight="fill" />
                 </div>
                 <h2 className="text-2xl font-bold">Lists</h2>
@@ -300,7 +300,7 @@ export default function PublicProfilePage() {
           {(favorites.length > 0 || owned.length > 0) && (
             <section className="space-y-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                <div className="p-2 rounded-lg bg-primary/10 text-primary">
                   <GameControllerIcon size={24} weight="fill" />
                 </div>
                 <h2 className="text-2xl font-bold">Library</h2>
@@ -308,7 +308,7 @@ export default function PublicProfilePage() {
 
               {favorites.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest pl-1">
+                  <h3 className="pl-1 text-sm font-bold tracking-widest uppercase text-muted-foreground">
                     Favorites
                   </h3>
                   <GameCarousel>
@@ -321,7 +321,7 @@ export default function PublicProfilePage() {
 
               {owned.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest pl-1">
+                  <h3 className="pl-1 text-sm font-bold tracking-widest uppercase text-muted-foreground">
                     Owned
                   </h3>
                   <GameCarousel>

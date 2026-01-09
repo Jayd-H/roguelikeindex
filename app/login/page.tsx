@@ -48,20 +48,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="h-screen w-full bg-background flex overflow-hidden">
+    <div className="flex w-full h-screen overflow-hidden bg-background">
       {/* Left Side - Game Grid */}
-      <div className="hidden lg:block w-7/12 h-full bg-black relative">
+      <div className="relative hidden w-7/12 h-full bg-black lg:block">
         <GameGrid />
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full lg:w-5/12 h-full flex flex-col relative z-20 bg-background/95 backdrop-blur-3xl border-l border-border/50">
+      <div className="relative z-20 flex flex-col w-full h-full border-l lg:w-5/12 bg-background/95 backdrop-blur-3xl border-border/50">
         <div className="absolute top-0 left-0 w-full">
           <Header />
         </div>
 
-        <div className="flex-1 flex flex-col justify-center px-8 sm:px-12 md:px-20 max-w-2xl mx-auto w-full">
-          <div className="space-y-2 mb-8">
+        <div className="flex flex-col justify-center flex-1 w-full max-w-2xl px-8 mx-auto sm:px-12 md:px-20">
+          <div className="mb-8 space-y-2">
             <h2 className="text-3xl font-black tracking-tighter">
               Welcome back
             </h2>
@@ -102,14 +102,14 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm font-medium border border-destructive/20">
+              <div className="p-3 text-sm font-medium border rounded-md bg-destructive/10 text-destructive border-destructive/20">
                 {error}
               </div>
             )}
 
             <Button
               type="submit"
-              className="w-full h-11 text-base font-semibold cursor-pointer"
+              className="w-full text-base font-semibold cursor-pointer h-11"
               disabled={loading}
             >
               {loading ? "Signing in..." : "Login"}{" "}
@@ -117,11 +117,11 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-8 text-center text-sm text-muted-foreground">
+          <div className="mt-8 text-sm text-center text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link
               href="/register"
-              className="underline font-medium text-foreground hover:text-primary transition-colors"
+              className="font-medium underline transition-colors text-foreground hover:text-primary"
             >
               Sign up
             </Link>

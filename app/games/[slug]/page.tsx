@@ -196,13 +196,13 @@ export default function GameDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex flex-col font-sans">
+      <div className="flex flex-col min-h-screen font-sans bg-background">
         <Header />
-        <div className="relative w-full h-100 md:h-125 bg-black/90 overflow-hidden">
+        <div className="relative w-full overflow-hidden h-100 md:h-125 bg-black/90">
           <Skeleton className="w-full h-full opacity-10" />
         </div>
-        <main className="max-w-7xl mx-auto w-full px-6 py-4 flex-1">
-          <Skeleton className="h-96 w-full" />
+        <main className="flex-1 w-full px-6 py-4 mx-auto max-w-7xl">
+          <Skeleton className="w-full h-96" />
         </main>
         <Footer />
       </div>
@@ -212,7 +212,7 @@ export default function GameDetailsPage() {
   if (!game) return notFound();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col font-sans">
+    <div className="flex flex-col min-h-screen font-sans bg-background">
       <Header />
       <GameHero
         game={game}
@@ -224,22 +224,22 @@ export default function GameDetailsPage() {
         onAddToList={handleAddToList}
       />
 
-      <main className="max-w-7xl mx-auto w-full px-6 py-4 flex-1">
+      <main className="flex-1 w-full px-6 py-4 mx-auto max-w-7xl">
         {suggestions.length > 0 && (
           <Collapsible
             open={showSuggestions}
             onOpenChange={setShowSuggestions}
-            className="mb-8 border border-border/50 rounded-xl bg-secondary/5 overflow-hidden"
+            className="mb-8 overflow-hidden border border-border/50 rounded-xl bg-secondary/5"
           >
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 hover:bg-secondary/10 transition-colors cursor-pointer">
-              <div className="flex items-center gap-2 font-bold text-sm">
+            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 transition-colors cursor-pointer hover:bg-secondary/10">
+              <div className="flex items-center gap-2 text-sm font-bold">
                 <UsersIcon size={18} className="text-primary" />
                 Community Edits ({suggestions.length})
               </div>
               {showSuggestions ? <CaretUp /> : <CaretDown />}
             </CollapsibleTrigger>
             <CollapsibleContent className="p-4 pt-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+              <div className="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 lg:grid-cols-3">
                 {suggestions.map((s) => (
                   <SuggestionReviewCard
                     key={s.id}
@@ -253,8 +253,8 @@ export default function GameDetailsPage() {
           </Collapsible>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          <div className="lg:col-span-8 space-y-10">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+          <div className="space-y-10 lg:col-span-8">
             <GameStats game={game} />
             <Separator />
             <GameReviews

@@ -28,18 +28,18 @@ export function ConfirmationModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 cursor-pointer"
+      className="fixed inset-0 z-50 flex items-center justify-center duration-200 cursor-pointer bg-black/60 backdrop-blur-sm animate-in fade-in"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md p-4 animate-in zoom-in-95 slide-in-from-bottom-5 duration-300 cursor-default"
+        className="relative w-full max-w-md p-4 duration-300 cursor-default animate-in zoom-in-95 slide-in-from-bottom-5"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-background border border-border/50 shadow-2xl rounded-xl overflow-hidden relative p-6 space-y-6">
+        <div className="relative p-6 space-y-6 overflow-hidden border shadow-2xl bg-background border-border/50 rounded-xl">
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-4 top-4 text-muted-foreground hover:text-foreground cursor-pointer"
+            className="absolute cursor-pointer right-4 top-4 text-muted-foreground hover:text-foreground"
             onClick={onClose}
           >
             <XIcon size={20} />

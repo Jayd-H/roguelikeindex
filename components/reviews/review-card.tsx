@@ -26,7 +26,7 @@ const StatBar = ({ label, value }: { label: string; value: number | null }) => {
       </div>
       <div className="h-1.5 w-full bg-secondary/30 rounded-full overflow-hidden">
         <div
-          className="h-full bg-primary/80 rounded-full"
+          className="h-full rounded-full bg-primary/80"
           style={{ width: `${(value / 10) * 100}%` }}
         />
       </div>
@@ -59,17 +59,17 @@ export function ReviewCard({ review, showGameTitle = false }: ReviewCardProps) {
 
   return (
     <Card
-      className="overflow-hidden transition-all duration-300 border-border/60 shadow-sm hover:shadow-md bg-card/60 cursor-pointer group"
+      className="overflow-hidden transition-all duration-300 shadow-sm cursor-pointer border-border/60 hover:shadow-md bg-card/60 group"
       onClick={() =>
         showGameTitle && review.game?.slug
           ? router.push(`/games/${review.game.slug}`)
           : undefined
       }
     >
-      <div className="p-6 pb-4 flex justify-between items-start">
+      <div className="flex items-start justify-between p-6 pb-4">
         <div className="flex items-center gap-3">
           <div
-            className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg bg-secondary text-muted-foreground shrink-0 overflow-hidden cursor-pointer hover:bg-secondary/80 transition-colors"
+            className="flex items-center justify-center w-10 h-10 overflow-hidden text-lg font-bold transition-colors rounded-full cursor-pointer bg-secondary text-muted-foreground shrink-0 hover:bg-secondary/80"
             onClick={!showGameTitle ? handleUserClick : undefined}
           >
             {showGameTitle && review.game?.title ? (
@@ -97,7 +97,7 @@ export function ReviewCard({ review, showGameTitle = false }: ReviewCardProps) {
           </div>
         </div>
 
-        <div className="flex items-center gap-1 bg-yellow-500/10 px-3 py-1 rounded-full border border-yellow-500/20">
+        <div className="flex items-center gap-1 px-3 py-1 border rounded-full bg-yellow-500/10 border-yellow-500/20">
           <StarIcon weight="fill" className="text-yellow-500" size={14} />
           <span className="text-sm font-bold text-yellow-700 dark:text-yellow-400">
             {review.rating}/5
@@ -107,16 +107,16 @@ export function ReviewCard({ review, showGameTitle = false }: ReviewCardProps) {
 
       {review.comment && (
         <div className="px-6 pb-6">
-          <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
+          <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/90">
             {review.comment}
           </p>
         </div>
       )}
 
       {(hasRatings || hasTimes || hasTraits) && (
-        <div className="bg-muted/20 border-t border-border/50 p-5 grid grid-cols-1 md:grid-cols-12 gap-6 text-sm">
+        <div className="grid grid-cols-1 gap-6 p-5 text-sm border-t bg-muted/20 border-border/50 md:grid-cols-12">
           {hasRatings && (
-            <div className="md:col-span-6 space-y-3">
+            <div className="space-y-3 md:col-span-6">
               <div className="flex items-center gap-2 mb-2 text-xs font-semibold text-primary/80">
                 <ChartBarIcon /> GAME FEEL
               </div>
@@ -138,25 +138,25 @@ export function ReviewCard({ review, showGameTitle = false }: ReviewCardProps) {
           )}
 
           {hasTimes && (
-            <div className="md:col-span-3 space-y-3 border-t md:border-t-0 md:border-l border-border/50 pt-4 md:pt-0 md:pl-6">
+            <div className="pt-4 space-y-3 border-t md:col-span-3 md:border-t-0 md:border-l border-border/50 md:pt-0 md:pl-6">
               <div className="flex items-center gap-2 mb-1 text-xs font-semibold text-primary/80">
                 <TimerIcon /> TIME
               </div>
               <div className="space-y-2">
                 {review.avgRunLength && (
-                  <div className="flex justify-between items-center text-xs">
+                  <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">Run Length</span>
                     <span className="font-medium">{review.avgRunLength}</span>
                   </div>
                 )}
                 {review.timeToFirstWin && (
-                  <div className="flex justify-between items-center text-xs">
+                  <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">First Win</span>
                     <span className="font-medium">{review.timeToFirstWin}</span>
                   </div>
                 )}
                 {review.timeTo100 && (
-                  <div className="flex justify-between items-center text-xs">
+                  <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">100% Comp</span>
                     <span className="font-medium">{review.timeTo100}</span>
                   </div>
@@ -166,7 +166,7 @@ export function ReviewCard({ review, showGameTitle = false }: ReviewCardProps) {
           )}
 
           {hasTraits && (
-            <div className="md:col-span-3 space-y-3 border-t md:border-t-0 md:border-l border-border/50 pt-4 md:pt-0 md:pl-6">
+            <div className="pt-4 space-y-3 border-t md:col-span-3 md:border-t-0 md:border-l border-border/50 md:pt-0 md:pl-6">
               <div className="flex items-center gap-2 mb-1 text-xs font-semibold text-primary/80">
                 <BookOpenIcon /> TRAITS
               </div>

@@ -12,24 +12,24 @@ export function Header() {
   const { user, loading, openLoginModal } = useAuth();
 
   return (
-    <header className="h-16 px-6 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50 border-b border-border/40">
+    <header className="sticky top-0 z-50 flex items-center justify-between h-16 px-6 border-b bg-background/80 backdrop-blur-md border-border/40">
       <div className="flex items-center gap-8">
         <Link href="/games" className="flex items-center gap-3 group">
-          <span className="text-lg font-semibold tracking-wide group-hover:text-primary transition-colors">
+          <span className="text-lg font-semibold tracking-wide transition-colors group-hover:text-primary">
             Roguelike<span className="text-primary">Index</span>
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+        <nav className="items-center hidden gap-6 text-sm font-medium md:flex">
           <Link
             href="/games"
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="transition-colors text-muted-foreground hover:text-foreground"
           >
             Browse
           </Link>
           <Link
             href="/lists"
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="transition-colors text-muted-foreground hover:text-foreground"
           >
             Lists
           </Link>
@@ -40,17 +40,17 @@ export function Header() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-9 w-9 rounded-full relative overflow-hidden cursor-pointer"
+          className="relative overflow-hidden rounded-full cursor-pointer h-9 w-9"
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           suppressHydrationWarning
         >
           <SunIcon
             size={20}
-            className="absolute transition-all rotate-0 scale-100 dark:-rotate-90 dark:scale-0"
+            className="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0"
           />
           <MoonIcon
             size={20}
-            className="absolute transition-all rotate-90 scale-0 dark:rotate-0 dark:scale-100"
+            className="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100"
           />
           <span className="sr-only">Toggle theme</span>
         </Button>
@@ -60,9 +60,9 @@ export function Header() {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full h-9 w-9 border border-border/50 cursor-pointer p-0 overflow-hidden bg-secondary/50"
+              className="p-0 overflow-hidden border rounded-full cursor-pointer h-9 w-9 border-border/50 bg-secondary/50"
             >
-              <span className="font-bold text-sm text-foreground">
+              <span className="text-sm font-bold text-foreground">
                 {user.name ? user.name[0].toUpperCase() : "U"}
               </span>
             </Button>
@@ -71,7 +71,7 @@ export function Header() {
           <Button
             variant="ghost"
             size="icon"
-            className="h-9 w-9 rounded-full cursor-pointer"
+            className="rounded-full cursor-pointer h-9 w-9"
             onClick={openLoginModal}
           >
             <UserIcon size={20} />

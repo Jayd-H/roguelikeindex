@@ -24,10 +24,10 @@ export function GameCard({ game }: GameCardProps) {
 
   return (
     <div
-      className="group flex flex-col sm:flex-row gap-6 cursor-pointer"
+      className="flex flex-col gap-6 cursor-pointer group sm:flex-row"
       onClick={() => router.push(`/games/${game.slug}`)}
     >
-      <div className="w-full sm:w-70 h-40 bg-black shrink-0 relative overflow-hidden rounded-lg">
+      <div className="relative w-full h-40 overflow-hidden bg-black rounded-lg sm:w-70 shrink-0">
         {game.steamAppId ? (
           <Image
             src={`/api/games/${game.slug}/image/header`}
@@ -36,7 +36,7 @@ export function GameCard({ game }: GameCardProps) {
             className="object-cover transition-transform duration-500 group-hover:scale-105 opacity-90 group-hover:opacity-100"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-secondary">
+          <div className="flex items-center justify-center w-full h-full bg-secondary">
             <GameControllerIcon
               size={32}
               className="text-muted-foreground/50"
@@ -46,7 +46,7 @@ export function GameCard({ game }: GameCardProps) {
 
         {/* Deck Verified Badge in Top Left */}
         {game.steamDeckVerified && (
-          <div className="absolute top-2 left-2 z-10">
+          <div className="absolute z-10 top-2 left-2">
             <Badge
               variant="outline"
               className="bg-black/70 border-green-500/50 text-green-400 backdrop-blur-md gap-1 px-2 py-0.5 text-[10px] h-auto font-bold shadow-sm"
@@ -56,25 +56,25 @@ export function GameCard({ game }: GameCardProps) {
           </div>
         )}
       </div>
-      <div className="flex-1 flex flex-col justify-between py-1">
+      <div className="flex flex-col justify-between flex-1 py-1">
         <div>
-          <div className="flex justify-between items-start mb-2">
-            <h3 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">
+          <div className="flex items-start justify-between mb-2">
+            <h3 className="text-2xl font-bold transition-colors text-foreground group-hover:text-primary line-clamp-1">
               {game.title}
             </h3>
             <div className="flex items-center gap-1.5 text-primary bg-primary/10 px-2.5 py-1 rounded-md h-fit">
               <StarIcon weight="fill" size={16} />
-              <span className="font-bold text-foreground text-sm">
+              <span className="text-sm font-bold text-foreground">
                 {game.rating}
               </span>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed mb-4 max-w-2xl">
+          <p className="max-w-2xl mb-4 text-sm leading-relaxed text-muted-foreground line-clamp-2">
             {game.description}
           </p>
         </div>
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div className="flex items-center gap-3 text-xs font-medium text-muted-foreground flex-wrap">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-muted-foreground">
             <div
               className="flex items-center gap-1.5 text-blue-500"
               title="Average Run Length"
@@ -82,7 +82,7 @@ export function GameCard({ game }: GameCardProps) {
               <TimerIcon size={16} weight="fill" />
               <span className="font-semibold">{game.avgRunLength}</span>
             </div>
-            <div className="w-px h-3 bg-border mx-1"></div>
+            <div className="w-px h-3 mx-1 bg-border"></div>
             <div
               className="flex items-center gap-1.5 text-red-500"
               title="Combat Type"
@@ -90,7 +90,7 @@ export function GameCard({ game }: GameCardProps) {
               <SwordIcon size={16} weight="fill" />
               <span className="font-semibold">{game.combatType}</span>
             </div>
-            <div className="w-px h-3 bg-border mx-1"></div>
+            <div className="w-px h-3 mx-1 bg-border"></div>
             <div
               className="flex items-center gap-1.5 text-purple-500"
               title="Narrative"
@@ -98,7 +98,7 @@ export function GameCard({ game }: GameCardProps) {
               <BookOpenIcon size={16} weight="fill" />
               <span className="font-semibold">{game.narrativePresence}</span>
             </div>
-            <div className="w-px h-3 bg-border mx-1"></div>
+            <div className="w-px h-3 mx-1 bg-border"></div>
             <div
               className="flex items-center gap-1.5 text-yellow-500"
               title="Difficulty"
@@ -112,7 +112,7 @@ export function GameCard({ game }: GameCardProps) {
           </div>
         </div>
       </div>
-      <Separator className="sm:hidden mt-4 opacity-50" />
+      <Separator className="mt-4 opacity-50 sm:hidden" />
     </div>
   );
 }
