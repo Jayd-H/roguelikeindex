@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import {
   CheckIcon,
@@ -22,7 +23,7 @@ interface GameHeroProps {
   favorited: boolean;
   toggleOwned: () => void;
   toggleFavorite: () => void;
-  handleGenericAction: () => void;
+  onAddToList: () => void;
 }
 
 export function GameHero({
@@ -32,15 +33,22 @@ export function GameHero({
   favorited,
   toggleOwned,
   toggleFavorite,
-  handleGenericAction,
+  onAddToList,
 }: GameHeroProps) {
+  const [copied, setCopied] = useState(false);
   const heroUrl = `/api/games/${game.slug}/image/hero`;
   const logoUrl = `/api/games/${game.slug}/image/logo`;
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <div className="relative w-full h-100 md:h-125 overflow-hidden bg-black/90 group">
       {heroUrl ? (
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 pointer-events-none">
           <div className="absolute inset-0 bg-linear-to-t from-background via-background/20 to-transparent z-10" />
           <div className="absolute inset-0 bg-linear-to-r from-background/80 via-transparent to-transparent z-10" />
           <Image
@@ -52,7 +60,7 @@ export function GameHero({
           />
         </div>
       ) : (
-        <div className="absolute inset-0 bg-linear-to-br from-secondary/20 to-primary/10" />
+        <div className="absolute inset-0 bg-linear-to-br from-secondary/20 to-primary/10 pointer-events-none" />
       )}
       <div className="absolute bottom-0 left-0 w-full z-20 pb-8">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
@@ -157,19 +165,23 @@ export function GameHero({
               </>
             )}
             <Button
-              onClick={handleGenericAction}
+              onClick={onAddToList}
               variant="secondary"
               className="rounded-full h-12 px-6 gap-2 backdrop-blur-md bg-secondary/80 hover:bg-secondary text-foreground border border-white/5 cursor-pointer"
             >
               <ListPlusIcon size={20} /> Add to List
             </Button>
             <Button
-              onClick={handleGenericAction}
+              onClick={handleShare}
               variant="secondary"
               size="icon"
               className="rounded-full h-12 w-12 backdrop-blur-md bg-secondary/80 hover:bg-secondary text-foreground border border-white/5 cursor-pointer"
             >
-              <ShareNetworkIcon size={20} />
+              {copied ? (
+                <CheckIcon size={20} weight="bold" className="text-green-500" />
+              ) : (
+                <ShareNetworkIcon size={20} />
+              )}
             </Button>
           </div>
         </div>

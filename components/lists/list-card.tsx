@@ -100,8 +100,20 @@ export function ListCard({ list: initialList }: { list: GameList }) {
     },
   };
 
+  const handleNavigate = () => {
+    const username = list.creator || "user";
+    const listSlug = `${username.toLowerCase()}-${list.title
+      .toLowerCase()
+      .replace(/[^\w ]+/g, "")
+      .replace(/ +/g, "-")}`;
+    window.location.href = `/lists/${listSlug}`;
+  };
+
   return (
-    <div className="relative w-80 h-115 shrink-0 group cursor-pointer z-0 hover:z-50 transition-all duration-300">
+    <div
+      className="relative w-80 h-115 shrink-0 group cursor-pointer z-0 hover:z-50 transition-all duration-300"
+      onClick={handleNavigate}
+    >
       <motion.div
         className="absolute inset-0 bg-transparent rounded-3xl transition-all duration-300 group-hover:bg-secondary/5 border border-transparent group-hover:border-white/5"
         initial="initial"

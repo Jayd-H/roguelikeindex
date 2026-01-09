@@ -10,6 +10,7 @@ import { Header } from "@/components/ui/header";
 import { GameGrid } from "@/components/auth/game-grid";
 import { CheckIcon, XIcon, ArrowRightIcon } from "@phosphor-icons/react";
 import { useAuth } from "@/components/auth-provider";
+import { containsProfanity } from "@/lib/profanity";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -17,13 +18,14 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Form State
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Validation State
-  const isUsernameValid = username.length >= 3 && username.length <= 16;
+  const isUsernameLengthValid = username.length >= 3 && username.length <= 16;
+  const isUsernameClean = !containsProfanity(username);
+  const isUsernameValid = isUsernameLengthValid && isUsernameClean;
+
   const isEmailValid = email.includes("@") && email.length > 3;
   const isPasswordLengthValid = password.length > 4;
   const isPasswordNotCommon = ![
@@ -115,12 +117,21 @@ export default function RegisterPage() {
                   </div>
                 )}
               </div>
-              <div
-                className={`text-xs ${
-                  isUsernameValid ? "text-green-600" : "text-muted-foreground"
-                }`}
-              >
-                Between 3 and 16 characters
+              <div className="flex flex-col gap-1">
+                <div
+                  className={`text-xs ${
+                    isUsernameLengthValid
+                      ? "text-green-600"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  Between 3 and 16 characters
+                </div>
+                {username.length > 0 && !isUsernameClean && (
+                  <div className="text-xs text-red-500">
+                    Username contains inappropriate words
+                  </div>
+                )}
               </div>
             </div>
 

@@ -11,6 +11,7 @@ import { GameHero } from "@/components/game-details/game-hero";
 import { GameStats } from "@/components/game-details/game-stats";
 import { GameReviews } from "@/components/game-details/game-reviews";
 import { GameSidebar } from "@/components/game-details/game-sidebar";
+import { AddToListModal } from "@/components/lists/add-to-list-modal";
 
 export default function GameDetailsPage() {
   const router = useRouter();
@@ -25,6 +26,9 @@ export default function GameDetailsPage() {
   const [statusLoaded, setStatusLoaded] = useState(false);
   const [owned, setOwned] = useState(false);
   const [favorited, setFavorited] = useState(false);
+
+  // Modal State
+  const [isAddToListOpen, setIsAddToListOpen] = useState(false);
 
   useEffect(() => {
     if (slug) {
@@ -82,7 +86,11 @@ export default function GameDetailsPage() {
       refreshUser();
     });
 
-  const handleGenericAction = () => requireAuth(() => {});
+  const handleAddToList = () => {
+    requireAuth(() => {
+      setIsAddToListOpen(true);
+    });
+  };
 
   if (loading)
     return (
@@ -102,7 +110,7 @@ export default function GameDetailsPage() {
         favorited={favorited}
         toggleOwned={toggleOwned}
         toggleFavorite={toggleFavorite}
-        handleGenericAction={handleGenericAction}
+        onAddToList={handleAddToList}
       />
 
       <main className="max-w-7xl mx-auto w-full px-6 py-4 flex-1">
@@ -123,6 +131,12 @@ export default function GameDetailsPage() {
         </div>
       </main>
       <Footer />
+
+      <AddToListModal
+        isOpen={isAddToListOpen}
+        onClose={() => setIsAddToListOpen(false)}
+        gameId={game.id}
+      />
     </div>
   );
 }
