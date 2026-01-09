@@ -8,7 +8,7 @@ export const revalidate = 3600;
 
 export async function GET() {
   try {
-    // 1. Fetch 30 random games with their header images
+    // 1. Fetch 100 random games with their header images (Increased for full-screen grid)
     const gridGames = await db.select({
       id: games.id,
       slug: games.slug,
@@ -16,7 +16,7 @@ export async function GET() {
     })
     .from(games)
     .orderBy(sql`RANDOM()`)
-    .limit(30)
+    .limit(100)
     .all();
 
     // 2. Fetch total count (lightweight)

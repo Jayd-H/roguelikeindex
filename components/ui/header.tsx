@@ -16,7 +16,7 @@ export function Header() {
       <div className="flex items-center gap-8">
         <Link href="/games" className="flex items-center gap-3 group">
           <span className="text-lg font-semibold tracking-wide group-hover:text-primary transition-colors">
-            Roguelike Index
+            Roguelike<span className="text-primary">Index</span>
           </span>
         </Link>
 
