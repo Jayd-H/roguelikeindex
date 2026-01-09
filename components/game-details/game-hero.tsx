@@ -11,10 +11,13 @@ import {
   CodeIcon,
   BuildingsIcon,
   CalendarBlankIcon,
+  PencilSimpleIcon,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Game } from "@/lib/types";
+import { SuggestionModal } from "./suggestion-modal";
+import { useAuth } from "@/components/auth-provider";
 
 interface GameHeroProps {
   game: Game;
@@ -35,7 +38,14 @@ export function GameHero({
   toggleFavorite,
   onAddToList,
 }: GameHeroProps) {
+  const { requireAuth } = useAuth();
   const [copied, setCopied] = useState(false);
+  const [editModal, setEditModal] = useState<{
+    field: string;
+    type: "toggle" | "add" | "edit" | "remove";
+    data: unknown;
+  } | null>(null);
+
   const heroUrl = `/api/games/${game.slug}/image/hero`;
   const logoUrl = `/api/games/${game.slug}/image/logo`;
 
@@ -43,6 +53,12 @@ export function GameHero({
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const openSuggest = (field: string, data: unknown) => {
+    requireAuth(() => {
+      setEditModal({ field, type: "toggle", data });
+    });
   };
 
   return (
@@ -83,22 +99,31 @@ export function GameHero({
             )}
 
             <div className="flex flex-wrap gap-2 mb-3">
-              {game.steamDeckVerified && (
-                <Badge
-                  variant="outline"
-                  className="border-green-500/50 text-green-400 bg-green-500/10 backdrop-blur-md gap-1 px-3 py-1"
-                >
-                  <GameControllerIcon size={16} weight="fill" /> Deck Verified
-                </Badge>
-              )}
-              {game.metaProgression && (
-                <Badge
-                  variant="outline"
-                  className="border-cyan-500/50 text-cyan-400 bg-cyan-500/10 backdrop-blur-md gap-1 px-3 py-1"
-                >
-                  <CheckIcon size={16} weight="bold" /> Meta Progression
-                </Badge>
-              )}
+              <Badge
+                variant="outline"
+                className={`cursor-pointer border-green-500/50 text-green-400 bg-green-500/10 backdrop-blur-md gap-1 px-3 py-1 hover:bg-green-500/20 ${
+                  !game.steamDeckVerified && "opacity-50 grayscale"
+                }`}
+                onClick={() =>
+                  openSuggest("steamDeckVerified", game.steamDeckVerified)
+                }
+              >
+                <GameControllerIcon size={16} weight="fill" /> Deck Verified
+                <PencilSimpleIcon className="ml-1 opacity-50" />
+              </Badge>
+
+              <Badge
+                variant="outline"
+                className={`cursor-pointer border-cyan-500/50 text-cyan-400 bg-cyan-500/10 backdrop-blur-md gap-1 px-3 py-1 hover:bg-cyan-500/20 ${
+                  !game.metaProgression && "opacity-50 grayscale"
+                }`}
+                onClick={() =>
+                  openSuggest("metaProgression", game.metaProgression)
+                }
+              >
+                <CheckIcon size={16} weight="bold" /> Meta Progression
+                <PencilSimpleIcon className="ml-1 opacity-50" />
+              </Badge>
             </div>
 
             <div className="flex flex-wrap gap-x-6 gap-y-2 py-2 text-sm text-white/80 font-medium">
@@ -186,6 +211,17 @@ export function GameHero({
           </div>
         </div>
       </div>
+
+      {editModal && (
+        <SuggestionModal
+          isOpen={!!editModal}
+          onClose={() => setEditModal(null)}
+          gameSlug={game.slug}
+          field={editModal.field}
+          type={editModal.type}
+          currentData={editModal.data}
+        />
+      )}
     </div>
   );
 }

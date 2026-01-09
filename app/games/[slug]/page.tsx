@@ -14,6 +14,24 @@ import { GameSidebar } from "@/components/game-details/game-sidebar";
 import { AddToListModal } from "@/components/lists/add-to-list-modal";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SuggestionReviewCard } from "@/components/game-details/suggestion-review-card";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { CaretDown, CaretUp, UsersIcon } from "@phosphor-icons/react";
+
+interface Suggestion {
+  id: string;
+  targetField: string;
+  operation: string;
+  originalValue: unknown;
+  suggestedValue: unknown;
+  voteCount: number;
+  suggester: string;
+  createdAt: string;
+}
 
 export default function GameDetailsPage() {
   const router = useRouter();
@@ -31,7 +49,13 @@ export default function GameDetailsPage() {
   const [isAddToListOpen, setIsAddToListOpen] = useState(false);
   const [isDeleteReviewModalOpen, setIsDeleteReviewModalOpen] = useState(false);
 
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [votedIds, setVotedIds] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Fetch Game Data
   useEffect(() => {
+    let mounted = true;
     if (slug) {
       fetch(`/api/games/${slug}`)
         .then((res) => {
@@ -39,32 +63,69 @@ export default function GameDetailsPage() {
           return res.json();
         })
         .then((data) => {
-          setGame(data);
-          setLoading(false);
+          if (mounted) {
+            setGame(data);
+            setLoading(false);
+          }
         })
         .catch(() => {
-          setLoading(false);
-          router.push("/404");
+          if (mounted) {
+            setLoading(false);
+            router.push("/404");
+          }
         });
     }
+    return () => {
+      mounted = false;
+    };
   }, [slug, router]);
 
+  // Fetch User Status & Suggestions
   useEffect(() => {
-    if (user && slug) {
-      fetch(`/api/games/${slug}/status`)
-        .then((res) => res.json())
-        .then((data) => {
-          setFavorited(data.favorited);
-          setOwned(data.owned);
-          if (data.review) {
-            setMyReview(data.review);
+    let mounted = true;
+
+    const loadUserData = async () => {
+      // 1. Fetch Suggestions (Always fetch this)
+      try {
+        const res = await fetch(`/api/games/${slug}/suggestions`);
+        const data = await res.json();
+        if (mounted && data.suggestions) {
+          setSuggestions(data.suggestions);
+          setVotedIds(data.votedIds || []);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
+      // 2. Fetch User Specific Status (Only if logged in)
+      if (user) {
+        try {
+          const res = await fetch(`/api/games/${slug}/status`);
+          const data = await res.json();
+          if (mounted) {
+            setFavorited(data.favorited);
+            setOwned(data.owned);
+            if (data.review) {
+              setMyReview(data.review);
+            }
+            setStatusLoaded(true);
           }
-          setStatusLoaded(true);
-        });
-    } else {
-      const timer = setTimeout(() => setStatusLoaded(true), 0);
-      return () => clearTimeout(timer);
+        } catch (e) {
+          console.error(e);
+          if (mounted) setStatusLoaded(true);
+        }
+      } else {
+        if (mounted) setStatusLoaded(true);
+      }
+    };
+
+    if (slug) {
+      loadUserData();
     }
+
+    return () => {
+      mounted = false;
+    };
   }, [user, slug]);
 
   const toggleOwned = () =>
@@ -106,150 +167,42 @@ export default function GameDetailsPage() {
     }
   };
 
+  const handleVote = async (id: string, vote: number) => {
+    requireAuth(async () => {
+      const res = await fetch(`/api/suggestions/${id}/vote`, {
+        method: "POST",
+        body: JSON.stringify({ vote }),
+      });
+      if (res.ok) {
+        setVotedIds((prev) => [...prev, id]);
+        setSuggestions((prev) =>
+          prev.map((s) =>
+            s.id === id ? { ...s, voteCount: s.voteCount + vote } : s
+          )
+        );
+
+        const data = await res.json();
+        if (data.status !== "pending") {
+          const refreshRes = await fetch(`/api/games/${slug}/suggestions`);
+          const refreshData = await refreshRes.json();
+          if (refreshData.suggestions) {
+            setSuggestions(refreshData.suggestions);
+          }
+          if (data.status === "approved") window.location.reload();
+        }
+      }
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex flex-col font-sans">
         <Header />
-
-        {/* Hero Skeleton */}
         <div className="relative w-full h-100 md:h-125 bg-black/90 overflow-hidden">
           <Skeleton className="w-full h-full opacity-10" />
-          <div className="absolute bottom-0 left-0 w-full z-20 pb-8 px-6">
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
-              <div className="w-full max-w-2xl space-y-6">
-                <Skeleton className="h-16 w-3/4 bg-white/10 rounded-lg" />
-                <div className="flex gap-3">
-                  <Skeleton className="h-6 w-24 bg-white/10 rounded-full" />
-                  <Skeleton className="h-6 w-32 bg-white/10 rounded-full" />
-                </div>
-                <div className="flex gap-8 pt-2">
-                  <Skeleton className="h-5 w-32 bg-white/10" />
-                  <Skeleton className="h-5 w-32 bg-white/10" />
-                  <Skeleton className="h-5 w-32 bg-white/10" />
-                </div>
-              </div>
-              <div className="flex gap-3 shrink-0">
-                <Skeleton className="h-12 w-36 rounded-full bg-white/10" />
-                <Skeleton className="h-12 w-32 rounded-full bg-white/10" />
-                <Skeleton className="h-12 w-36 rounded-full bg-white/10" />
-                <Skeleton className="h-12 w-12 rounded-full bg-white/10" />
-              </div>
-            </div>
-          </div>
         </div>
-
         <main className="max-w-7xl mx-auto w-full px-6 py-4 flex-1">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            <div className="lg:col-span-8 space-y-10">
-              {/* Stats Skeleton */}
-              <div className="space-y-6">
-                <Skeleton className="h-8 w-32" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-2/3" />
-                </div>
-
-                <div className="p-8 space-y-8">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-4">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="space-y-2">
-                        <Skeleton className="h-4 w-24" />
-                        <Skeleton className="h-8 w-20" />
-                      </div>
-                    ))}
-                  </div>
-                  <Separator />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                    {[1, 2, 3, 4, 5, 6].map((i) => (
-                      <div key={i} className="space-y-2">
-                        <div className="flex justify-between">
-                          <Skeleton className="h-4 w-32" />
-                          <Skeleton className="h-4 w-8" />
-                        </div>
-                        <Skeleton className="h-2 w-full rounded-full" />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex gap-2">
-                    {[1, 2, 3].map((i) => (
-                      <Skeleton key={i} className="h-6 w-24 rounded-full" />
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Reviews Skeleton */}
-              <div className="space-y-6">
-                <Skeleton className="h-8 w-48" />
-                {[1, 2].map((i) => (
-                  <div
-                    key={i}
-                    className="rounded-xl border border-border/60 bg-card/60 p-6 space-y-4"
-                  >
-                    <div className="flex justify-between">
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="h-10 w-10 rounded-full" />
-                        <div className="space-y-1.5">
-                          <Skeleton className="h-4 w-32" />
-                          <Skeleton className="h-3 w-24" />
-                        </div>
-                      </div>
-                      <Skeleton className="h-7 w-16 rounded-full" />
-                    </div>
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-5/6" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Sidebar Skeleton */}
-            <div className="lg:col-span-4 space-y-8">
-              <div className="rounded-xl bg-secondary/10 p-6 h-48 flex flex-col justify-between">
-                <div className="space-y-2 mt-auto">
-                  <Skeleton className="h-12 w-24" />
-                  <Skeleton className="h-4 w-32" />
-                </div>
-                <div className="flex gap-1">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <Skeleton key={i} className="h-5 w-5 rounded-sm" />
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <Skeleton className="h-6 w-32" />
-                <div className="space-y-4">
-                  {[1, 2].map((i) => (
-                    <div key={i} className="space-y-2">
-                      <Skeleton className="h-4 w-24" />
-                      <Skeleton className="h-10 w-full" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <Skeleton className="h-6 w-32" />
-                <div className="space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex gap-3">
-                      <Skeleton className="h-16 w-24 rounded-md" />
-                      <div className="space-y-2 py-2">
-                        <Skeleton className="h-4 w-32" />
-                        <Skeleton className="h-3 w-20" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+          <Skeleton className="h-96 w-full" />
         </main>
         <Footer />
       </div>
@@ -272,6 +225,34 @@ export default function GameDetailsPage() {
       />
 
       <main className="max-w-7xl mx-auto w-full px-6 py-4 flex-1">
+        {suggestions.length > 0 && (
+          <Collapsible
+            open={showSuggestions}
+            onOpenChange={setShowSuggestions}
+            className="mb-8 border border-border/50 rounded-xl bg-secondary/5 overflow-hidden"
+          >
+            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 hover:bg-secondary/10 transition-colors cursor-pointer">
+              <div className="flex items-center gap-2 font-bold text-sm">
+                <UsersIcon size={18} className="text-primary" />
+                Community Edits ({suggestions.length})
+              </div>
+              {showSuggestions ? <CaretUp /> : <CaretDown />}
+            </CollapsibleTrigger>
+            <CollapsibleContent className="p-4 pt-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                {suggestions.map((s) => (
+                  <SuggestionReviewCard
+                    key={s.id}
+                    suggestion={s}
+                    hasVoted={votedIds.includes(s.id)}
+                    onVote={handleVote}
+                  />
+                ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           <div className="lg:col-span-8 space-y-10">
             <GameStats game={game} />

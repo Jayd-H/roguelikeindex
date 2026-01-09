@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   TimerIcon,
   TrophyIcon,
@@ -12,13 +13,34 @@ import {
   PuzzlePieceIcon,
   LightningIcon,
   DiceFiveIcon,
+  PlusIcon,
+  XIcon,
 } from "@phosphor-icons/react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Game } from "@/lib/types";
+import { SuggestionModal } from "./suggestion-modal";
+import { useAuth } from "@/components/auth-provider";
 
 export function GameStats({ game }: { game: Game }) {
+  const { requireAuth } = useAuth();
+  const [editModal, setEditModal] = useState<{
+    field: string;
+    type: "add" | "remove";
+    data?: unknown;
+  } | null>(null);
+
+  const openSuggest = (
+    field: string,
+    type: "add" | "remove",
+    data?: unknown
+  ) => {
+    requireAuth(() => {
+      setEditModal({ field, type, data });
+    });
+  };
+
   return (
     <section className="space-y-6">
       <h3 className="text-2xl font-bold flex items-center gap-2">Overview</h3>
@@ -150,17 +172,40 @@ export function GameStats({ game }: { game: Game }) {
           </div>
         </div>
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 items-center group">
         {game.tags.map((tag) => (
           <Badge
             key={tag.name}
             variant="secondary"
-            className="px-3 py-1.5 text-sm bg-secondary/50 hover:bg-secondary"
+            className="px-3 py-1.5 text-sm bg-secondary/50 hover:bg-secondary relative group/tag pr-2"
           >
             {tag.name}
+            <button
+              onClick={() => openSuggest("tags", "remove", tag)}
+              className="ml-2 opacity-0 group-hover/tag:opacity-100 hover:text-destructive transition-opacity cursor-pointer"
+            >
+              <XIcon size={12} weight="bold" />
+            </button>
           </Badge>
         ))}
+        <button
+          onClick={() => openSuggest("tags", "add")}
+          className="px-3 py-1.5 text-sm rounded-full border border-dashed border-border text-muted-foreground hover:text-primary hover:border-primary transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+        >
+          <PlusIcon size={14} />
+        </button>
       </div>
+
+      {editModal && (
+        <SuggestionModal
+          isOpen={!!editModal}
+          onClose={() => setEditModal(null)}
+          gameSlug={game.slug}
+          field={editModal.field}
+          type={editModal.type}
+          currentData={editModal.data}
+        />
+      )}
     </section>
   );
 }

@@ -177,6 +177,27 @@ export const rateLimits = sqliteTable('rate_limits', {
   expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
 });
 
+export const suggestions = sqliteTable('suggestions', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  gameId: text('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  targetField: text('target_field').notNull(), 
+  operation: text('operation').notNull(), 
+  originalValue: text('original_value', { mode: 'json' }), 
+  suggestedValue: text('suggested_value', { mode: 'json' }).notNull(), 
+  voteCount: integer('vote_count').default(0).notNull(),
+  status: text('status').default('pending').notNull(), 
+  createdAt: text('created_at').$defaultFn(() => new Date().toISOString()),
+});
+
+export const suggestionVotes = sqliteTable('suggestion_votes', {
+  suggestionId: text('suggestion_id').notNull().references(() => suggestions.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  vote: integer('vote').notNull(), 
+}, (t) => ({
+  pk: primaryKey({ columns: [t.suggestionId, t.userId] }),
+}));
+
 export const gamesRelations = relations(games, ({ many }) => ({
   tags: many(gamesToTags),
   reviews: many(reviews),
@@ -187,6 +208,7 @@ export const gamesRelations = relations(games, ({ many }) => ({
   favoritedBy: many(favorites),
   ownedBy: many(ownedGames),
   listedIn: many(listItems),
+  suggestions: many(suggestions),
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -196,6 +218,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   lists: many(lists),
   listRatings: many(listRatings),
   savedLists: many(savedLists),
+  suggestions: many(suggestions),
+  suggestionVotes: many(suggestionVotes),
 }));
 
 export const tagsRelations = relations(tags, ({ many }) => ({
@@ -259,4 +283,15 @@ export const listRatingsRelations = relations(listRatings, ({ one }) => ({
 export const savedListsRelations = relations(savedLists, ({ one }) => ({
   list: one(lists, { fields: [savedLists.listId], references: [lists.id] }),
   user: one(users, { fields: [savedLists.userId], references: [users.id] }),
+}));
+
+export const suggestionsRelations = relations(suggestions, ({ one, many }) => ({
+  game: one(games, { fields: [suggestions.gameId], references: [games.id] }),
+  user: one(users, { fields: [suggestions.userId], references: [users.id] }),
+  votes: many(suggestionVotes),
+}));
+
+export const suggestionVotesRelations = relations(suggestionVotes, ({ one }) => ({
+  suggestion: one(suggestions, { fields: [suggestionVotes.suggestionId], references: [suggestions.id] }),
+  user: one(users, { fields: [suggestionVotes.userId], references: [users.id] }),
 }));
