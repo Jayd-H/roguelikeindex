@@ -202,8 +202,14 @@ export function AddToListModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl bg-background border border-border/50 shadow-2xl rounded-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 slide-in-from-bottom-5 duration-300">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-200 cursor-pointer"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-xl bg-background border border-border/50 shadow-2xl rounded-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 slide-in-from-bottom-5 duration-300 cursor-default"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between px-6 py-4 border-b border-border/40 bg-secondary/5 shrink-0">
           <h2 className="text-lg font-bold tracking-tight flex items-center gap-2">
             {view === "select" && (
@@ -229,7 +235,7 @@ export function AddToListModal({
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="h-8 w-8 rounded-full hover:bg-secondary/50"
+            className="h-8 w-8 rounded-full hover:bg-secondary/50 cursor-pointer"
           >
             <XIcon size={16} />
           </Button>
@@ -240,7 +246,7 @@ export function AddToListModal({
             <>
               <div className="p-4 border-b border-border/40 bg-background/50">
                 <Button
-                  className="w-full justify-start text-muted-foreground hover:text-foreground h-14 gap-4 bg-secondary/30 hover:bg-secondary/60 border border-dashed border-border/60 hover:border-primary/50 transition-all group"
+                  className="w-full justify-start text-muted-foreground hover:text-foreground h-14 gap-4 bg-secondary/30 hover:bg-secondary/60 border border-dashed border-border/60 hover:border-primary/50 transition-all group cursor-pointer"
                   variant="ghost"
                   onClick={() => {
                     setFormData({ title: "", description: "" });
@@ -306,7 +312,7 @@ export function AddToListModal({
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                className="h-8 hover:bg-white/20"
+                                className="h-8 hover:bg-white/20 cursor-pointer"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setDeleteConfirmId(null);
@@ -317,7 +323,7 @@ export function AddToListModal({
                               <Button
                                 size="sm"
                                 variant="destructive"
-                                className="h-8 shadow-sm"
+                                className="h-8 shadow-sm cursor-pointer"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleDelete(list.id);
@@ -409,7 +415,7 @@ export function AddToListModal({
                               <Button
                                 size="icon"
                                 variant="ghost"
-                                className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                                className="h-7 w-7 text-muted-foreground hover:text-foreground cursor-pointer"
                                 onClick={(e) => openEdit(list, e)}
                               >
                                 <PencilSimpleIcon size={14} />
@@ -417,7 +423,7 @@ export function AddToListModal({
                               <Button
                                 size="icon"
                                 variant="ghost"
-                                className="h-7 w-7 text-muted-foreground hover:text-red-500"
+                                className="h-7 w-7 text-muted-foreground hover:text-red-500 cursor-pointer"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setDeleteConfirmId(list.id);
@@ -440,7 +446,7 @@ export function AddToListModal({
                 <div className="space-y-2">
                   <Label>List Name</Label>
                   <Input
-                    placeholder="e.g. Best Deckbuilders 2024"
+                    placeholder="e.g. Best Deckbuilders 2026"
                     value={formData.title}
                     onChange={(e) =>
                       setFormData((prev) => ({
@@ -478,13 +484,17 @@ export function AddToListModal({
                 )}
               </div>
               <div className="flex justify-end gap-3 mt-auto pt-6 border-t border-border/40">
-                <Button variant="ghost" onClick={() => setView("select")}>
+                <Button
+                  variant="ghost"
+                  onClick={() => setView("select")}
+                  className="cursor-pointer"
+                >
                   Cancel
                 </Button>
                 <Button
                   onClick={view === "create" ? handleCreate : handleUpdate}
                   disabled={!formData.title.trim() || submitting}
-                  className="px-8"
+                  className="px-8 cursor-pointer"
                 >
                   {submitting
                     ? "Saving..."

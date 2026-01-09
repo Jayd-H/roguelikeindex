@@ -11,13 +11,18 @@ import {
   StarIcon,
   UserIcon,
   PencilSimpleIcon,
+  TrashIcon,
+  CheckIcon,
+  XIcon,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Game, Tag } from "@/lib/types";
 import { GameCard } from "@/components/games/game-card";
 import { GameFilters } from "@/components/games/game-filters";
+import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 
 interface ListData {
   id: string;
@@ -42,6 +47,7 @@ export default function ListDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Filter State
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedCombat, setSelectedCombat] = useState<string[]>([]);
@@ -50,6 +56,16 @@ export default function ListDetailPage() {
   const [complexity, setComplexity] = useState([0]);
   const [metaProgression, setMetaProgression] = useState(false);
   const [deckVerified, setDeckVerified] = useState(false);
+
+  // Edit State
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [isEditingDesc, setIsEditingDesc] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDesc, setEditDesc] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  // Modal State
+  const [deleteListModalOpen, setDeleteListModalOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/tags")
@@ -81,6 +97,12 @@ export default function ListDetailPage() {
       const data = await res.json();
       setListData(data.list);
       setGames(data.games || []);
+
+      if (data.list) {
+        setEditTitle(data.list.title);
+        setEditDesc(data.list.description || "");
+      }
+
       setLoading(false);
     } catch {
       setError("Could not load list.");
@@ -141,6 +163,66 @@ export default function ListDetailPage() {
         console.error(err);
       }
     });
+  };
+
+  const handleDeleteList = async () => {
+    if (!listData) return;
+    try {
+      const res = await fetch(`/api/lists/${listData.id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        router.push("/lists");
+        router.refresh();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleUpdateList = async () => {
+    if (!listData) return;
+    setIsUpdating(true);
+    try {
+      const res = await fetch(`/api/lists/${listData.id}`, {
+        method: "PUT",
+        body: JSON.stringify({ title: editTitle, description: editDesc }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setListData((prev) =>
+          prev
+            ? {
+                ...prev,
+                title: updated.title,
+                description: updated.description,
+              }
+            : null
+        );
+        setIsEditingTitle(false);
+        setIsEditingDesc(false);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleRemoveGame = async (gameId: string) => {
+    if (!listData) return;
+    // Removed confirmation for game deletion as requested
+    try {
+      const res = await fetch(`/api/lists/${listData.id}/remove`, {
+        method: "POST",
+        body: JSON.stringify({ gameId }),
+      });
+      if (res.ok) {
+        setGames((prev) => prev.filter((g) => g.id !== gameId));
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleTagToggle = (tag: string) =>
@@ -204,14 +286,110 @@ export default function ListDetailPage() {
       <main className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-6 py-8">
         <div className="w-full max-w-4xl mx-auto mb-12 space-y-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="flex-1">
-              <h1 className="text-4xl font-black tracking-tighter mb-2">
-                {listData.title}
-              </h1>
-              <p className="text-muted-foreground">
-                {listData.description || "No description provided."}
-              </p>
+            <div className="flex-1 w-full">
+              {/* Title Section */}
+              <div className="flex items-center gap-2 mb-2 group">
+                {isEditingTitle ? (
+                  <div className="flex items-center gap-2 w-full max-w-md">
+                    <Input
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleUpdateList();
+                      }}
+                      className="text-3xl font-black h-12"
+                      autoFocus
+                    />
+                    <Button
+                      size="icon"
+                      onClick={handleUpdateList}
+                      disabled={isUpdating}
+                      className="cursor-pointer"
+                    >
+                      <CheckIcon />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => {
+                        setIsEditingTitle(false);
+                        setEditTitle(listData.title);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <XIcon />
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <h1 className="text-4xl font-black tracking-tighter">
+                      {listData.title}
+                    </h1>
+                    {listData.isOwner && (
+                      <button
+                        onClick={() => setIsEditingTitle(true)}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary cursor-pointer"
+                      >
+                        <PencilSimpleIcon size={24} />
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {/* Description Section */}
+              <div className="group relative">
+                {isEditingDesc ? (
+                  <div className="flex items-start gap-2 w-full max-w-2xl mt-2">
+                    <Textarea
+                      value={editDesc}
+                      onChange={(e) => setEditDesc(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          handleUpdateList();
+                        }
+                      }}
+                      className="min-h-25"
+                    />
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        size="icon"
+                        onClick={handleUpdateList}
+                        disabled={isUpdating}
+                        className="cursor-pointer"
+                      >
+                        <CheckIcon />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => {
+                          setIsEditingDesc(false);
+                          setEditDesc(listData.description);
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <XIcon />
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground flex items-center gap-2 whitespace-pre-wrap">
+                    {listData.description || "No description provided."}
+                    {listData.isOwner && (
+                      <button
+                        onClick={() => setIsEditingDesc(true)}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary cursor-pointer"
+                      >
+                        <PencilSimpleIcon size={16} />
+                      </button>
+                    )}
+                  </p>
+                )}
+              </div>
             </div>
+
             <div className="flex gap-2">
               <Button
                 variant={listData.isSaved ? "default" : "outline"}
@@ -225,9 +403,13 @@ export default function ListDetailPage() {
                 {listData.isSaved ? "Saved" : "Save List"}
               </Button>
               {listData.isOwner && (
-                <Button variant="outline" className="gap-2 cursor-pointer">
-                  <PencilSimpleIcon size={20} />
-                  Edit
+                <Button
+                  variant="destructive"
+                  className="gap-2 cursor-pointer"
+                  onClick={() => setDeleteListModalOpen(true)}
+                >
+                  <TrashIcon size={20} />
+                  Delete List
                 </Button>
               )}
             </div>
@@ -340,9 +522,25 @@ export default function ListDetailPage() {
                 <div className="text-center py-20 text-red-500">{error}</div>
               )}
               {games.map((game) => (
-                <div key={game.id}>
-                  <GameCard game={game} />
-                  <Separator className="opacity-50 last:hidden" />
+                <div key={game.id} className="relative group/card">
+                  <div className={listData.isOwner ? "pr-0" : ""}>
+                    <GameCard game={game} />
+                  </div>
+                  {listData.isOwner && (
+                    <Button
+                      size="icon"
+                      variant="destructive"
+                      className="absolute top-2 right-2 sm:right-auto sm:left-58 z-20 opacity-0 group-hover/card:opacity-100 transition-opacity shadow-lg cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveGame(game.id);
+                      }}
+                      title="Remove from list"
+                    >
+                      <TrashIcon size={18} />
+                    </Button>
+                  )}
+                  <Separator className="opacity-50 last:hidden mt-6" />
                 </div>
               ))}
               {!loading && !error && games.length === 0 && (
@@ -365,6 +563,16 @@ export default function ListDetailPage() {
         </div>
       </main>
       <Footer />
+
+      <ConfirmationModal
+        isOpen={deleteListModalOpen}
+        onClose={() => setDeleteListModalOpen(false)}
+        onConfirm={handleDeleteList}
+        title="Delete List"
+        description="Are you sure you want to delete this list? This action cannot be undone."
+        confirmText="Delete"
+        variant="destructive"
+      />
     </div>
   );
 }

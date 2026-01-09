@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { games, tags, gamesToTags, externalRatings, lists, listItems, users, savedLists, listRatings } from '@/lib/schema';
-import { desc, eq, and, gte, inArray, like, sql, count } from 'drizzle-orm';
+import { desc, eq, and, gte, inArray, like, sql } from 'drizzle-orm';
 import { getCurrentUser } from '@/lib/get-user';
 
 export const revalidate = 3600;
@@ -99,12 +99,6 @@ export async function GET() {
     const pixelArtGames = await getTagGames('Pixel Art');
     const multiplayerGames = await getTagGames('Multiplayer');
 
-    const metaProgressionGames = await db.query.games.findMany({
-      where: eq(games.metaProgression, true),
-      orderBy: desc(games.rating),
-      columns: { id: true, slug: true, title: true, rating: true }
-    });
-
     const definitions = [
       { id: 'auto-top', title: 'Hall of Fame', desc: 'The absolute best roguelikes as rated by the community.', games: topRated },
       { id: 'auto-deck', title: 'Perfect on Deck', desc: 'Verified gems for your portable sessions.', games: deckVerified },
@@ -112,7 +106,7 @@ export async function GET() {
       { id: 'auto-deckbuilder', title: 'Master Deckbuilders', desc: 'Draft your way to victory with these card-based hits.', games: deckbuilders },
       { id: 'auto-turnbased', title: 'Tactical Thinkers', desc: 'Take your time and plan every move carefully.', games: turnBasedRoguelikes },
       { id: 'auto-traditional', title: 'Classic Roguelikes', desc: 'The purest form of the genre.', games: traditionalRoguelikes },
-      { id: 'auto-meta', title: 'Progressive Journey', desc: 'Get stronger between runs with meta progression.', games: metaProgressionGames },
+      // Removed Progressive Journey (Metaprogression)
       { id: 'auto-ign', title: 'IGN Editor\'s Choice', desc: 'Critically acclaimed titles scoring 8+ on IGN.', games: ignGames },
       { id: 'auto-metacritic', title: 'Metacritic Must-Plays', desc: 'Games with a Metascore of 85 or higher.', games: metaGames },
       { id: 'auto-strat', title: 'Strategic Minds', desc: 'For those who prefer planning over reflexes.', games: strategyGames },

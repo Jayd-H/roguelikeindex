@@ -71,9 +71,21 @@ export const reviews = sqliteTable('reviews', {
   rating: integer('rating').notNull(),
   comment: text('comment').notNull(),
   date: text('date').notNull(),
-  timeToFirstWin: text('time_to_first_win'),
-  hoursPlayed: text('hours_played'),
   gameId: text('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
+  
+  difficulty: integer('difficulty'),
+  replayability: integer('replayability'),
+  synergyDepth: integer('synergy_depth'),
+  complexity: integer('complexity'),
+  rngReliance: integer('rng_reliance'),
+  userFriendliness: integer('user_friendliness'),
+  
+  avgRunLength: text('avg_run_length'),
+  timeToFirstWin: text('time_to_first_win'),
+  timeTo100: text('time_to_100'),
+  
+  narrativePresence: text('narrative_presence'),
+  combatType: text('combat_type'),
 });
 
 export const pricePoints = sqliteTable('price_points', {

@@ -10,8 +10,20 @@ export interface Review {
   rating: number;
   comment: string;
   date: string;
+  
+  difficulty?: number | null;
+  replayability?: number | null;
+  synergyDepth?: number | null;
+  complexity?: number | null;
+  rngReliance?: number | null;
+  userFriendliness?: number | null;
+  
+  avgRunLength?: string | null;
   timeToFirstWin?: string | null;
-  hoursPlayed?: string | null;
+  timeTo100?: string | null;
+  
+  narrativePresence?: string | null;
+  combatType?: string | null;
 }
 
 export interface PricePoint {

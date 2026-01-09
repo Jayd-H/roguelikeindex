@@ -7,7 +7,6 @@ import {
   ListDashesIcon,
   SparkleIcon,
   UserListIcon,
-  PlusIcon,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -96,18 +95,9 @@ export default function ListsPage() {
             Discover collections curated by the Index algorithm and the
             community.
           </p>
-          <div className="pt-4">
-            <Button
-              size="lg"
-              className="font-bold text-base px-8 h-12 shadow-lg hover:shadow-primary/20 transition-all cursor-pointer rounded-full"
-            >
-              <PlusIcon weight="bold" className="mr-2" size={18} />
-              Create New List
-            </Button>
-          </div>
         </div>
 
-        <section className=" mb-16 relative">
+        <section className=" mb-8 relative">
           <div className="flex items-center gap-4 px-4 sm:px-0">
             <div className="p-3 bg-yellow-500/10 rounded-xl">
               <SparkleIcon
@@ -146,7 +136,7 @@ export default function ListsPage() {
           )}
         </section>
 
-        <section className="space-y-8 mb-12 relative">
+        <section className="mb-12 relative">
           <div className="flex items-center gap-4 px-4 sm:px-0">
             <div className="p-3 bg-blue-500/10 rounded-xl">
               <UserListIcon weight="fill" className="text-blue-500" size={24} />

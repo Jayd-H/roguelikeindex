@@ -12,6 +12,7 @@ import { GameStats } from "@/components/game-details/game-stats";
 import { GameReviews } from "@/components/game-details/game-reviews";
 import { GameSidebar } from "@/components/game-details/game-sidebar";
 import { AddToListModal } from "@/components/lists/add-to-list-modal";
+import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 
 export default function GameDetailsPage() {
   const router = useRouter();
@@ -21,14 +22,13 @@ export default function GameDetailsPage() {
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Status state
   const [myReview, setMyReview] = useState<Review | null>(null);
   const [statusLoaded, setStatusLoaded] = useState(false);
   const [owned, setOwned] = useState(false);
   const [favorited, setFavorited] = useState(false);
 
-  // Modal State
   const [isAddToListOpen, setIsAddToListOpen] = useState(false);
+  const [isDeleteReviewModalOpen, setIsDeleteReviewModalOpen] = useState(false);
 
   useEffect(() => {
     if (slug) {
@@ -92,6 +92,19 @@ export default function GameDetailsPage() {
     });
   };
 
+  const handleConfirmDeleteReview = async () => {
+    const res = await fetch(`/api/games/${slug}/review`, {
+      method: "DELETE",
+    });
+
+    if (res.ok) {
+      setMyReview(null);
+      refreshUser();
+      setIsDeleteReviewModalOpen(false);
+      window.location.reload();
+    }
+  };
+
   if (loading)
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -125,6 +138,7 @@ export default function GameDetailsPage() {
               currentUser={user}
               requireAuth={requireAuth}
               refreshUser={refreshUser}
+              onDeleteReview={() => setIsDeleteReviewModalOpen(true)}
             />
           </div>
           <GameSidebar game={game} />
@@ -136,6 +150,14 @@ export default function GameDetailsPage() {
         isOpen={isAddToListOpen}
         onClose={() => setIsAddToListOpen(false)}
         gameId={game.id}
+      />
+
+      <ConfirmationModal
+        isOpen={isDeleteReviewModalOpen}
+        onClose={() => setIsDeleteReviewModalOpen(false)}
+        onConfirm={handleConfirmDeleteReview}
+        title="Delete Review?"
+        description="Are you sure you want to delete your review? This action cannot be undone."
       />
     </div>
   );
