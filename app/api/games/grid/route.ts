@@ -1,49 +1,30 @@
 import { NextResponse } from 'next/server';
+import fs from 'fs';
+import path from 'path';
 import { db } from '@/lib/db';
 import { games } from '@/lib/schema';
-import { sql, count } from 'drizzle-orm';
+import { count } from 'drizzle-orm';
 
-// Cache this route's response for 1 hour (3600 seconds)
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 export async function GET() {
   try {
-    // 1. Fetch 100 random games with their header images (Increased for full-screen grid)
-    const gridGames = await db.select({
-      id: games.id,
-      slug: games.slug,
-      headerBlob: games.headerBlob,
-    })
-    .from(games)
-    .orderBy(sql`RANDOM()`)
-    .limit(100)
-    .all();
+    const manifestPath = path.join(process.cwd(), 'public', 'game-images', 'grid-manifest.json');
+    let staticGames = [];
 
-    // 2. Fetch total count (lightweight)
-    const [total] = await db.select({ count: count() }).from(games);
+    if (fs.existsSync(manifestPath)) {
+      const fileContents = fs.readFileSync(manifestPath, 'utf-8');
+      const data = JSON.parse(fileContents);
+      staticGames = data.games || [];
+    }
 
-    // 3. Convert Buffers to Base64 Data URIs
-    const gamesWithImages = gridGames.map(game => {
-      let image = null;
-      if (game.headerBlob) {
-        // Convert Buffer to Base64 string
-        const base64 = Buffer.from(game.headerBlob).toString('base64');
-        image = `data:image/jpeg;base64,${base64}`;
-      }
-      
-      return {
-        id: game.id,
-        slug: game.slug,
-        image: image // Send the actual image data
-      };
-    });
+    const [total] = await db.select({ value: count() }).from(games);
 
     return NextResponse.json({
-      games: gamesWithImages,
-      totalCount: total?.count || 0
+      games: staticGames,
+      totalCount: total?.value || 0
     });
-  } catch (error) {
-    console.error("Grid API Error:", error);
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch grid games' }, { status: 500 });
   }
 }

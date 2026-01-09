@@ -5,13 +5,42 @@ import { and, eq, gte, inArray, like, desc, asc, count } from 'drizzle-orm';
 
 export const dynamic = 'force-dynamic';
 
+const gameColumns = {
+  id: true,
+  slug: true,
+  title: true,
+  description: true,
+  subgenre: true,
+  combatType: true,
+  narrativePresence: true,
+  avgRunLength: true,
+  timeToFirstWin: true,
+  timeTo100: true,
+  difficulty: true,
+  rngReliance: true,
+  userFriendliness: true,
+  complexity: true,
+  synergyDepth: true,
+  replayability: true,
+  metaProgression: true,
+  steamDeckVerified: true,
+  rating: true,
+  releaseDate: true,
+  developer: true,
+  publisher: true,
+  steamAppId: true,
+  achievementsCount: true,
+  websiteUrl: true,
+  supportEmail: true,
+};
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const page = parseInt(searchParams.get('page') || '1');
   const limit = parseInt(searchParams.get('limit') || '10');
   
   const search = searchParams.get('search');
-  const tagNames = searchParams.get('tags'); // Changed from genres to tags
+  const tagNames = searchParams.get('tags');
   const combat = searchParams.get('combat');
   const narrative = searchParams.get('narrative');
   const rating = searchParams.get('rating');
@@ -23,14 +52,11 @@ export async function GET(request: Request) {
   try {
     const conditions = [];
 
-    // Search Filter
     if (search) conditions.push(like(games.title, `%${search}%`));
 
-    // Tag Filter (Many-to-Many)
     if (tagNames) {
       const selectedTags = tagNames.split(',');
       
-      // Find IDs of games that have ANY of the selected tags
       const matchingGames = await db.selectDistinct({ gameId: gamesToTags.gameId })
         .from(gamesToTags)
         .leftJoin(tags, eq(gamesToTags.tagId, tags.id))
@@ -41,12 +67,10 @@ export async function GET(request: Request) {
       if (gameIds.length > 0) {
         conditions.push(inArray(games.id, gameIds));
       } else {
-        // If tags are selected but no games match, return empty
         return NextResponse.json({ games: [], total: 0 });
       }
     }
 
-    // Other Filters
     if (combat) conditions.push(inArray(games.combatType, combat.split(',')));
     if (narrative) conditions.push(inArray(games.narrativePresence, narrative.split(',')));
     if (rating) conditions.push(gte(games.rating, parseFloat(rating)));
@@ -54,7 +78,6 @@ export async function GET(request: Request) {
     if (meta === 'true') conditions.push(eq(games.metaProgression, true));
     if (deck === 'true') conditions.push(eq(games.steamDeckVerified, true));
 
-    // Sorting
     let orderBy;
     switch (sort) {
       case 'newest':
@@ -70,11 +93,11 @@ export async function GET(request: Request) {
         orderBy = desc(games.rating);
     }
 
-    // 1. Get Actual Data
     const data = await db.query.games.findMany({
       where: and(...conditions),
       limit: limit,
       offset: (page - 1) * limit,
+      columns: gameColumns,
       with: {
         tags: {
           with: {
@@ -90,7 +113,6 @@ export async function GET(request: Request) {
       tags: game.tags.map(t => t.tag)
     }));
 
-    // 2. Get Total Count (for pagination UI)
     const totalResult = await db.select({ value: count() })
       .from(games)
       .where(and(...conditions));

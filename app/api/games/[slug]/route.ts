@@ -3,6 +3,35 @@ import { db } from '@/lib/db';
 import { eq } from 'drizzle-orm';
 import { games } from '@/lib/schema';
 
+const gameColumns = {
+  id: true,
+  slug: true,
+  title: true,
+  description: true,
+  subgenre: true,
+  combatType: true,
+  narrativePresence: true,
+  avgRunLength: true,
+  timeToFirstWin: true,
+  timeTo100: true,
+  difficulty: true,
+  rngReliance: true,
+  userFriendliness: true,
+  complexity: true,
+  synergyDepth: true,
+  replayability: true,
+  metaProgression: true,
+  steamDeckVerified: true,
+  rating: true,
+  releaseDate: true,
+  developer: true,
+  publisher: true,
+  steamAppId: true,
+  achievementsCount: true,
+  websiteUrl: true,
+  supportEmail: true,
+};
+
 export async function GET(
   request: Request,
   props: { params: Promise<{ slug: string }> }
@@ -12,6 +41,7 @@ export async function GET(
 
   const game = await db.query.games.findFirst({
     where: eq(games.slug, slug),
+    columns: gameColumns,
     with: {
       tags: {
         with: { tag: true }
@@ -40,7 +70,6 @@ export async function GET(
     return NextResponse.json({ error: 'Game not found' }, { status: 404 });
   }
 
-  // Define the shape of our accumulated pricing object
   type PricingAccumulator = {
     [key: string]: {
       platform: string;

@@ -4,6 +4,35 @@ import { lists, listItems, users, savedLists, listRatings, games, gamesToTags, t
 import { eq, and, inArray, gte, or, sql } from 'drizzle-orm';
 import { getCurrentUser } from '@/lib/get-user';
 
+const gameColumns = {
+  id: true,
+  slug: true,
+  title: true,
+  description: true,
+  subgenre: true,
+  combatType: true,
+  narrativePresence: true,
+  avgRunLength: true,
+  timeToFirstWin: true,
+  timeTo100: true,
+  difficulty: true,
+  rngReliance: true,
+  userFriendliness: true,
+  complexity: true,
+  synergyDepth: true,
+  replayability: true,
+  metaProgression: true,
+  steamDeckVerified: true,
+  rating: true,
+  releaseDate: true,
+  developer: true,
+  publisher: true,
+  steamAppId: true,
+  achievementsCount: true,
+  websiteUrl: true,
+  supportEmail: true,
+};
+
 export async function GET(
   request: Request,
   props: { params: Promise<{ slug: string }> }
@@ -11,7 +40,6 @@ export async function GET(
   const params = await props.params;
   const { searchParams } = new URL(request.url);
   
-  // Decode the slug to handle any URL encoding
   const slug = decodeURIComponent(params.slug);
 
   const parts = slug.split('-');
@@ -23,7 +51,6 @@ export async function GET(
   try {
     let creator;
 
-    // Special handling for the system user to ensure robust lookup
     if (username.toLowerCase() === 'roguelikeindex') {
       creator = await db.select().from(users).where(eq(users.id, 'system-auto-list-creator')).get();
     } else {
@@ -144,6 +171,7 @@ export async function GET(
 
     const data = await db.query.games.findMany({
       where: and(...conditions),
+      columns: gameColumns,
       with: {
         tags: {
           with: {
