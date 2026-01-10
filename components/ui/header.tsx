@@ -32,6 +32,12 @@ export function Header() {
           >
             Lists
           </Link>
+          <Link
+            href="/recommendations"
+            className="transition-colors text-muted-foreground hover:text-foreground"
+          >
+            Recommendations
+          </Link>
         </nav>
       </div>
 

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { games, tags, gamesToTags, externalRatings, lists, listItems, users, listRatings } from '@/lib/schema';
-import { desc, eq, and, gte, inArray, like, sql, type SQL } from 'drizzle-orm';
+import { desc, eq, and, gte, inArray, like, sql, SQL } from 'drizzle-orm';
 import { unstable_cache } from 'next/cache';
 
 interface PartialGame {
@@ -36,7 +36,7 @@ const getAutomaticLists = unstable_cache(
     };
 
     // Helper: Fetch IDs by simple criteria
-    const getGameIds = async (condition: SQL<unknown>) => {
+    const getGameIds = async (condition: SQL) => {
       const res = await db.select({ id: games.id })
         .from(games)
         .where(condition)
