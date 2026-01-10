@@ -50,9 +50,6 @@ export const games = sqliteTable('games', {
   metaProgression: integer('meta_progression', { mode: 'boolean' }).notNull(),
   steamDeckVerified: integer('steam_deck_verified', { mode: 'boolean' }).notNull(),
   rating: real('rating').notNull(),
-  headerBlob: blob('header_blob', { mode: 'buffer' }),
-  heroBlob: blob('hero_blob', { mode: 'buffer' }),
-  logoBlob: blob('logo_blob', { mode: 'buffer' }),
   releaseDate: text('release_date'),
   developer: text('developer'),
   publisher: text('publisher'),
@@ -69,6 +66,16 @@ export const games = sqliteTable('games', {
   steamAppIdIdx: index('steam_app_id_idx').on(t.steamAppId),
 }));
 
+export const gameBlobs = sqliteTable('game_blobs', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  gameId: text('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
+  type: text('type').notNull(),
+  data: blob('data', { mode: 'buffer' }).notNull(),
+}, (t) => ({
+  gameIdIdx: index('game_blobs_game_id_idx').on(t.gameId),
+  gameIdTypeIdx: index('game_blobs_game_id_type_idx').on(t.gameId, t.type),
+}));
+
 export const tags = sqliteTable('tags', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').unique().notNull(),
@@ -79,6 +86,7 @@ export const gamesToTags = sqliteTable('games_to_tags', {
   tagId: integer('tag_id').notNull().references(() => tags.id, { onDelete: 'cascade' }),
 }, (t) => ({
   pk: primaryKey({ columns: [t.gameId, t.tagId] }),
+  tagIdIdx: index('games_to_tags_tag_id_idx').on(t.tagId),
 }));
 
 export const reviews = sqliteTable('reviews', {
@@ -104,7 +112,7 @@ export const reviews = sqliteTable('reviews', {
   narrativePresence: text('narrative_presence'),
   combatType: text('combat_type'),
 }, (t) => ({
-  gameIdIdx: index('reviews_game_id_idx').on(t.gameId),
+  gameIdDateIdx: index('reviews_game_id_date_idx').on(t.gameId, t.date),
   userIdIdx: index('reviews_user_id_idx').on(t.userId),
 }));
 
@@ -116,7 +124,7 @@ export const pricePoints = sqliteTable('price_points', {
   url: text('url').notNull(),
   gameId: text('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
 }, (t) => ({
-  gameIdIdx: index('price_points_game_id_idx').on(t.gameId),
+  gameIdCoveringIdx: index('price_points_covering_idx').on(t.gameId, t.platform, t.store, t.price, t.url),
 }));
 
 export const externalRatings = sqliteTable('external_ratings', {
@@ -126,7 +134,7 @@ export const externalRatings = sqliteTable('external_ratings', {
   url: text('url').notNull(),
   gameId: text('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
 }, (t) => ({
-  gameIdIdx: index('external_ratings_game_id_idx').on(t.gameId),
+  gameIdCoveringIdx: index('external_ratings_covering_idx').on(t.gameId, t.source, t.score, t.url),
 }));
 
 export const gameImages = sqliteTable('game_images', {
@@ -264,11 +272,16 @@ export const gamesRelations = relations(games, ({ many }) => ({
   pricing: many(pricePoints),
   externalRatings: many(externalRatings),
   gallery: many(gameImages),
+  blobs: many(gameBlobs),
   similarGames: many(similarGames, { relationName: 'isSimilarTo' }),
   favoritedBy: many(favorites),
   ownedBy: many(ownedGames),
   listedIn: many(listItems),
   suggestions: many(suggestions),
+}));
+
+export const gameBlobsRelations = relations(gameBlobs, ({ one }) => ({
+  game: one(games, { fields: [gameBlobs.gameId], references: [games.id] }),
 }));
 
 export const tagsRelations = relations(tags, ({ many }) => ({

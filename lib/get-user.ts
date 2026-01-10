@@ -3,8 +3,9 @@ import { verifyToken } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { users } from '@/lib/schema';
 import { eq } from 'drizzle-orm';
+import { cache } from 'react';
 
-export async function getCurrentUser() {
+export const getCurrentUser = cache(async () => {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
   
@@ -20,4 +21,4 @@ export async function getCurrentUser() {
   }).from(users).where(eq(users.email, payload.email)).get();
 
   return user;
-}
+});

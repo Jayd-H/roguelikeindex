@@ -37,18 +37,12 @@ export async function GET(request: Request) {
 
     if (tagNames) {
       const selectedTags = tagNames.split(',');
-      const matchingGames = await db.selectDistinct({ gameId: gamesToTags.gameId })
+      const subQuery = db.select({ gameId: gamesToTags.gameId })
         .from(gamesToTags)
-        .leftJoin(tags, eq(gamesToTags.tagId, tags.id))
+        .innerJoin(tags, eq(gamesToTags.tagId, tags.id))
         .where(inArray(tags.name, selectedTags));
-      
-      const gameIds = matchingGames.map(g => g.gameId);
-
-      if (gameIds.length > 0) {
-        conditions.push(inArray(games.id, gameIds));
-      } else {
-        return NextResponse.json({ games: [], total: 0 });
-      }
+        
+      conditions.push(inArray(games.id, subQuery));
     }
 
     if (combat) conditions.push(inArray(games.combatType, combat.split(',')));
