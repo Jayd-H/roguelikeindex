@@ -35,9 +35,22 @@ const getMode = (arr: string[]): string | null => {
 };
 
 async function updateGameStats(gameId: string) {
-  const allReviews = await db.select().from(reviews).where(eq(reviews.gameId, gameId));
+  const allReviews = await db.select({
+    rating: reviews.rating,
+    difficulty: reviews.difficulty,
+    replayability: reviews.replayability,
+    synergyDepth: reviews.synergyDepth,
+    complexity: reviews.complexity,
+    rngReliance: reviews.rngReliance,
+    userFriendliness: reviews.userFriendliness,
+    avgRunLength: reviews.avgRunLength,
+    timeToFirstWin: reviews.timeToFirstWin,
+    timeTo100: reviews.timeTo100,
+    narrativePresence: reviews.narrativePresence,
+    combatType: reviews.combatType,
+  }).from(reviews).where(eq(reviews.gameId, gameId));
 
-  const avg = (field: keyof typeof reviews.$inferSelect): number | null => {
+  const avg = (field: keyof typeof allReviews[0]): number | null => {
     const valid = allReviews.filter(r => r[field] !== null && typeof r[field] === 'number');
     if (valid.length === 0) return null;
     const sum = valid.reduce((a, b) => a + (b[field] as number), 0);
@@ -84,25 +97,15 @@ export async function POST(
 
   const json = await request.json();
   const {
-    rating,
-    comment,
-    difficulty,
-    replayability,
-    synergyDepth,
-    complexity,
-    rngReliance,
-    userFriendliness,
-    avgRunLength,
-    timeToFirstWin,
-    timeTo100,
-    narrativePresence,
-    combatType
+    rating, comment, difficulty, replayability, synergyDepth, complexity,
+    rngReliance, userFriendliness, avgRunLength, timeToFirstWin, timeTo100,
+    narrativePresence, combatType
   } = json;
 
-  const game = await db.select().from(games).where(eq(games.slug, params.slug)).get();
+  const game = await db.select({ id: games.id }).from(games).where(eq(games.slug, params.slug)).get();
   if (!game) return NextResponse.json({ error: 'Game not found' }, { status: 404 });
 
-  const existing = await db.select().from(reviews).where(and(eq(reviews.userId, user.id), eq(reviews.gameId, game.id))).get();
+  const existing = await db.select({ id: reviews.id }).from(reviews).where(and(eq(reviews.userId, user.id), eq(reviews.gameId, game.id))).get();
 
   const reviewData = {
     user: user.name || user.email.split('@')[0],
@@ -144,7 +147,7 @@ export async function DELETE(
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const game = await db.select().from(games).where(eq(games.slug, params.slug)).get();
+  const game = await db.select({ id: games.id }).from(games).where(eq(games.slug, params.slug)).get();
   if (!game) return NextResponse.json({ error: 'Game not found' }, { status: 404 });
 
   await db.delete(reviews).where(and(eq(reviews.userId, user.id), eq(reviews.gameId, game.id)));

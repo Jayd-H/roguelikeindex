@@ -1,93 +1,92 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { games, tags, gamesToTags, externalRatings, lists, listItems, users, listRatings } from '@/lib/schema';
-import { desc, eq, and, gte, inArray, like, sql } from 'drizzle-orm';
-
-export const revalidate = 86400;
+import { desc, eq, and, gte, inArray, like, sql, type SQL } from 'drizzle-orm';
+import { unstable_cache } from 'next/cache';
 
 interface PartialGame {
   id: string;
   slug: string;
   title: string;
-  rating: number;
 }
 
-export async function GET() {
-  try {
+const getAutomaticLists = unstable_cache(
+  async () => {
     const SYSTEM_USER_ID = 'system-auto-list-creator';
-    const systemUser = await db.select().from(users).where(eq(users.id, SYSTEM_USER_ID)).get();
-    if (!systemUser) {
-        await db.insert(users).values({
-            id: SYSTEM_USER_ID,
-            email: 'system@roguelikeindex.com',
-            username: 'RoguelikeIndex',
-            password: 'system-password-placeholder' 
-        }).onConflictDoNothing();
-    }
+    
+    // Ensure system user exists
+    await db.insert(users).values({
+        id: SYSTEM_USER_ID,
+        email: 'system@roguelikeindex.com',
+        username: 'RoguelikeIndex',
+        password: 'system-password-placeholder' 
+    }).onConflictDoNothing();
 
+    // Helper: Fetch limited game data by IDs
     const fetchGamesByIds = async (ids: string[]) => {
       if (ids.length === 0) return [];
-      return await db.query.games.findMany({
-        where: inArray(games.id, ids),
-        limit: 10,
-        columns: { id: true, slug: true, title: true, rating: true }
-      });
+      return await db.select({
+        id: games.id,
+        slug: games.slug,
+        title: games.title,
+      })
+      .from(games)
+      .where(inArray(games.id, ids))
+      .limit(10);
     };
 
-    const topRated = await db.query.games.findMany({
-      where: gte(games.rating, 4.0),
-      orderBy: desc(games.rating),
-      columns: { id: true, slug: true, title: true, rating: true }
-    });
+    // Helper: Fetch IDs by simple criteria
+    const getGameIds = async (condition: SQL<unknown>) => {
+      const res = await db.select({ id: games.id })
+        .from(games)
+        .where(condition)
+        .orderBy(desc(games.rating))
+        .limit(10);
+      return res.map(g => g.id);
+    };
 
-    const deckVerified = await db.query.games.findMany({
-      where: eq(games.steamDeckVerified, true),
-      orderBy: desc(games.rating),
-      columns: { id: true, slug: true, title: true, rating: true }
-    });
+    // --- Category Queries ---
+    const topRatedIds = await getGameIds(gte(games.rating, 4.0));
+    const topRated = await fetchGamesByIds(topRatedIds);
 
-    const deckbuilders = await db.query.games.findMany({
-      where: eq(games.subgenre, 'Deckbuilder'),
-      orderBy: desc(games.rating),
-      columns: { id: true, slug: true, title: true, rating: true }
-    });
+    const deckVerifiedIds = await getGameIds(eq(games.steamDeckVerified, true));
+    const deckVerified = await fetchGamesByIds(deckVerifiedIds);
 
-    const actionRoguelikes = await db.query.games.findMany({
-      where: eq(games.subgenre, 'Action'),
-      orderBy: desc(games.rating),
-      columns: { id: true, slug: true, title: true, rating: true }
-    });
+    const deckbuilderIds = await getGameIds(eq(games.subgenre, 'Deckbuilder'));
+    const deckbuilders = await fetchGamesByIds(deckbuilderIds);
 
-    const turnBasedRoguelikes = await db.query.games.findMany({
-      where: eq(games.subgenre, 'Turn-Based'),
-      orderBy: desc(games.rating),
-      columns: { id: true, slug: true, title: true, rating: true }
-    });
+    const actionIds = await getGameIds(eq(games.subgenre, 'Action'));
+    const actionRoguelikes = await fetchGamesByIds(actionIds);
 
-    const traditionalRoguelikes = await db.query.games.findMany({
-      where: eq(games.subgenre, 'Traditional'),
-      orderBy: desc(games.rating),
-      columns: { id: true, slug: true, title: true, rating: true }
-    });
+    const turnBasedIds = await getGameIds(eq(games.subgenre, 'Turn-Based'));
+    const turnBasedRoguelikes = await fetchGamesByIds(turnBasedIds);
 
+    const traditionalIds = await getGameIds(eq(games.subgenre, 'Traditional'));
+    const traditionalRoguelikes = await fetchGamesByIds(traditionalIds);
+
+    // --- External Rating Queries ---
     const ignRatings = await db.select({ gameId: externalRatings.gameId })
       .from(externalRatings)
-      .where(and(like(externalRatings.source, '%IGN%'), gte(externalRatings.score, '8')))
+      .where(and(like(externalRatings.source, 'IGN%'), gte(externalRatings.score, '8')))
       .limit(10);
     const ignGames = await fetchGamesByIds(ignRatings.map(r => r.gameId));
 
     const metaRatings = await db.select({ gameId: externalRatings.gameId })
       .from(externalRatings)
-      .where(and(like(externalRatings.source, '%Metacritic%'), gte(externalRatings.score, '85')))
+      .where(and(like(externalRatings.source, 'Metacritic%'), gte(externalRatings.score, '85')))
       .limit(10);
     const metaGames = await fetchGamesByIds(metaRatings.map(r => r.gameId));
 
+    // --- Tag Queries ---
     const getTagGames = async (tagName: string) => {
-        const tag = await db.query.tags.findFirst({ where: eq(tags.name, tagName) });
+        const tag = await db.select({ id: tags.id }).from(tags).where(eq(tags.name, tagName)).get();
         if (!tag) return [];
+        
         const links = await db.select({ gameId: gamesToTags.gameId })
             .from(gamesToTags)
-            .where(eq(gamesToTags.tagId, tag.id));
+            .where(eq(gamesToTags.tagId, tag.id))
+            .limit(10);
+            
         return await fetchGamesByIds(links.map(l => l.gameId));
     };
 
@@ -111,14 +110,16 @@ export async function GET() {
       { id: 'auto-multiplayer', title: 'Play Together', desc: 'Roguelikes you can enjoy with friends.', games: multiplayerGames },
     ].filter(d => d.games.length > 0);
 
-    const formatGames = (gamesList: PartialGame[]) => gamesList.slice(0, 10).map(g => ({
+    const formatGames = (gamesList: PartialGame[]) => gamesList.map(g => ({
         id: g.id,
         slug: g.slug,
         title: g.title,
         image: `/api/games/${g.slug}/image/header`
     }));
 
+    // --- DB Synchronization (Run inside cache callback to only execute once per revalidate period) ---
     const finalLists = await Promise.all(definitions.map(async (def) => {
+        // Upsert List
         await db.insert(lists).values({
             id: def.id,
             userId: SYSTEM_USER_ID,
@@ -130,6 +131,7 @@ export async function GET() {
             set: { title: def.title, description: def.desc, updatedAt: new Date().toISOString() }
         });
 
+        // Replace List Items
         await db.delete(listItems).where(eq(listItems.listId, def.id));
         if (def.games.length > 0) {
             await db.insert(listItems).values(
@@ -141,6 +143,7 @@ export async function GET() {
             );
         }
 
+        // Update Ratings
         const ratingResult = await db.select({ value: sql<number>`avg(rating)` })
             .from(listRatings)
             .where(eq(listRatings.listId, def.id))
@@ -163,7 +166,16 @@ export async function GET() {
         };
     }));
 
-    return NextResponse.json(finalLists);
+    return finalLists;
+  },
+  ['automatic-lists-v1'],
+  { revalidate: 86400 } // Re-run logic (and DB updates) once every 24 hours
+);
+
+export async function GET() {
+  try {
+    const lists = await getAutomaticLists();
+    return NextResponse.json(lists);
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: 'Failed to sync automatic lists' }, { status: 500 });

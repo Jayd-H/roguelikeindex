@@ -16,15 +16,13 @@ export async function POST(
     const { gameId } = await request.json();
     const listId = params.id;
 
-    // Verify ownership
-    const list = await db.select().from(lists)
+    const list = await db.select({ id: lists.id }).from(lists)
       .where(and(eq(lists.id, listId), eq(lists.userId, user.id)))
       .get();
 
     if (!list) return NextResponse.json({ error: 'List not found' }, { status: 404 });
 
-    // Check if game already in list
-    const existing = await db.select().from(listItems)
+    const existing = await db.select({ id: listItems.id }).from(listItems)
       .where(and(eq(listItems.listId, listId), eq(listItems.gameId, gameId)))
       .get();
 
@@ -32,7 +30,6 @@ export async function POST(
       return NextResponse.json({ message: 'Game already in list' });
     }
 
-    // Get current count for order
     const countRes = await db.select({ value: count() })
       .from(listItems)
       .where(eq(listItems.listId, listId));

@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, real, blob, primaryKey } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, real, blob, primaryKey, index } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
 
 export const users = sqliteTable('users', {
@@ -59,7 +59,15 @@ export const games = sqliteTable('games', {
   achievementsCount: integer('achievements_count'),
   websiteUrl: text('website_url'),
   supportEmail: text('support_email'),
-});
+}, (t) => ({
+  ratingIdx: index('rating_idx').on(t.rating),
+  complexityIdx: index('complexity_idx').on(t.complexity),
+  releaseDateIdx: index('release_date_idx').on(t.releaseDate),
+  subgenreIdx: index('subgenre_idx').on(t.subgenre),
+  ratingIdIdx: index('rating_id_idx').on(t.rating, t.id),
+  deckVerifiedIdx: index('deck_verified_idx').on(t.steamDeckVerified),
+  steamAppIdIdx: index('steam_app_id_idx').on(t.steamAppId),
+}));
 
 export const tags = sqliteTable('tags', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -95,7 +103,10 @@ export const reviews = sqliteTable('reviews', {
   
   narrativePresence: text('narrative_presence'),
   combatType: text('combat_type'),
-});
+}, (t) => ({
+  gameIdIdx: index('reviews_game_id_idx').on(t.gameId),
+  userIdIdx: index('reviews_user_id_idx').on(t.userId),
+}));
 
 export const pricePoints = sqliteTable('price_points', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -104,7 +115,9 @@ export const pricePoints = sqliteTable('price_points', {
   price: text('price').notNull(),
   url: text('url').notNull(),
   gameId: text('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
-});
+}, (t) => ({
+  gameIdIdx: index('price_points_game_id_idx').on(t.gameId),
+}));
 
 export const externalRatings = sqliteTable('external_ratings', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -112,13 +125,17 @@ export const externalRatings = sqliteTable('external_ratings', {
   score: text('score').notNull(),
   url: text('url').notNull(),
   gameId: text('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
-});
+}, (t) => ({
+  gameIdIdx: index('external_ratings_game_id_idx').on(t.gameId),
+}));
 
 export const gameImages = sqliteTable('game_images', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   url: text('url').notNull(),
   gameId: text('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
-});
+}, (t) => ({
+  gameIdIdx: index('game_images_game_id_idx').on(t.gameId),
+}));
 
 export const similarGames = sqliteTable('similar_games', {
   gameId: text('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
@@ -150,7 +167,9 @@ export const lists = sqliteTable('lists', {
   averageRating: real('average_rating').default(0),
   createdAt: text('created_at').$defaultFn(() => new Date().toISOString()),
   updatedAt: text('updated_at').$defaultFn(() => new Date().toISOString()),
-});
+}, (t) => ({
+  userIdIdx: index('lists_user_id_idx').on(t.userId),
+}));
 
 export const listItems = sqliteTable('list_items', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -158,7 +177,10 @@ export const listItems = sqliteTable('list_items', {
   gameId: text('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
   order: integer('order').default(0),
   addedAt: text('added_at').$defaultFn(() => new Date().toISOString()),
-});
+}, (t) => ({
+  listIdIdx: index('list_items_list_id_idx').on(t.listId),
+  gameIdIdx: index('list_items_game_id_idx').on(t.gameId),
+}));
 
 export const listRatings = sqliteTable('list_ratings', {
   listId: text('list_id').notNull().references(() => lists.id, { onDelete: 'cascade' }),
@@ -183,7 +205,9 @@ export const rateLimits = sqliteTable('rate_limits', {
   action: text('action').notNull(),
   count: integer('count').notNull().default(1),
   expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
-});
+}, (t) => ({
+  keyActionIdx: index('rate_limits_key_action_idx').on(t.key, t.action),
+}));
 
 export const suggestions = sqliteTable('suggestions', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -196,7 +220,10 @@ export const suggestions = sqliteTable('suggestions', {
   voteCount: integer('vote_count').default(0).notNull(),
   status: text('status').default('pending').notNull(), 
   createdAt: text('created_at').$defaultFn(() => new Date().toISOString()),
-});
+}, (t) => ({
+  gameIdIdx: index('suggestions_game_id_idx').on(t.gameId),
+  userIdIdx: index('suggestions_user_id_idx').on(t.userId),
+}));
 
 export const suggestionVotes = sqliteTable('suggestion_votes', {
   suggestionId: text('suggestion_id').notNull().references(() => suggestions.id, { onDelete: 'cascade' }),

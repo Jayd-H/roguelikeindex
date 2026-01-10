@@ -4,33 +4,19 @@ import { lists, listItems, users, savedLists, listRatings, games, gamesToTags, t
 import { eq, and, inArray, gte, or, sql } from 'drizzle-orm';
 import { getCurrentUser } from '@/lib/get-user';
 
-const gameColumns = {
+const gameCardColumns = {
   id: true,
   slug: true,
   title: true,
-  description: true,
   subgenre: true,
   combatType: true,
   narrativePresence: true,
   avgRunLength: true,
-  timeToFirstWin: true,
-  timeTo100: true,
   difficulty: true,
-  rngReliance: true,
-  userFriendliness: true,
-  complexity: true,
-  synergyDepth: true,
-  replayability: true,
-  metaProgression: true,
-  steamDeckVerified: true,
   rating: true,
-  releaseDate: true,
-  developer: true,
-  publisher: true,
   steamAppId: true,
-  achievementsCount: true,
-  websiteUrl: true,
-  supportEmail: true,
+  steamDeckVerified: true,
+  metaProgression: true,
 };
 
 export async function GET(
@@ -171,9 +157,10 @@ export async function GET(
 
     const data = await db.query.games.findMany({
       where: and(...conditions),
-      columns: gameColumns,
+      columns: gameCardColumns,
       with: {
         tags: {
+          limit: 3,
           with: {
             tag: true
           }

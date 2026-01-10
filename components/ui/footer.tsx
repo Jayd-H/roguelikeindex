@@ -15,16 +15,12 @@ export function Footer() {
 
         <div className="flex gap-6 text-sm font-medium text-muted-foreground">
           <Link href="/about">
-            <a className="transition-colors hover:text-primary">About</a>
+            <p className="transition-colors hover:text-primary">About</p>
           </Link>
           <Link href="/apidocs">
-            <a href="#" className="transition-colors hover:text-primary">
-              API
-            </a>
+            <p className="transition-colors hover:text-primary">API</p>
           </Link>
-          <a href="#" className="transition-colors hover:text-primary">
-            Privacy
-          </a>
+          <p className="transition-colors hover:text-primary">Privacy</p>
         </div>
 
         <div className="flex gap-4">

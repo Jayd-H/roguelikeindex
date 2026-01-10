@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { lists, listRatings, savedLists, listItems } from '@/lib/schema';
-import { desc, eq, and, not, like, count } from 'drizzle-orm';
+import { desc, eq, and, not, like, count, inArray } from 'drizzle-orm';
 import { getCurrentUser } from '@/lib/get-user';
 
 export const dynamic = 'force-dynamic';
@@ -49,27 +49,52 @@ export async function GET(request: Request) {
       }
     });
 
-    const formattedLists = await Promise.all(userLists.map(async (list) => {
-        let isSaved = false;
-        let userRating = 0;
+    if (userLists.length === 0) {
+      return NextResponse.json([]);
+    }
+
+    const listIds = userLists.map(l => l.id);
+
+    const counts = await db.select({
+      listId: listItems.listId,
+      count: count()
+    })
+    .from(listItems)
+    .where(inArray(listItems.listId, listIds))
+    .groupBy(listItems.listId);
+    
+    const countMap = Object.fromEntries(counts.map(c => [c.listId, c.count]));
+
+    let savedMap: Record<string, boolean> = {};
+    let ratingMap: Record<string, number> = {};
+
+    if (user) {
+      try {
+        const saved = await db.select({ listId: savedLists.listId })
+          .from(savedLists)
+          .where(and(
+            eq(savedLists.userId, user.id),
+            inArray(savedLists.listId, listIds)
+          ));
+        savedMap = Object.fromEntries(saved.map(s => [s.listId, true]));
+
+        const ratings = await db.select({ 
+            listId: listRatings.listId, 
+            rating: listRatings.rating 
+          })
+          .from(listRatings)
+          .where(and(
+            eq(listRatings.userId, user.id),
+            inArray(listRatings.listId, listIds)
+          ));
+        ratingMap = Object.fromEntries(ratings.map(r => [r.listId, r.rating]));
+      } catch (err) {
+        console.error("Error fetching user relation data:", err);
+      }
+    }
+
+    const formattedLists = userLists.map((list) => {
         const isOwner = user ? list.creator.id === user.id : false;
-
-        const totalCount = await db.select({ value: count() })
-          .from(listItems)
-          .where(eq(listItems.listId, list.id))
-          .get();
-
-        if (user) {
-            try {
-                const saved = await db.select().from(savedLists).where(and(eq(savedLists.userId, user.id), eq(savedLists.listId, list.id))).get();
-                isSaved = !!saved;
-
-                const rating = await db.select().from(listRatings).where(and(eq(listRatings.userId, user.id), eq(listRatings.listId, list.id))).get();
-                userRating = rating ? rating.rating : 0;
-            } catch (err) {
-                console.error("Error fetching user relation data:", err);
-            }
-        }
 
         return {
             id: list.id,
@@ -77,10 +102,10 @@ export async function GET(request: Request) {
             description: list.description,
             creator: list.creator.username,
             averageRating: list.averageRating,
-            gameCount: totalCount?.value || 0,
+            gameCount: countMap[list.id] || 0,
             type: 'user' as const,
-            isSaved,
-            userRating,
+            isSaved: !!savedMap[list.id],
+            userRating: ratingMap[list.id] || 0,
             isOwner,
             games: list.items.map(item => ({
                 id: item.game.id,
@@ -89,7 +114,7 @@ export async function GET(request: Request) {
                 image: `/api/games/${item.game.slug}/image/header`
             }))
         };
-    }));
+    });
 
     return NextResponse.json(formattedLists);
   } catch (error) {

@@ -2,37 +2,18 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { games, gamesToTags, tags } from '@/lib/schema';
 import { and, eq, gte, inArray, like, desc, asc, count } from 'drizzle-orm';
+import { unstable_cache } from 'next/cache';
 
 export const revalidate = 60;
 
-const gameColumns = {
-  id: games.id,
-  slug: games.slug,
-  title: games.title,
-  description: games.description,
-  subgenre: games.subgenre,
-  combatType: games.combatType,
-  narrativePresence: games.narrativePresence,
-  avgRunLength: games.avgRunLength,
-  timeToFirstWin: games.timeToFirstWin,
-  timeTo100: games.timeTo100,
-  difficulty: games.difficulty,
-  rngReliance: games.rngReliance,
-  userFriendliness: games.userFriendliness,
-  complexity: games.complexity,
-  synergyDepth: games.synergyDepth,
-  replayability: games.replayability,
-  metaProgression: games.metaProgression,
-  steamDeckVerified: games.steamDeckVerified,
-  rating: games.rating,
-  releaseDate: games.releaseDate,
-  developer: games.developer,
-  publisher: games.publisher,
-  steamAppId: games.steamAppId,
-  achievementsCount: games.achievementsCount,
-  websiteUrl: games.websiteUrl,
-  supportEmail: games.supportEmail,
-};
+const getCachedTotal = unstable_cache(
+  async () => {
+    const res = await db.select({ value: count() }).from(games);
+    return res[0]?.value || 0;
+  },
+  ['total-games-count'],
+  { revalidate: 3600 }
+);
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -56,7 +37,6 @@ export async function GET(request: Request) {
 
     if (tagNames) {
       const selectedTags = tagNames.split(',');
-      
       const matchingGames = await db.selectDistinct({ gameId: gamesToTags.gameId })
         .from(gamesToTags)
         .leftJoin(tags, eq(gamesToTags.tagId, tags.id))
@@ -95,44 +75,70 @@ export async function GET(request: Request) {
 
     const offset = (page - 1) * limit;
     
-    const gamesList = await db.select(gameColumns)
+    const gamesListIds = await db.select({ id: games.id })
       .from(games)
       .where(and(...conditions))
       .limit(limit)
       .offset(offset)
       .orderBy(orderBy);
 
-    if (gamesList.length === 0) {
+    if (gamesListIds.length === 0) {
       return NextResponse.json({ games: [], total: 0 });
     }
 
-    const gameIds = gamesList.map(g => g.id);
-    
-    const gameTags = await db.select({
+    const ids = gamesListIds.map(g => g.id);
+
+    const gamesData = await db.select({
+      id: games.id,
+      slug: games.slug,
+      title: games.title,
+      description: games.description,
+      combatType: games.combatType,
+      narrativePresence: games.narrativePresence,
+      avgRunLength: games.avgRunLength,
+      difficulty: games.difficulty,
+      rating: games.rating,
+      steamAppId: games.steamAppId,
+      steamDeckVerified: games.steamDeckVerified,
+    })
+    .from(games)
+    .where(inArray(games.id, ids));
+
+    const tagsData = await db.select({
       gameId: gamesToTags.gameId,
-      tagId: tags.id,
-      tagName: tags.name,
+      name: tags.name
     })
     .from(gamesToTags)
     .innerJoin(tags, eq(gamesToTags.tagId, tags.id))
-    .where(inArray(gamesToTags.gameId, gameIds));
+    .where(inArray(gamesToTags.gameId, ids));
 
-    const tagsByGame = gameTags.reduce((acc, { gameId, tagId, tagName }) => {
-      if (!acc[gameId]) acc[gameId] = [];
-      acc[gameId].push({ id: tagId, name: tagName });
-      return acc;
-    }, {} as Record<string, { id: number; name: string }[]>);
+    const tagsMap: Record<string, { name: string }[]> = {};
+    tagsData.forEach(t => {
+      if (!tagsMap[t.gameId]) tagsMap[t.gameId] = [];
+      if (tagsMap[t.gameId].length < 3) {
+        tagsMap[t.gameId].push({ name: t.name });
+      }
+    });
 
-    const formattedData = gamesList.map(game => ({
+    const gamesMap = new Map(gamesData.map(g => [g.id, g]));
+    const sortedGames = ids.map(id => gamesMap.get(id)!);
+
+    const formattedData = sortedGames.map(game => ({
       ...game,
-      tags: tagsByGame[game.id] || []
+      tags: tagsMap[game.id] || []
     }));
 
-    const totalResult = await db.select({ value: count() })
-      .from(games)
-      .where(and(...conditions));
-    
-    const total = totalResult[0]?.value || 0;
+    let total = 0;
+    const hasActiveFilters = search || tagNames || combat || narrative || rating || complexity || meta || deck;
+
+    if (hasActiveFilters) {
+      const totalResult = await db.select({ value: count() })
+        .from(games)
+        .where(and(...conditions));
+      total = totalResult[0]?.value || 0;
+    } else {
+      total = await getCachedTotal();
+    }
 
     return NextResponse.json({
       games: formattedData,

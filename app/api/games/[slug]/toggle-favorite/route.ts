@@ -12,10 +12,10 @@ export async function POST(
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const game = await db.select().from(games).where(eq(games.slug, params.slug)).get();
+  const game = await db.select({ id: games.id }).from(games).where(eq(games.slug, params.slug)).get();
   if (!game) return NextResponse.json({ error: 'Game not found' }, { status: 404 });
 
-  const existing = await db.select().from(favorites).where(and(eq(favorites.userId, user.id), eq(favorites.gameId, game.id))).get();
+  const existing = await db.select({ userId: favorites.userId }).from(favorites).where(and(eq(favorites.userId, user.id), eq(favorites.gameId, game.id))).get();
 
   if (existing) {
     await db.delete(favorites).where(and(eq(favorites.userId, user.id), eq(favorites.gameId, game.id))).run();

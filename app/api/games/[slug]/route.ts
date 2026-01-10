@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { eq } from 'drizzle-orm';
-import { games } from '@/lib/schema';
+import { eq, desc } from 'drizzle-orm';
+import { games, reviews } from '@/lib/schema';
 
 export const revalidate = 3600;
 
@@ -10,7 +10,6 @@ const gameColumns = {
   slug: true,
   title: true,
   description: true,
-  subgenre: true,
   combatType: true,
   narrativePresence: true,
   avgRunLength: true,
@@ -29,9 +28,6 @@ const gameColumns = {
   developer: true,
   publisher: true,
   steamAppId: true,
-  achievementsCount: true,
-  websiteUrl: true,
-  supportEmail: true,
 };
 
 export async function GET(
@@ -50,9 +46,13 @@ export async function GET(
       },
       pricing: true,
       externalRatings: true,
-      reviews: true,
+      reviews: {
+        limit: 20,
+        orderBy: desc(reviews.date)
+      },
       gallery: true,
       similarGames: {
+        limit: 10,
         with: {
           targetGame: {
             columns: {
@@ -60,7 +60,6 @@ export async function GET(
                 title: true,
                 slug: true,
                 steamAppId: true,
-                subgenre: true
             }
           }
         }

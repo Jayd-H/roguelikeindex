@@ -33,11 +33,10 @@ export async function POST(
       return NextResponse.json({ error: 'Inappropriate content detected' }, { status: 400 });
     }
 
-    const game = await db.select().from(games).where(eq(games.slug, params.slug)).get();
+    const game = await db.select({ id: games.id }).from(games).where(eq(games.slug, params.slug)).get();
     if (!game) return NextResponse.json({ error: 'Game not found' }, { status: 404 });
 
-    // Check if user is admin
-    const isAdmin = await db.select()
+    const isAdmin = await db.select({ userId: usersToRoles.userId })
         .from(usersToRoles)
         .innerJoin(roles, eq(usersToRoles.roleId, roles.id))
         .where(and(eq(usersToRoles.userId, user.id), eq(roles.name, 'admin')))
@@ -48,7 +47,6 @@ export async function POST(
     const originalSql = safeOriginalValue ? sql`${JSON.stringify(safeOriginalValue)}` : null;
 
     if (isAdmin) {
-        // Admin Bypass: Apply immediately
         await applyChange({
             gameId: game.id,
             targetField,
@@ -57,7 +55,6 @@ export async function POST(
             originalValue: safeOriginalValue
         });
 
-        // Log as approved suggestion for history
         await db.insert(suggestions).values({
             gameId: game.id,
             userId: user.id,
@@ -72,7 +69,6 @@ export async function POST(
         return NextResponse.json({ success: true, status: 'approved' });
     }
 
-    // Normal User Flow with Rate Limit
     const userId = user.id;
     const RATE_LIMIT_WINDOW = 60 * 60 * 1000;
     const MAX_ATTEMPTS = 10;
@@ -106,7 +102,7 @@ export async function POST(
       });
     }
 
-    const existing = await db.select().from(suggestions).where(
+    const existing = await db.select({ id: suggestions.id }).from(suggestions).where(
         and(
             eq(suggestions.gameId, game.id),
             eq(suggestions.userId, user.id),

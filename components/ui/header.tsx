@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { UserIcon, MoonIcon, SunIcon } from "@phosphor-icons/react";
@@ -56,7 +55,7 @@ export function Header() {
         </Button>
 
         {!loading && user ? (
-          <Link href="/profile">
+          <Link href={`/${user.name}`}>
             <Button
               variant="ghost"
               size="icon"

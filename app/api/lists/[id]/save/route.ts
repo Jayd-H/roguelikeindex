@@ -13,11 +13,11 @@ export async function POST(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const listId = params.id;
-  const list = await db.select().from(lists).where(eq(lists.id, listId)).get();
+  const list = await db.select({ id: lists.id }).from(lists).where(eq(lists.id, listId)).get();
   
   if (!list) return NextResponse.json({ error: 'List not found' }, { status: 404 });
 
-  const existing = await db.select().from(savedLists).where(and(eq(savedLists.userId, user.id), eq(savedLists.listId, listId))).get();
+  const existing = await db.select({ listId: savedLists.listId }).from(savedLists).where(and(eq(savedLists.userId, user.id), eq(savedLists.listId, listId))).get();
 
   if (existing) {
     await db.delete(savedLists).where(and(eq(savedLists.userId, user.id), eq(savedLists.listId, listId))).run();
