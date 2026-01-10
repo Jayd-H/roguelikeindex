@@ -117,7 +117,7 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-8 text-sm text-center text-muted-foreground">
+          <div className="mt-8 text-sm text-center text-muted-foreground cursor-pointer">
             Don&apos;t have an account?{" "}
             <Link
               href="/register"

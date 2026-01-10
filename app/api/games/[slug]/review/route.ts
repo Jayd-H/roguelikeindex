@@ -50,11 +50,12 @@ async function updateGameStats(gameId: string) {
     combatType: reviews.combatType,
   }).from(reviews).where(eq(reviews.gameId, gameId));
 
-  const avg = (field: keyof typeof allReviews[0]): number | null => {
+  const avg = (field: keyof typeof allReviews[0], asFloat = false): number | null => {
     const valid = allReviews.filter(r => r[field] !== null && typeof r[field] === 'number');
     if (valid.length === 0) return null;
     const sum = valid.reduce((a, b) => a + (b[field] as number), 0);
-    return Math.round(sum / valid.length);
+    const value = sum / valid.length;
+    return asFloat ? parseFloat(value.toFixed(1)) : Math.round(value);
   };
 
   const avgTime = (field: 'avgRunLength' | 'timeToFirstWin' | 'timeTo100') => {
@@ -70,7 +71,7 @@ async function updateGameStats(gameId: string) {
   };
 
   const newStats = {
-    rating: avg('rating') ?? 0,
+    rating: avg('rating', true) ?? 0,
     difficulty: avg('difficulty') ?? 0,
     replayability: avg('replayability') ?? 0,
     synergyDepth: avg('synergyDepth') ?? 0,
@@ -114,12 +115,14 @@ export async function POST(
     date: new Date().toLocaleDateString(),
     rating: rating || 0,
     comment: comment || "",
-    difficulty: difficulty || null,
-    replayability: replayability || null,
-    synergyDepth: synergyDepth || null,
-    complexity: complexity || null,
-    rngReliance: rngReliance || null,
-    userFriendliness: userFriendliness || null,
+    
+    difficulty: difficulty ?? null,
+    replayability: replayability ?? null,
+    synergyDepth: synergyDepth ?? null,
+    complexity: complexity ?? null,
+    rngReliance: rngReliance ?? null,
+    userFriendliness: userFriendliness ?? null,
+    
     avgRunLength: avgRunLength || null,
     timeToFirstWin: timeToFirstWin || null,
     timeTo100: timeTo100 || null, 

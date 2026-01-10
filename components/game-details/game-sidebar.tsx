@@ -86,21 +86,31 @@ export function GameSidebar({ game }: GameSidebarProps) {
           <div className="flex items-end justify-between">
             <div>
               <div className="text-5xl font-black tracking-tighter text-primary">
-                {game.rating}
+                {game.rating.toFixed(1)}
               </div>
               <div className="mt-1 text-xs font-bold tracking-wider uppercase text-muted-foreground">
                 Index Score
               </div>
             </div>
-            <div className="flex gap-0.5 text-primary mb-1">
-              {[...Array(5)].map((_, i) => (
-                <StarIcon
-                  key={i}
-                  size={20}
-                  weight={i < Math.floor(game.rating) ? "fill" : "regular"}
-                  className={i >= Math.floor(game.rating) ? "opacity-30" : ""}
-                />
-              ))}
+            <div className="relative flex items-center text-primary mb-1">
+              <div className="flex gap-0.5 opacity-30">
+                {[...Array(5)].map((_, i) => (
+                  <StarIcon key={i} size={20} weight="regular" />
+                ))}
+              </div>
+              <div
+                className="absolute top-0 left-0 flex gap-0.5 overflow-hidden"
+                style={{ width: `${(game.rating / 5) * 100}%` }}
+              >
+                {[...Array(5)].map((_, i) => (
+                  <StarIcon
+                    key={i}
+                    size={20}
+                    weight="fill"
+                    className="shrink-0"
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>

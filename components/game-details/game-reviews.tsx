@@ -47,12 +47,12 @@ export function GameReviews({
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
 
-  const [difficulty, setDifficulty] = useState(5);
-  const [replayability, setReplayability] = useState(5);
-  const [synergyDepth, setSynergyDepth] = useState(5);
-  const [complexity, setComplexity] = useState(5);
-  const [rngReliance, setRngReliance] = useState(5);
-  const [userFriendliness, setUserFriendliness] = useState(5);
+  const [difficulty, setDifficulty] = useState<number | null>(null);
+  const [replayability, setReplayability] = useState<number | null>(null);
+  const [synergyDepth, setSynergyDepth] = useState<number | null>(null);
+  const [complexity, setComplexity] = useState<number | null>(null);
+  const [rngReliance, setRngReliance] = useState<number | null>(null);
+  const [userFriendliness, setUserFriendliness] = useState<number | null>(null);
 
   const [avgRunLength, setAvgRunLength] = useState("");
   const [timeWin, setTimeWin] = useState("");
@@ -71,12 +71,14 @@ export function GameReviews({
     if (initialMyReview) {
       setUserRating(initialMyReview.rating);
       setReviewText(initialMyReview.comment);
-      setDifficulty(initialMyReview.difficulty || 5);
-      setReplayability(initialMyReview.replayability || 5);
-      setSynergyDepth(initialMyReview.synergyDepth || 5);
-      setComplexity(initialMyReview.complexity || 5);
-      setRngReliance(initialMyReview.rngReliance || 5);
-      setUserFriendliness(initialMyReview.userFriendliness || 5);
+      // Use null coalescing to preserve 0s but default to null if undefined/null
+      setDifficulty(initialMyReview.difficulty ?? null);
+      setReplayability(initialMyReview.replayability ?? null);
+      setSynergyDepth(initialMyReview.synergyDepth ?? null);
+      setComplexity(initialMyReview.complexity ?? null);
+      setRngReliance(initialMyReview.rngReliance ?? null);
+      setUserFriendliness(initialMyReview.userFriendliness ?? null);
+
       setAvgRunLength(initialMyReview.avgRunLength || "");
       setTimeWin(initialMyReview.timeToFirstWin || "");
       setTime100(initialMyReview.timeTo100 || "");
@@ -230,17 +232,26 @@ export function GameReviews({
                               <span className="text-xs text-muted-foreground">
                                 {stat.desc}
                               </span>
-                              <span className="w-4 font-bold text-right">
-                                {stat.value}
+                              <span
+                                className={`w-4 font-bold text-right ${
+                                  stat.value === null
+                                    ? "text-muted-foreground font-normal"
+                                    : ""
+                                }`}
+                              >
+                                {stat.value ?? "-"}
                               </span>
                             </div>
                           </div>
                           <Slider
-                            value={[stat.value]}
+                            // Default visual to 5 if null, but state remains null
+                            value={[stat.value ?? 5]}
                             onValueChange={(val) => stat.set(val[0])}
                             max={10}
                             step={1}
-                            className="py-2 cursor-pointer"
+                            className={`py-2 cursor-pointer transition-opacity ${
+                              stat.value === null ? "opacity-50" : "opacity-100"
+                            }`}
                           />
                         </div>
                       ))}

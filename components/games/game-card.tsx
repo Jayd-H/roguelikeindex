@@ -65,7 +65,7 @@ export function GameCard({ game }: GameCardProps) {
             <div className="flex items-center gap-1.5 text-primary bg-primary/10 px-2.5 py-1 rounded-md h-fit">
               <StarIcon weight="fill" size={16} />
               <span className="text-sm font-bold text-foreground">
-                {game.rating}
+                {game.rating.toFixed(1)}
               </span>
             </div>
           </div>

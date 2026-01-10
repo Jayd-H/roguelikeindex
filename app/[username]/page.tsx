@@ -256,22 +256,26 @@ export default function UserProfilePage(props: {
                         </button>
                       )}
                     </h1>
-                    {isAdmin && (
-                      <Badge
-                        variant="outline"
-                        className="border-amber-500/50 bg-amber-500/10 text-amber-400 font-bold px-2 py-0.5 flex gap-1 items-center"
-                      >
-                        <CrownIcon weight="fill" size={14} /> Admin
-                      </Badge>
-                    )}
-                    {isEarlyAdopter && !isAdmin && (
-                      <Badge
-                        variant="outline"
-                        className="border-blue-500/50 bg-blue-500/10 text-blue-400 font-bold px-2 py-0.5 flex gap-1 items-center"
-                      >
-                        <SparkleIcon weight="fill" size={14} /> Early Adopter
-                      </Badge>
-                    )}
+
+                    {/* Updated Badge Logic: Render side-by-side */}
+                    <div className="flex items-center gap-2">
+                      {isAdmin && (
+                        <Badge
+                          variant="outline"
+                          className="border-amber-500/50 bg-amber-500/10 text-amber-400 font-bold px-2 py-0.5 flex gap-1 items-center"
+                        >
+                          <CrownIcon weight="fill" size={14} /> Admin
+                        </Badge>
+                      )}
+                      {isEarlyAdopter && (
+                        <Badge
+                          variant="outline"
+                          className="border-blue-500/50 bg-blue-500/10 text-blue-400 font-bold px-2 py-0.5 flex gap-1 items-center"
+                        >
+                          <SparkleIcon weight="fill" size={14} /> Early Adopter
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 )}
                 <div className="flex items-center gap-2 mt-1 text-sm font-medium text-muted-foreground">
