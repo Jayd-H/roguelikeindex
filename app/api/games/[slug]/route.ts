@@ -66,9 +66,21 @@ export async function GET(
     db.select({
       id: reviews.id,
       user: reviews.user,
+      userId: reviews.userId,
       rating: reviews.rating,
       comment: reviews.comment,
-      date: reviews.date
+      date: reviews.date,
+      difficulty: reviews.difficulty,
+      replayability: reviews.replayability,
+      synergyDepth: reviews.synergyDepth,
+      complexity: reviews.complexity,
+      rngReliance: reviews.rngReliance,
+      userFriendliness: reviews.userFriendliness,
+      avgRunLength: reviews.avgRunLength,
+      timeToFirstWin: reviews.timeToFirstWin,
+      timeTo100: reviews.timeTo100,
+      narrativePresence: reviews.narrativePresence,
+      combatType: reviews.combatType,
     }).from(reviews)
       .where(eq(reviews.gameId, game.id))
       .orderBy(desc(reviews.date))

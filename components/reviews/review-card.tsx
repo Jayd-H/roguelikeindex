@@ -92,7 +92,7 @@ export function ReviewCard({ review, showGameTitle = false }: ReviewCardProps) {
               </h4>
             </div>
             <p className="text-xs text-muted-foreground">
-              {new Date(review.date).toLocaleDateString()}
+              {new Date(review.date).toLocaleDateString("en-GB")}
             </p>
           </div>
         </div>

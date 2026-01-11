@@ -112,7 +112,7 @@ export async function POST(
     user: user.name || user.email.split('@')[0],
     userId: user.id,
     gameId: game.id,
-    date: new Date().toLocaleDateString(),
+    date: new Date().toISOString(),
     rating: rating || 0,
     comment: comment || "",
     
