@@ -35,6 +35,9 @@ export async function GET(
     developer: games.developer,
     publisher: games.publisher,
     steamAppId: games.steamAppId,
+    status: games.status,
+    approvalVotes: games.approvalVotes,
+    submitterId: games.submitterId,
   })
   .from(games)
   .where(eq(games.slug, slug))

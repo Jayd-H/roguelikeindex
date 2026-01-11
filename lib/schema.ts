@@ -41,21 +41,27 @@ export const games = sqliteTable('games', {
   avgRunLength: text('avg_run_length').notNull(),
   timeToFirstWin: text('time_to_first_win').notNull(),
   timeTo100: text('time_to_100').notNull(),
-  difficulty: integer('difficulty').notNull(),
-  rngReliance: integer('rng_reliance').notNull(),
-  userFriendliness: integer('user_friendliness').notNull(),
-  complexity: integer('complexity').notNull(),
-  synergyDepth: integer('synergy_depth').notNull(),
-  replayability: integer('replayability').notNull(),
+  
+  // Nullable stats (Unknown)
+  difficulty: integer('difficulty'),
+  rngReliance: integer('rng_reliance'),
+  userFriendliness: integer('user_friendliness'),
+  complexity: integer('complexity'),
+  synergyDepth: integer('synergy_depth'),
+  replayability: integer('replayability'),
+  
   metaProgression: integer('meta_progression', { mode: 'boolean' }).notNull(),
   steamDeckVerified: integer('steam_deck_verified', { mode: 'boolean' }).notNull(),
-  rating: real('rating').notNull(),
+  rating: real('rating').notNull(), // Kept as notNull without default to match DB
   releaseDate: text('release_date'),
   developer: text('developer'),
   publisher: text('publisher'),
   achievementsCount: integer('achievements_count'),
   websiteUrl: text('website_url'),
   supportEmail: text('support_email'),
+  status: text('status').default('approved').notNull(), 
+  approvalVotes: integer('approval_votes').default(0).notNull(),
+  submitterId: text('submitter_id'),
 }, (t) => ({
   ratingIdx: index('rating_idx').on(t.rating),
   complexityIdx: index('complexity_idx').on(t.complexity),
@@ -64,6 +70,7 @@ export const games = sqliteTable('games', {
   ratingIdIdx: index('rating_id_idx').on(t.rating, t.id),
   deckVerifiedIdx: index('deck_verified_idx').on(t.steamDeckVerified),
   steamAppIdIdx: index('steam_app_id_idx').on(t.steamAppId),
+  statusIdx: index('status_idx').on(t.status),
 }));
 
 export const gameBlobs = sqliteTable('game_blobs', {

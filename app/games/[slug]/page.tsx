@@ -6,6 +6,7 @@ import { Header } from "@/components/ui/header";
 import { Footer } from "@/components/ui/footer";
 import { useAuth } from "@/components/auth-provider";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import { Game, Review } from "@/lib/types";
 import { GameHero } from "@/components/game-details/game-hero";
 import { GameStats } from "@/components/game-details/game-stats";
@@ -20,7 +21,13 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { CaretDown, CaretUp, UsersIcon } from "@phosphor-icons/react";
+import {
+  CaretDown,
+  CaretUp,
+  UsersIcon,
+  WarningCircleIcon,
+  CheckIcon,
+} from "@phosphor-icons/react";
 
 interface Suggestion {
   id: string;
@@ -53,6 +60,15 @@ export default function GameDetailsPage() {
   const [votedIds, setVotedIds] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
+  // Pending Status
+  const [hasVotedApproval, setHasVotedApproval] = useState(false);
+  const [approvalVotes, setApprovalVotes] = useState(0);
+  const [approvalError, setApprovalError] = useState("");
+
+  // Determine if the current user submitted this game
+  const isSubmitter =
+    user?.id && game?.submitterId && user.id === game.submitterId;
+
   // Fetch Game Data
   useEffect(() => {
     let mounted = true;
@@ -65,6 +81,7 @@ export default function GameDetailsPage() {
         .then((data) => {
           if (mounted) {
             setGame(data);
+            setApprovalVotes(data.approvalVotes || 0);
             setLoading(false);
           }
         })
@@ -85,7 +102,6 @@ export default function GameDetailsPage() {
     let mounted = true;
 
     const loadUserData = async () => {
-      // 1. Fetch Suggestions (Always fetch this)
       try {
         const res = await fetch(`/api/games/${slug}/suggestions`);
         const data = await res.json();
@@ -97,7 +113,6 @@ export default function GameDetailsPage() {
         console.error(e);
       }
 
-      // 2. Fetch User Specific Status (Only if logged in)
       if (user) {
         try {
           const res = await fetch(`/api/games/${slug}/status`);
@@ -194,6 +209,24 @@ export default function GameDetailsPage() {
     });
   };
 
+  const handleApproveGame = async () => {
+    requireAuth(async () => {
+      setApprovalError("");
+      const res = await fetch(`/api/games/${slug}/approve`, { method: "POST" });
+      if (res.ok) {
+        const data = await res.json();
+        setHasVotedApproval(true);
+        setApprovalVotes(data.votes);
+        if (data.approved) {
+          setTimeout(() => window.location.reload(), 1500);
+        }
+      } else {
+        const json = await res.json();
+        setApprovalError(json.error || "Failed to approve");
+      }
+    });
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col min-h-screen font-sans bg-background">
@@ -223,6 +256,62 @@ export default function GameDetailsPage() {
         toggleFavorite={toggleFavorite}
         onAddToList={handleAddToList}
       />
+
+      {game.status === "pending" && (
+        <div className="w-full bg-yellow-500/10 border-y border-yellow-500/20 backdrop-blur-md sticky top-16 z-40">
+          <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <WarningCircleIcon
+                size={24}
+                className="text-yellow-500 shrink-0"
+                weight="fill"
+              />
+              <div>
+                <h3 className="font-bold text-foreground">Under Review</h3>
+                <p className="text-sm text-muted-foreground">
+                  This game was submitted by the community and is currently
+                  pending approval.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col items-end gap-1">
+              <div className="flex items-center gap-4">
+                <div className="text-sm font-bold text-yellow-500">
+                  {approvalVotes} / 5 Votes
+                </div>
+
+                {/* Voting Buttons: Hidden for submitter */}
+                {!isSubmitter && (
+                  <>
+                    {hasVotedApproval ? (
+                      <Button
+                        disabled
+                        variant="secondary"
+                        className="gap-2 cursor-not-allowed"
+                      >
+                        <CheckIcon /> Voted
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={handleApproveGame}
+                        className="gap-2 bg-yellow-500 hover:bg-yellow-600 text-black font-bold cursor-pointer"
+                      >
+                        <CheckIcon weight="bold" /> This Page is Accurate
+                      </Button>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {approvalError && (
+                <span className="text-xs text-red-500 font-medium">
+                  {approvalError}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <main className="flex-1 w-full px-6 py-4 mx-auto max-w-7xl">
         {suggestions.length > 0 && (

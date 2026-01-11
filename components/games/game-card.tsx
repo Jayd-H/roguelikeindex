@@ -9,11 +9,13 @@ import {
   BookOpenIcon,
   SwordIcon,
   TrophyIcon,
+  WarningCircleIcon,
 } from "@phosphor-icons/react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { TagCycler } from "./tag-cycler";
 import { Game } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 interface GameCardProps {
   game: Game;
@@ -21,10 +23,14 @@ interface GameCardProps {
 
 export function GameCard({ game }: GameCardProps) {
   const router = useRouter();
+  const isPending = game.status === "pending";
 
   return (
     <div
-      className="flex flex-col gap-6 cursor-pointer group sm:flex-row"
+      className={cn(
+        "flex flex-col gap-6 cursor-pointer group sm:flex-row p-4 rounded-xl transition-colors",
+        isPending && "bg-yellow-500/5 border border-yellow-500/20"
+      )}
       onClick={() => router.push(`/games/${game.slug}`)}
     >
       <div className="relative w-full h-40 overflow-hidden bg-black rounded-lg sm:w-70 shrink-0">
@@ -44,8 +50,16 @@ export function GameCard({ game }: GameCardProps) {
           </div>
         )}
 
+        {isPending && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
+            <Badge className="bg-yellow-500 text-black font-bold border-none hover:bg-yellow-500">
+              <WarningCircleIcon weight="fill" className="mr-1" /> Under Review
+            </Badge>
+          </div>
+        )}
+
         {/* Deck Verified Badge in Top Left */}
-        {game.steamDeckVerified && (
+        {game.steamDeckVerified && !isPending && (
           <div className="absolute z-10 top-2 left-2">
             <Badge
               variant="outline"
@@ -62,12 +76,14 @@ export function GameCard({ game }: GameCardProps) {
             <h3 className="text-2xl font-bold transition-colors text-foreground group-hover:text-primary line-clamp-1">
               {game.title}
             </h3>
-            <div className="flex items-center gap-1.5 text-primary bg-primary/10 px-2.5 py-1 rounded-md h-fit">
-              <StarIcon weight="fill" size={16} />
-              <span className="text-sm font-bold text-foreground">
-                {game.rating.toFixed(1)}
-              </span>
-            </div>
+            {!isPending && (
+              <div className="flex items-center gap-1.5 text-primary bg-primary/10 px-2.5 py-1 rounded-md h-fit">
+                <StarIcon weight="fill" size={16} />
+                <span className="text-sm font-bold text-foreground">
+                  {game.rating.toFixed(1)}
+                </span>
+              </div>
+            )}
           </div>
           <p className="max-w-2xl mb-4 text-sm leading-relaxed text-muted-foreground line-clamp-2">
             {game.description}
@@ -104,7 +120,9 @@ export function GameCard({ game }: GameCardProps) {
               title="Difficulty"
             >
               <TrophyIcon size={16} weight="fill" />
-              <span className="font-semibold">{game.difficulty}/10</span>
+              <span className="font-semibold">
+                {game.difficulty !== null ? `${game.difficulty}/10` : "Unknown"}
+              </span>
             </div>
           </div>
           <div className="flex items-center justify-end">

@@ -4,7 +4,11 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Header } from "@/components/ui/header";
 import { Footer } from "@/components/ui/footer";
 import { useAuth } from "@/components/auth-provider";
-import { MagnifyingGlassIcon, SortAscendingIcon } from "@phosphor-icons/react";
+import {
+  MagnifyingGlassIcon,
+  SortAscendingIcon,
+  PlusIcon,
+} from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -20,12 +24,14 @@ import {
 import { Game, Tag } from "@/lib/types";
 import { GameCard } from "@/components/games/game-card";
 import { GameFilters } from "@/components/games/game-filters";
+import { AddGameModal } from "@/components/games/add-game-modal";
 
 export default function GamesPage() {
-  useAuth();
+  const { user, requireAuth } = useAuth();
   const [games, setGames] = useState<Game[]>([]);
   const [totalGames, setTotalGames] = useState(0);
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -269,30 +275,41 @@ export default function GamesPage() {
                   </>
                 )}
               </div>
-              <div className="flex items-center gap-2">
-                <Label className="mr-1 text-xs text-muted-foreground">
-                  Sort by:
-                </Label>
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="text-sm cursor-pointer w-45 h-9">
-                    <SortAscendingIcon size={16} className="mr-2" />
-                    <SelectValue placeholder="Sort by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="rating" className="cursor-pointer">
-                      Highest Rating
-                    </SelectItem>
-                    <SelectItem value="newest" className="cursor-pointer">
-                      Newest Added
-                    </SelectItem>
-                    <SelectItem value="alphabetical" className="cursor-pointer">
-                      Alphabetical
-                    </SelectItem>
-                    <SelectItem value="complexity" className="cursor-pointer">
-                      Highest Complexity
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="flex items-center gap-4">
+                <Button
+                  onClick={() => requireAuth(() => setIsAddModalOpen(true))}
+                  className="gap-2 rounded-full font-semibold shadow-md shadow-primary/10 cursor-pointer"
+                >
+                  <PlusIcon weight="bold" /> Add Game
+                </Button>
+                <div className="flex items-center gap-2">
+                  <Label className="mr-1 text-xs text-muted-foreground">
+                    Sort by:
+                  </Label>
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="text-sm cursor-pointer w-45 h-9">
+                      <SortAscendingIcon size={16} className="mr-2" />
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="rating" className="cursor-pointer">
+                        Highest Rating
+                      </SelectItem>
+                      <SelectItem value="newest" className="cursor-pointer">
+                        Newest Added
+                      </SelectItem>
+                      <SelectItem
+                        value="alphabetical"
+                        className="cursor-pointer"
+                      >
+                        Alphabetical
+                      </SelectItem>
+                      <SelectItem value="complexity" className="cursor-pointer">
+                        Highest Complexity
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
             <div className="flex flex-col gap-6">
@@ -358,6 +375,10 @@ export default function GamesPage() {
         </div>
       </main>
       <Footer />
+      <AddGameModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+      />
     </div>
   );
 }

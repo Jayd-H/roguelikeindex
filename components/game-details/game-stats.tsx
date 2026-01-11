@@ -41,6 +41,11 @@ export function GameStats({ game }: { game: Game }) {
     });
   };
 
+  // Helpers to handle nullable stats safely
+  const getProgressValue = (val: number | null | undefined) => (val ?? 0) * 10;
+  const getDisplayText = (val: number | null | undefined) =>
+    val !== null && val !== undefined ? `${val}/10` : "Unknown";
+
   return (
     <section className="space-y-6">
       <h3 className="flex items-center gap-2 text-2xl font-bold">Overview</h3>
@@ -78,7 +83,7 @@ export function GameStats({ game }: { game: Game }) {
               <TrophyIcon size={18} weight="fill" /> Difficulty
             </div>
             <div className="text-2xl font-black text-foreground">
-              {game.difficulty}/10
+              {getDisplayText(game.difficulty)}
             </div>
           </div>
         </div>
@@ -90,11 +95,11 @@ export function GameStats({ game }: { game: Game }) {
                 <InfinityIcon size={16} weight="fill" /> Replayability
               </span>
               <span className="font-semibold text-foreground">
-                {game.replayability}/10
+                {getDisplayText(game.replayability)}
               </span>
             </div>
             <Progress
-              value={game.replayability * 10}
+              value={getProgressValue(game.replayability)}
               className="h-2 bg-secondary"
             />
           </div>
@@ -104,11 +109,11 @@ export function GameStats({ game }: { game: Game }) {
                 <LightningIcon size={16} weight="fill" /> Synergy Depth
               </span>
               <span className="font-semibold text-foreground">
-                {game.synergyDepth}/10
+                {getDisplayText(game.synergyDepth)}
               </span>
             </div>
             <Progress
-              value={game.synergyDepth * 10}
+              value={getProgressValue(game.synergyDepth)}
               className="h-2 bg-secondary"
             />
           </div>
@@ -118,11 +123,11 @@ export function GameStats({ game }: { game: Game }) {
                 <PuzzlePieceIcon size={16} weight="fill" /> Complexity
               </span>
               <span className="font-semibold text-foreground">
-                {game.complexity}/10
+                {getDisplayText(game.complexity)}
               </span>
             </div>
             <Progress
-              value={game.complexity * 10}
+              value={getProgressValue(game.complexity)}
               className="h-2 bg-secondary"
             />
           </div>
@@ -132,11 +137,11 @@ export function GameStats({ game }: { game: Game }) {
                 <DiceFiveIcon size={16} weight="fill" /> RNG Reliance
               </span>
               <span className="font-semibold text-foreground">
-                {game.rngReliance}/10
+                {getDisplayText(game.rngReliance)}
               </span>
             </div>
             <Progress
-              value={game.rngReliance * 10}
+              value={getProgressValue(game.rngReliance)}
               className="h-2 bg-secondary"
             />
           </div>
@@ -146,11 +151,11 @@ export function GameStats({ game }: { game: Game }) {
                 <SmileyIcon size={16} weight="fill" /> User Friendliness
               </span>
               <span className="font-semibold text-foreground">
-                {game.userFriendliness}/10
+                {getDisplayText(game.userFriendliness)}
               </span>
             </div>
             <Progress
-              value={game.userFriendliness * 10}
+              value={getProgressValue(game.userFriendliness)}
               className="h-2 bg-secondary"
             />
           </div>
